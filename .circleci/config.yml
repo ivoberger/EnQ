@@ -1,0 +1,106 @@
+version: 2.1
+executors:
+  android-executor:
+    docker:
+      - image: circleci/android:api-28-alpha
+    environment:
+      JVM_OPTS: -Xmx3200m
+#      GRADLE_USER_HOME: /gradle
+jobs:
+  test:
+    executor: android-executor
+    steps:
+      - checkout
+      - restore_cache:
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}-{{ checksum  "gradle.properties" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}-{{ checksum  "gradle.properties" }}
+      - run:
+          name: Lint & Test
+          command: ./gradlew lint test
+      - store_artifacts:
+          path: app/build/reports
+          destination: reports
+      - store_test_results:
+          path: app/build/test-results
+      - persist_to_workspace:
+          root: ~
+          paths:
+            - .gradle
+  build_debug:
+    executor: android-executor
+    steps:
+      - attach_workspace:
+          at: ~
+      - checkout
+      - run:
+          name: Build debug apk
+          command: ./gradlew assembleDebug
+      - store_artifacts:
+          path: app/build/outputs/apk/debug/app-debug.apk
+          destination: debug-apk
+      - persist_to_workspace:
+          root: ~
+          paths:
+            - .gradle
+  build_release:
+    executor: android-executor
+    steps:
+      - attach_workspace:
+          at: ~
+      - checkout
+      - run:
+          name: Signing Setup
+          command: .circleci/signing_setup.sh
+      - run:
+          name: Build release apk
+          command: ./gradlew assembleRelease
+      - store_artifacts:
+          path: app/build/outputs/apk/release/app-release.apk
+          destination: release-apk
+      - persist_to_workspace:
+          root: ~
+          paths:
+            - .gradle
+  deploy:
+    executor: android-executor
+    steps:
+      - attach_workspace:
+          at: ~
+      - checkout
+      - run:
+          name: Signing Setup
+          command: .circleci/signing_setup.sh
+      - run:
+          name: Deploy
+          command: ./gradlew publish
+
+workflows:
+  version: 2.1
+  test_build_deploy:
+    jobs:
+      - test
+      - build_debug:
+          requires:
+            - test
+      - build_release:
+          requires:
+            - test
+          filter:
+            branches:
+              only:
+                - dev
+                - master
+      - deploy:
+          requires:
+            - build_debug
+            - build_release
+          filter:
+            branches:
+              only:
+                - master
