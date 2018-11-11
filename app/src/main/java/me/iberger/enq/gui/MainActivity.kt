@@ -1,4 +1,4 @@
-package me.iberger.enq
+package me.iberger.enq.gui
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -11,6 +11,7 @@ import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.context.IconicsLayoutInflater2
 import kotlinx.android.synthetic.main.activity_main.*
+import me.iberger.enq.R
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -30,7 +31,10 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             item.icon = IconicsDrawable(this).icon(mMenuIcons[index])
         }
 
-        supportFragmentManager.commit { replace(R.id.main_content, QueueFragment.newInstance()) }
+        supportFragmentManager.commit {
+            replace(R.id.main_content, QueueFragment.newInstance())
+            replace(R.id.main_current_song, CurrentSongFragment())
+        }
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

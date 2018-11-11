@@ -1,10 +1,11 @@
-package me.iberger.enq
+package me.iberger.enq.gui
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import me.iberger.enq.R
 
 class QueueFragment : Fragment() {
 
