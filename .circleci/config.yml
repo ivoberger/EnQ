@@ -91,19 +91,19 @@ workflows:
       - build_debug:
           requires:
             - test
-      - build_release:
-          requires:
-            - test
-          filters:
-            branches:
-              only:
-                - dev
-                - master
-      - deploy:
-          requires:
-            - build_debug
-            - build_release
-          filters:
-            branches:
-              only:
-                - master
+#      - build_release:
+#          requires:
+#            - test
+#          filters:
+#            branches:
+#              only:
+#                - dev
+#                - master
+#      - deploy:
+#          requires:
+#            - build_debug
+#            - build_release
+#          filters:
+#            branches:
+#              only:
+#                - master
