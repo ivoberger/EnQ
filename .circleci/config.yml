@@ -91,7 +91,7 @@ workflows:
       - build_release:
           requires:
             - test
-          filter:
+          filters:
             branches:
               only:
                 - dev
@@ -100,7 +100,7 @@ workflows:
           requires:
             - build_debug
             - build_release
-          filter:
+          filters:
             branches:
               only:
                 - master
