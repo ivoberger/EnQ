@@ -21,6 +21,9 @@ jobs:
             - /tmp/workspace/.gradle
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}-{{ checksum  "gradle.properties" }}
       - run:
+          name: Disable Pre-Dexing
+          command: cp .circleci/init.gradle $GRADLE_USER_HOME/init.gradle
+      - run:
           name: Lint & Test
           command: ./gradlew lint test
       - store_artifacts:
