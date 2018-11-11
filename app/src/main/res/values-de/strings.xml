@@ -1,2 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="nav_queue">Warteschlange</string>
+    <string name="nav_search">Suche</string>
+    <string name="nav_favourites">Favoriten</string>
+</resources>

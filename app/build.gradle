@@ -15,7 +15,8 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -23,7 +24,14 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.0.1"
+    implementation "androidx.core:core-ktx:1.0.1"
+    implementation "androidx.fragment:fragment-ktx:1.1.0-alpha01"
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
+    implementation "com.google.android.material:material:1.1.0-alpha01"
+    implementation 'com.mikepenz:fastadapter:3.3.1'
+    implementation "com.mikepenz:iconics-core:3.1.0"
+    implementation 'com.mikepenz:community-material-typeface:2.7.94.1@aar'
 }
