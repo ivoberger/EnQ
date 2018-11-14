@@ -12,6 +12,8 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.context.IconicsLayoutInflater2
 import kotlinx.android.synthetic.main.activity_main.*
 import me.iberger.enq.R
+import me.iberger.enq.gui.fragments.CurrentSongFragment
+import me.iberger.enq.gui.fragments.QueueFragment
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
 

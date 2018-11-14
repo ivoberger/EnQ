@@ -7,9 +7,49 @@
     android:background="@color/background"
     tools:ignore="MissingPrefix,UnusedAttribute">
 
-    <include
-        layout="@layout/include_song_info"
-        tools:ignore="MissingConstraints" />
+    <ImageView
+        android:id="@+id/song_album_art"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/song_albumArt_margin"
+        android:layout_marginTop="@dimen/song_albumArt_margin"
+        android:layout_marginBottom="@dimen/song_albumArt_margin"
+        android:contentDescription="@string/lbl_album_art"
+        app:ico_color="#9e9e9e"
+        app:ico_icon="cmd-album"
+        app:ico_size="44dp"
+        app:layout_constraintBottom_toTopOf="@id/song_progress"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingPrefix" />
+
+    <TextView
+        android:id="@+id/song_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/song_info_margin"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
+        android:text="Awesome song playing here!"
+        app:layout_constraintBottom_toTopOf="@id/song_artist"
+        app:layout_constraintLeft_toRightOf="@id/song_album_art"
+        app:layout_constraintRight_toLeftOf="@id/song_action_1"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/song_artist"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/song_info_margin"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
+        android:text="Suuuuper hip artist"
+        app:layout_constraintBottom_toTopOf="@id/song_progress"
+        app:layout_constraintLeft_toRightOf="@id/song_album_art"
+        app:layout_constraintRight_toLeftOf="@id/song_action_1"
+        app:layout_constraintTop_toBottomOf="@id/song_title" />
 
     <ImageButton
         android:id="@+id/song_action_1"
@@ -38,4 +78,12 @@
         app:layout_constraintBottom_toTopOf="@id/song_progress"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/song_progress"
+        style="@android:style/Widget.Material.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:progress="35"
+        app:layout_constraintBottom_toBottomOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

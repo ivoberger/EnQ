@@ -1,4 +1,4 @@
-package me.iberger.enq.gui
+package me.iberger.enq.gui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -20,3 +20,6 @@ class CurrentSongFragment : Fragment() {
         song_artist.isSelected = true
     }
 }
+
+
+data class test(val bla: Int)
