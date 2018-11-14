@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:ignore="MissingPrefix,UnusedAttribute">
+
+    <include
+        layout="@layout/include_song_info"
+        tools:ignore="MissingConstraints" />
+
+    <ImageButton
+        android:id="@+id/song_action_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/song_imgButton_margin"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/lbl_album_art"
+        app:ico_color="@color/white"
+        app:ico_icon="cmd-play"
+        app:ico_size="@dimen/song_imgButton_size"
+        app:layout_constraintBottom_toTopOf="@id/song_progress"
+        app:layout_constraintRight_toLeftOf="@id/song_action_2"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/song_action_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/song_imgButton_margin"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/lbl_album_art"
+        app:ico_color="@color/white"
+        app:ico_icon="cmd-star-outline"
+        app:ico_size="@dimen/song_imgButton_size"
+        app:layout_constraintBottom_toTopOf="@id/song_progress"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
