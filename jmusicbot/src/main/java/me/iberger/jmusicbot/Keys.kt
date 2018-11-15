@@ -1,0 +1,9 @@
+package me.iberger.jmusicbot
+
+const val KEY_AUTHORIZATION = "Authorization"
+const val KEY_PREFERENCES = "musicBotPreferences"
+
+const val KEY_PROVIDER_ID = "providerId"
+const val KEY_SONG_ID = "songId"
+const val KEY_SUGGESTER_ID = "suggesterId"
+const val KEY_QUERY = "query"
