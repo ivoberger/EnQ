@@ -1,2 +1,0 @@
-package me.iberger.jmusicbot
-
