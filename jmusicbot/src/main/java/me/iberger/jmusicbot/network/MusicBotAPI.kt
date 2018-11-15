@@ -1,5 +1,9 @@
-package me.iberger.jmusicbot
+package me.iberger.jmusicbot.network
 
+import me.iberger.jmusicbot.KEY_PROVIDER_ID
+import me.iberger.jmusicbot.KEY_QUERY
+import me.iberger.jmusicbot.KEY_SONG_ID
+import me.iberger.jmusicbot.KEY_SUGGESTER_ID
 import me.iberger.jmusicbot.data.*
 import retrofit2.Call
 import retrofit2.http.*
@@ -10,19 +14,19 @@ private const val URL_SUGGEST = "suggester"
 private const val URL_PROVIDER = "provider"
 private const val URL_QUEUE = "queue"
 
-interface MusicBotAPI {
+internal interface MusicBotAPI {
     // User operations
     @PUT(URL_USER)
-    fun changePassword(newPassword: String): Call<String>
+    fun changePassword(newPassword: String): Call<Credentials.Token>
 
     @DELETE(URL_USER)
-    fun deleteUser(): Call<String>
+    fun deleteUser(): Call<Unit>
 
     @POST(URL_USER)
-    fun registerUser(@Body credentials: Credentials.Register)
+    fun registerUser(@Body credentials: Credentials.Register): Call<Credentials.Token>
 
     @GET("token")
-    fun login(): Call<String>
+    fun login(): Call<Credentials.Token>
 
     // Song operations
 
