@@ -1,5 +1,6 @@
 package me.iberger.enq.gui
 
+import android.content.Context
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -11,9 +12,14 @@ import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.context.IconicsLayoutInflater2
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import me.iberger.enq.R
 import me.iberger.enq.gui.fragments.CurrentSongFragment
 import me.iberger.enq.gui.fragments.QueueFragment
+import me.iberger.jmusicbot.KEY_PREFERENCES
+import me.iberger.jmusicbot.MusicBot
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -24,6 +30,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Timber.plant(Timber.DebugTree())
         LayoutInflaterCompat.setFactory2(layoutInflater, IconicsLayoutInflater2(delegate))
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -37,6 +44,20 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             replace(R.id.main_content, QueueFragment.newInstance())
             replace(R.id.main_current_song, CurrentSongFragment())
         }
+
+        if (!MusicBot.hasUser(this)) {
+            GlobalScope.launch {
+                val user = try {
+                    MusicBot.registerUser(this@MainActivity, "TEST").await()
+                } catch (e: Exception) {
+                    Timber.e("Error: $e")
+                    null
+                }
+                Timber.d("User: $user")
+                user?.save(this@MainActivity.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE))
+            }
+        } else Timber.d("User exists")
+        val bot = MusicBot.init(this)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
