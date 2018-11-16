@@ -2,12 +2,13 @@ package me.iberger.jmusicbot.data
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.squareup.moshi.JsonClass
 import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.Moshi
 import me.iberger.jmusicbot.KEY_USER
 import timber.log.Timber
 
-
+@JsonClass(generateAdapter = true)
 data class User(val name: String, var authorization: Credentials.Token) {
 
     init {
