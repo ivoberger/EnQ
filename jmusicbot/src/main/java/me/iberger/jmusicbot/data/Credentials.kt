@@ -13,16 +13,15 @@ sealed class Credentials {
         val uuid: String = UUID.randomUUID().toString()
     ) : Credentials()
 
+    @JsonClass(generateAdapter = true)
     class Token(val token: String) : Credentials() {
-        companion object {
-            @ToJson
-            fun toJson(token: Credentials.Token) = token.token
+        @ToJson
+        fun toJson(token: Credentials.Token) = token.token
 
-            @FromJson
-            fun fromJson(token: String): Credentials.Token {
-                Timber.d("Creating Token: $token")
-                return Credentials.Token(token)
-            }
+        @FromJson
+        fun fromJson(token: String): Credentials.Token {
+            Timber.d("Creating Token: $token")
+            return Credentials.Token(token)
         }
     }
 }

@@ -17,7 +17,7 @@ data class User(val name: String, var authorization: Credentials.Token) {
 
     companion object {
         fun load(sharedPreferences: SharedPreferences, moshi: Moshi = Moshi.Builder().build()): User? {
-            val userAdapter = moshi.adapter<User>(this::class.java)
+            val userAdapter = moshi.adapter<User>(User::class.java)
             sharedPreferences.getString(KEY_USER, null)?.let {
                 Timber.d("Creating user from json: $it")
                 return userAdapter.fromJson(it) ?: throw JsonEncodingException("User data corrupted")
