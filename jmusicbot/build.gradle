@@ -28,15 +28,14 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$v_kotlin"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$v_coroutines"
     implementation 'androidx.core:core-ktx:1.0.1'
-    implementation 'androidx.appcompat:appcompat:1.0.2'
 
-    implementation 'com.jakewharton.timber:timber:4.7.1'
+    implementation "com.jakewharton.timber:timber:$v_timber"
 
 //    implementation "androidx.room:room-runtime:$v_room"
 //    kapt "androidx.room:room-compiler:$v_room"
 
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-    implementation 'com.squareup.retrofit2:converter-moshi:2.3.0'
-    implementation 'com.squareup.moshi:moshi:1.5.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
+    implementation 'com.squareup.retrofit2:converter-moshi:2.4.0'
+    implementation 'com.squareup.moshi:moshi:1.8.0'
 }
