@@ -1,6 +1,6 @@
 package me.iberger.jmusicbot.exceptions
 
-class QueueException : Exception {
+class QueueException : Throwable {
     val reason: Reason
 
     constructor(reason: Reason) : super() {

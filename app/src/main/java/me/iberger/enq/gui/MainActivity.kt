@@ -1,6 +1,5 @@
 package me.iberger.enq.gui
 
-import android.content.Context
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -17,8 +16,8 @@ import kotlinx.coroutines.launch
 import me.iberger.enq.R
 import me.iberger.enq.gui.fragments.CurrentSongFragment
 import me.iberger.enq.gui.fragments.QueueFragment
-import me.iberger.jmusicbot.KEY_PREFERENCES
 import me.iberger.jmusicbot.MusicBot
+import me.iberger.jmusicbot.exceptions.AuthException
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
@@ -44,20 +43,15 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             replace(R.id.main_content, QueueFragment.newInstance())
             replace(R.id.main_current_song, CurrentSongFragment())
         }
-
-        if (!MusicBot.hasUser(this)) {
-            GlobalScope.launch {
-                val user = try {
-                    MusicBot.registerUser(this@MainActivity, "TEST").await()
-                } catch (e: Exception) {
-                    Timber.e("Error: $e")
-                    null
-                }
-                Timber.d("User: $user")
-                user?.save(this@MainActivity.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE))
+        GlobalScope.launch {
+            try {
+                val musicBot = MusicBot.init(this@MainActivity, "test").await()
+                Timber.d("User: ${musicBot.user}")
+                musicBot.changePassword("cake").await()
+            } catch (e: AuthException) {
+                Timber.e("Error with cause ${e.reason}")
             }
-        } else Timber.d("User exists")
-        val bot = MusicBot.init(this)
+        }
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

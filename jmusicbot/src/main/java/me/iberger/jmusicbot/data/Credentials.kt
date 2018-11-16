@@ -24,4 +24,6 @@ sealed class Credentials {
             return Credentials.Token(token)
         }
     }
+
+    class PasswordChange(val newPassword: String)
 }

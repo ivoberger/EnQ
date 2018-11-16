@@ -1,6 +1,6 @@
 package me.iberger.jmusicbot.exceptions
 
-class NotFoundException : Exception {
+class NotFoundException : Throwable {
     val type: Type
 
     constructor(type: Type) : super() {

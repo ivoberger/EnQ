@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.wifi.WifiManager
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.exceptions.InvalidParametersException
@@ -21,7 +20,7 @@ private const val GROUP_ADDRESS = "224.0.0.142"
 private const val PORT = 42945
 private const val LOCK_TAG = "enq_broadcast"
 
-internal fun verifyHostAddress(context: Context, address: String? = null) = MusicBot.mCRScope.launch {
+internal fun verifyHostAddress(context: Context, address: String? = null) = MusicBot.mCRScope.async {
     MusicBot.baseUrl = address ?: MusicBot.baseUrl ?: discoverHost(context).await()
     Timber.d("New host address: ${MusicBot.baseUrl}")
 }
@@ -51,17 +50,15 @@ private fun discoverHost(context: Context): Deferred<String> = MusicBot.mCRScope
 
 internal fun <T> Response<T>.process(
     successCodes: List<Int> = listOf(200, 201, 204),
-    errorCodes: Map<Int, Exception> = mapOf(),
+    errorCodes: Map<Int, Throwable> = mapOf(),
     notFoundType: NotFoundException.Type = NotFoundException.Type.SONG,
     invalidParamsType: InvalidParametersException.Type = InvalidParametersException.Type.MISSING
-): T {
-    return when (this.code()) {
-        in successCodes -> this.body()!!
-        in errorCodes -> throw errorCodes[this.code()]!!
-        400 -> throw InvalidParametersException(invalidParamsType)
-        401 -> throw AuthException(AuthException.Reason.NEEDS_AUTH)
-        403 -> throw AuthException(AuthException.Reason.NEEDS_PERMISSION)
-        404 -> throw NotFoundException(notFoundType)
-        else -> throw ServerErrorException(this.code())
-    }
+): T = when (this.code()) {
+    in successCodes -> body()!!
+    in errorCodes -> throw errorCodes[this.code()]!!
+    400 -> throw InvalidParametersException(invalidParamsType)
+    401 -> throw AuthException(AuthException.Reason.NEEDS_AUTH)
+    403 -> throw AuthException(AuthException.Reason.NEEDS_PERMISSION)
+    404 -> throw NotFoundException(notFoundType)
+    else -> throw ServerErrorException(this.code())
 }

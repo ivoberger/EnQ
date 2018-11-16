@@ -43,10 +43,20 @@ class MusicBot(context: Context, baseUrl: String, user: User) {
         .build()
         .create(MusicBotAPI::class.java)
 
+    // User operations
+
     var user: User = user
         set(newUser) {
             newUser.save(mPreferences)
         }
+
+    @Throws(InvalidParametersException::class, AuthException::class)
+    fun changePassword(newPassword: String) = mCRScope.async {
+        user.authorization = apiClient.changePassword(
+            Credentials.PasswordChange((newPassword))
+        ).execute().process()
+    }
+
     private val queue: MutableList<Song> = mutableListOf()
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)

@@ -17,7 +17,7 @@ private const val URL_QUEUE = "queue"
 internal interface MusicBotAPI {
     // User operations
     @PUT(URL_USER)
-    fun changePassword(newPassword: String): Call<Credentials.Token>
+    fun changePassword(@Body newPassword: Credentials.PasswordChange): Call<Credentials.Token>
 
     @DELETE(URL_USER)
     fun deleteUser(): Call<Unit>
