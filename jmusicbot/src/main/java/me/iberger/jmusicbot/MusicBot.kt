@@ -2,6 +2,7 @@ package me.iberger.jmusicbot
 
 import android.content.Context
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -58,6 +59,7 @@ class MusicBot(context: Context, baseUrl: String, user: User) {
         internal var hostAddress: String? = null
         private val mMoshi = Moshi.Builder()
             .add(Credentials.Token)
+            .add(KotlinJsonAdapterFactory())
             .build()
 
         fun init(context: Context, hostAddress: String? = null, user: User? = null): Deferred<MusicBot?> =
