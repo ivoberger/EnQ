@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.wifi.WifiManager
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.exceptions.InvalidParametersException
@@ -15,13 +16,17 @@ import java.io.IOException
 import java.net.DatagramPacket
 import java.net.InetAddress
 import java.net.MulticastSocket
-import java.net.UnknownHostException
 
 private const val GROUP_ADDRESS = "224.0.0.142"
 private const val PORT = 42945
 private const val LOCK_TAG = "enq_broadcast"
 
-internal fun discoverHost(context: Context): Deferred<String> = MusicBot.mCRScope.async {
+internal fun verifyHostAddress(context: Context, address: String? = null) = MusicBot.mCRScope.launch {
+    MusicBot.baseUrl = address ?: MusicBot.baseUrl ?: discoverHost(context).await()
+    Timber.d("New host address: ${MusicBot.baseUrl}")
+}
+
+private fun discoverHost(context: Context): Deferred<String> = MusicBot.mCRScope.async {
     val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
     val lock = wifiManager.createMulticastLock(LOCK_TAG)
     lock.acquire()
@@ -35,12 +40,10 @@ internal fun discoverHost(context: Context): Deferred<String> = MusicBot.mCRScop
             socket.broadcast = true
             socket.receive(packet)
             socket.leaveGroup(groupAddress)
-            MusicBot.hostAddress = "http://${packet.address.hostAddress}:$PORT/v1/"
-            Timber.d(MusicBot.hostAddress)
-            return@async MusicBot.hostAddress!!
+            return@async "http://${packet.address.hostAddress}:$PORT/v1/"
         }
     } catch (e: IOException) {
-        throw UnknownHostException("No valid hostname found")
+        throw IOException("No valid hostname found", e)
     } finally {
         lock.release()
     }
