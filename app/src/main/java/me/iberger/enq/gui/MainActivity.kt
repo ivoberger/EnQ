@@ -45,11 +45,13 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         }
         GlobalScope.launch {
             try {
-                val musicBot = MusicBot.init(this@MainActivity, "test").await()
-                Timber.d("User: ${musicBot.user}")
+                val musicBot =
+                    MusicBot.init(this@MainActivity, "test5", hostAddress = "http://192.168.178.32:42945/v1/").await()
                 musicBot.changePassword("cake").await()
-            } catch (e: AuthException) {
-                Timber.e("Error with cause ${e.reason}")
+//                Timber.d("User: ${musicBot.user}")
+            } catch (e: Exception) {
+                Timber.e(e)
+                if (e is AuthException) Timber.d("Reason: ${e.reason}")
             }
         }
     }

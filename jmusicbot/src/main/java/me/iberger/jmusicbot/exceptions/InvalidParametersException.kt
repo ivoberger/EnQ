@@ -1,6 +1,6 @@
 package me.iberger.jmusicbot.exceptions
 
-class InvalidParametersException : Throwable {
+class InvalidParametersException : Exception {
     val type: Type
 
     constructor(type: Type) : super() {

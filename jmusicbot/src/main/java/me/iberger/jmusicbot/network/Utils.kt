@@ -2,8 +2,6 @@ package me.iberger.jmusicbot.network
 
 import android.content.Context
 import android.net.wifi.WifiManager
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.exceptions.InvalidParametersException
@@ -20,12 +18,12 @@ private const val GROUP_ADDRESS = "224.0.0.142"
 private const val PORT = 42945
 private const val LOCK_TAG = "enq_broadcast"
 
-internal fun verifyHostAddress(context: Context, address: String? = null) = MusicBot.mCRScope.async {
-    MusicBot.baseUrl = address ?: MusicBot.baseUrl ?: discoverHost(context).await()
+internal fun verifyHostAddress(context: Context, address: String? = null) {
+    MusicBot.baseUrl = address ?: MusicBot.baseUrl ?: discoverHost(context)
     Timber.d("New host address: ${MusicBot.baseUrl}")
 }
 
-private fun discoverHost(context: Context): Deferred<String> = MusicBot.mCRScope.async {
+private fun discoverHost(context: Context): String {
     val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
     val lock = wifiManager.createMulticastLock(LOCK_TAG)
     lock.acquire()
@@ -39,7 +37,7 @@ private fun discoverHost(context: Context): Deferred<String> = MusicBot.mCRScope
             socket.broadcast = true
             socket.receive(packet)
             socket.leaveGroup(groupAddress)
-            return@async "http://${packet.address.hostAddress}:$PORT/v1/"
+            return "http://${packet.address.hostAddress}:$PORT/v1/"
         }
     } catch (e: IOException) {
         throw IOException("No valid hostname found", e)
@@ -50,7 +48,7 @@ private fun discoverHost(context: Context): Deferred<String> = MusicBot.mCRScope
 
 internal fun <T> Response<T>.process(
     successCodes: List<Int> = listOf(200, 201, 204),
-    errorCodes: Map<Int, Throwable> = mapOf(),
+    errorCodes: Map<Int, Exception> = mapOf(),
     notFoundType: NotFoundException.Type = NotFoundException.Type.SONG,
     invalidParamsType: InvalidParametersException.Type = InvalidParametersException.Type.MISSING
 ): T = when (this.code()) {

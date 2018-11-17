@@ -1,6 +1,6 @@
 package me.iberger.jmusicbot.exceptions
 
-class AuthException : Throwable {
+class AuthException : Exception {
     val reason: Reason
 
     constructor(reason: Reason) {
@@ -16,7 +16,7 @@ class AuthException : Throwable {
     }
 }
 
-class UsernameTakenException : Throwable("Username already in use")
+class UsernameTakenException : Exception("Username already in use")
 
 
-class ServerErrorException(code: Int) : Throwable("Server error $code")
+class ServerErrorException(code: Int) : Exception("Server error $code")

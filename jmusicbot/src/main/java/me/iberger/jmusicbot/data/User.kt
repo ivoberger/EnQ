@@ -7,10 +7,14 @@ import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.Moshi
 import me.iberger.jmusicbot.KEY_USER
 import timber.log.Timber
+import java.util.*
 
 @JsonClass(generateAdapter = true)
-data class User(val name: String, var authorization: Credentials.Token) {
-
+data class User(
+    val name: String,
+    val uuid: String = UUID.randomUUID().toString(),
+    var password: String? = null
+) {
     init {
         Timber.d("Creating User $this")
     }
