@@ -63,7 +63,7 @@ internal interface MusicBotAPI {
         @Path(KEY_SUGGESTER_ID) suggesterId: String,
         @Query(KEY_SONG_ID) songId: String,
         @Query(KEY_PROVIDER_ID) providerId: String
-    ): Call<Boolean>
+    ): Call<Unit>
 
     @GET("$URL_SUGGEST/{$KEY_SUGGESTER_ID}")
     fun getSuggestions(@Path(KEY_SUGGESTER_ID) suggesterId: String, @Query("max") limit: Int = 32): Call<List<Song>>
@@ -76,7 +76,7 @@ internal interface MusicBotAPI {
     // Player operations
 
     @GET(URL_PLAYER)
-    fun getPlayerState()
+    fun getPlayerState(): Call<PlayerState>
 
     @PUT(URL_PLAYER)
     fun setPlayerState(@Body playerStateChange: PlayerStateChange): Call<PlayerState>

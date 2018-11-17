@@ -4,6 +4,11 @@
     <string name="nav_search">Suche</string>
     <string name="nav_favourites">Favoriten</string>
     <string name="lbl_album_art">Albumcover</string>
-    <string name="tlt_login">Login</string>
+    <string name="tlt_login">Anmelden</string>
     <string name="msg_login">Bitte gib einen Nutzernamen und ein Passwort ein (oder melde dich als Gast an)</string>
+    <string name="btn_login">Login</string>
+    <string name="tlt_no_server">Kein Server gefunden</string>
+    <string name="btn_retry">Erneut suchen</string>
+    <string name="msg_server_found">Server gefunden!</string>
+    <string name="tlt_server_discovery">Finde Server...</string>
 </resources>

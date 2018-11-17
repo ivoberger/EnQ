@@ -7,10 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import me.iberger.jmusicbot.data.Credentials
-import me.iberger.jmusicbot.data.QueueEntry
-import me.iberger.jmusicbot.data.Song
-import me.iberger.jmusicbot.data.User
+import me.iberger.jmusicbot.data.*
 import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.exceptions.InvalidParametersException
 import me.iberger.jmusicbot.exceptions.NotFoundException
@@ -70,17 +67,40 @@ class MusicBot(
         user.save(mPreferences)
     }
 
-    private val queue: MutableList<Song> = mutableListOf()
+    var queue: List<QueueEntry> = listOf()
+        get() = apiClient.getQueue().execute().process()
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     fun enqueue(song: Song): Deferred<List<QueueEntry>> = mCRScope.async {
-        apiClient.enqueue(song.id, song.provider.id).execute().process()
+        queue = apiClient.enqueue(song.id, song.provider.id).execute().process()
+        return@async queue
     }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     fun dequeue(song: Song): Deferred<List<QueueEntry>> = mCRScope.async {
-        apiClient.dequeue(song.id, song.provider.id).execute().process()
+        queue = apiClient.dequeue(song.id, song.provider.id).execute().process()
+        return@async queue
     }
+
+    val history: List<QueueEntry>
+        get() = apiClient.getHistory().execute().process()
+
+    fun getSuggestions(suggester: MusicBotPlugin): Deferred<List<Song>> = mCRScope.async {
+        apiClient.getSuggestions(suggester.id).execute().process()
+    }
+
+    fun deleteSuggestion(suggester: MusicBotPlugin, song: Song, provider: MusicBotPlugin): Deferred<Unit> =
+        mCRScope.async { apiClient.deleteSuggestion(suggester.id, song.id, provider.id).execute().process() }
+
+    val provider: List<MusicBotPlugin>
+        get() = apiClient.getProvider().execute().process()
+
+    val suggesters: List<MusicBotPlugin>
+        get() = apiClient.getSuggesters().execute().process()
+
+    var playerState: PlayerState
+        get() = apiClient.getPlayerState().execute().process()
+        set(value) = run { apiClient.setPlayerState(PlayerStateChange(value.state)).execute().process() }
 
     companion object {
 
@@ -111,7 +131,7 @@ class MusicBot(
                 .create(MusicBotAPI::class.java)
             val user: User
             val authToken: String
-            if (hasUser(context)) {
+            if (hasUser(context).await()) {
                 user = User.load(preferences, mMoshi)!!
                 authToken = if (user.password == null) registerUser(apiClient, user.name)
                 else loginUser(apiClient, user)
@@ -125,7 +145,13 @@ class MusicBot(
         }
 
         fun hasUser(context: Context) =
-            context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE).contains(KEY_USER)
+            mCRScope.async { context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE).contains(KEY_USER) }
+
+        fun hasServer(context: Context): Deferred<Boolean> = mCRScope.async {
+            verifyHostAddress(context)
+            return@async baseUrl != null
+        }
+
 
         private fun loginUser(apiClient: MusicBotAPI, user: User): String {
             Timber.d("Logging in user ${user.name}")

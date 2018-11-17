@@ -6,4 +6,9 @@
     <string name="lbl_album_art">Album Art</string>
     <string name="tlt_login">Login</string>
     <string name="msg_login">Please provide  a username and password (or login as guest)</string>
+    <string name="btn_login">Login</string>
+    <string name="tlt_no_server">Server not found</string>
+    <string name="btn_retry">Retry</string>
+    <string name="msg_server_found">Server found!</string>
+    <string name="tlt_server_discovery">Discovering Server...</string>
 </resources>

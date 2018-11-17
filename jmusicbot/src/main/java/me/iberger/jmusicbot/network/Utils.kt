@@ -23,11 +23,11 @@ internal fun verifyHostAddress(context: Context, address: String? = null) {
     Timber.d("New host address: ${MusicBot.baseUrl}")
 }
 
-private fun discoverHost(context: Context): String {
+private fun discoverHost(context: Context): String? {
     val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
     val lock = wifiManager.createMulticastLock(LOCK_TAG)
     lock.acquire()
-    try {
+    return try {
         MulticastSocket(PORT).use { socket ->
             val groupAddress = InetAddress.getByName(GROUP_ADDRESS)
             socket.joinGroup(groupAddress)
@@ -37,10 +37,10 @@ private fun discoverHost(context: Context): String {
             socket.broadcast = true
             socket.receive(packet)
             socket.leaveGroup(groupAddress)
-            return "http://${packet.address.hostAddress}:$PORT/v1/"
+            "http://${packet.address.hostAddress}:$PORT/v1/"
         }
     } catch (e: IOException) {
-        throw IOException("No valid hostname found", e)
+        null
     } finally {
         lock.release()
     }

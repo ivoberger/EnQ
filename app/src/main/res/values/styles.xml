@@ -8,6 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="bottomNavigationStyle">@style/Widget.EnQ.BottomNavigationView</item>
         <item name="android:windowBackground">@color/backgroundDark</item>
+        <item name="android:positiveButtonText">@color/colorAccent</item>
     </style>
 
     <style name="Widget.EnQ.BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
