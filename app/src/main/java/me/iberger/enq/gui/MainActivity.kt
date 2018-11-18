@@ -15,7 +15,7 @@ import kotlinx.coroutines.*
 import me.iberger.enq.R
 import me.iberger.enq.gui.fragments.CurrentSongFragment
 import me.iberger.enq.gui.fragments.QueueFragment
-import me.iberger.enq.utils.showServerNotFoundDialog
+import me.iberger.enq.utils.showServerDiscoveryDialog
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.exceptions.AuthException
 import timber.log.Timber
@@ -28,7 +28,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         CommunityMaterial.Icon2.cmd_star_outline
     )
 
-    private val mScope = CoroutineScope(Dispatchers.Main)
+    private val mUIScope = CoroutineScope(Dispatchers.Main)
+    private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
     private lateinit var mHasUser: Deferred<Boolean>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,35 +38,36 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         setContentView(R.layout.activity_main)
 
         main_bottom_navigation.setOnNavigationItemSelectedListener(this)
-        mScope.launch {
-            val icons = mMenuIcons.map { async { IconicsDrawable(this@MainActivity).icon(it) } }
+        mUIScope.launch {
+            val icons = mMenuIcons.map { mBackgroundScope.async { IconicsDrawable(this@MainActivity).icon(it) } }
             main_bottom_navigation.menu.forEachIndexed { index, item ->
                 item.icon = icons[index].await()
             }
         }
-        showServerNotFoundDialog(this@MainActivity, mScope, true)
+        showServerDiscoveryDialog(this@MainActivity, mBackgroundScope, true)
         mHasUser = MusicBot.hasUser(this)
     }
 
-    fun continueWithLogin() = mScope.launch {
+    @ExperimentalCoroutinesApi
+    fun continueWithLogin() = mBackgroundScope.launch {
         if (mHasUser.await()) {
             login()
         } else {
-            val dialogView = layoutInflater.inflate(R.layout.dialog_login, null)
-            AlertDialog.Builder(this@MainActivity)
-                .setView(dialogView)
+            val dialogView = async(Dispatchers.Main) { layoutInflater.inflate(R.layout.dialog_login, null) }
+            val dialogBuilder = AlertDialog.Builder(this@MainActivity)
+                .setView(dialogView.await())
                 .setTitle(R.string.tlt_login)
                 .setMessage(R.string.msg_login)
                 .setPositiveButton(R.string.btn_login) { dialog, _ ->
-                    login(dialogView.findViewById<EditText>(R.id.login_username).text.toString())
+                    login(dialogView.getCompleted().findViewById<EditText>(R.id.login_username).text.toString())
                     dialog.dismiss()
                 }
                 .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.cancel() }
-                .show()
+            withContext(Dispatchers.Main) { dialogBuilder.show() }
         }
     }
 
-    private fun login(userName: String? = null, password: String? = null) = mScope.launch {
+    private fun login(userName: String? = null, password: String? = null) = mBackgroundScope.launch {
         Timber.d("Attempting login for user $userName")
         try {
             val musicBot = MusicBot.init(this@MainActivity, userName).await()
@@ -96,5 +98,11 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             }
             else -> false
         }
+    }
+
+    override fun onDestroy() {
+        mUIScope.coroutineContext.cancel()
+        mBackgroundScope.coroutineContext.cancel()
+        super.onDestroy()
     }
 }
