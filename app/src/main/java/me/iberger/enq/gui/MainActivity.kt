@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
 
     fun continueWithBot(musicBot: MusicBot) {
-
+        mMusicBot = musicBot
     }
 
     private fun login(userName: String? = null, password: String? = null) = mBackgroundScope.launch {

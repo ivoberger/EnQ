@@ -2,7 +2,6 @@ package me.iberger.enq.utils
 
 import android.content.Context
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -43,7 +42,7 @@ fun showServerDiscoveryDialog(
         serverDialog.show()
         if (!searching) return@withContext
         if (MusicBot.hasServer(activity).await()) {
-            Toast.makeText(activity, R.string.msg_server_found, Toast.LENGTH_LONG).show()
+            Toast.makeText(activity, R.string.msg_server_found, Toast.LENGTH_SHORT).show()
             (activity as MainActivity).continueWithLogin()
             serverDialog.dismiss()
         } else {
@@ -59,8 +58,7 @@ fun showLoginDialog(
     coroutineScope: CoroutineScope,
     loggingIn: Boolean,
     userName: String? = null,
-    password: String? = null,
-    errorMsg: Int? = null
+    password: String? = null
 ): Job = coroutineScope.launch {
     Timber.d("Showing Login Dialog for user $userName, Logging in: $loggingIn")
     val loginDialogBuilder = AlertDialog.Builder(activity)
@@ -69,7 +67,6 @@ fun showLoginDialog(
     if (!loggingIn) {
         val dialogView =
             async(Dispatchers.Main) { activity.layoutInflater.inflate(R.layout.dialog_login, null) }.await()
-        errorMsg?.also { dialogView.findViewById<TextView>(R.id.login_message).setText(it) }
         loginDialogBuilder
             .setView(dialogView)
             .setTitle(R.string.tlt_login)
@@ -87,17 +84,21 @@ fun showLoginDialog(
         loginDialog.show()
         if (!loggingIn) return@withContext
         try {
-            (activity as MainActivity).continueWithBot(MusicBot.init(activity, userName, password).await())
-            Toast.makeText(activity, activity.getString(R.string.msg_logged_in, userName), Toast.LENGTH_LONG).show()
+            val musicBot = MusicBot.init(activity, userName, password).await()
+            (activity as MainActivity).continueWithBot(musicBot)
+            Toast.makeText(activity, activity.getString(R.string.msg_logged_in, musicBot.user.name), Toast.LENGTH_SHORT)
+                .show()
             loginDialog.dismiss()
         } catch (e: UsernameTakenException) {
             Timber.w(e)
-            showLoginDialog(activity, coroutineScope, false, errorMsg = R.string.msg_username_taken)
+            Toast.makeText(activity, activity.getString(R.string.msg_username_taken), Toast.LENGTH_LONG).show()
+            showLoginDialog(activity, coroutineScope, false)
             loginDialog.cancel()
         } catch (e: AuthException) {
             Timber.w("Authentication error with reason ${e.reason}")
             Timber.w(e)
-            showLoginDialog(activity, coroutineScope, false, errorMsg = R.string.msg_password_wrong)
+            Toast.makeText(activity, activity.getString(R.string.msg_password_wrong), Toast.LENGTH_LONG).show()
+            showLoginDialog(activity, coroutineScope, false)
             loginDialog.cancel()
         }
     }
