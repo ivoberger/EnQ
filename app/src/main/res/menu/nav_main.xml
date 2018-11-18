@@ -5,8 +5,8 @@
         android:title="@string/nav_queue" />
 
     <item
-        android:id="@+id/nav_search"
-        android:title="@string/nav_search" />
+        android:id="@+id/nav_suggestions"
+        android:title="@string/nav_suggestions" />
     <item
         android:id="@+id/nav_starred"
         android:title="@string/nav_favourites" />

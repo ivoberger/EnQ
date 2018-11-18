@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             R.id.nav_queue -> {
                 true
             }
-            R.id.nav_search -> {
+            R.id.nav_suggestions -> {
                 true
             }
             R.id.nav_starred -> {

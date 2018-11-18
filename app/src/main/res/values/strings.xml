@@ -19,4 +19,5 @@
     <string name="msg_password_wrong">Wrong password or username</string>
     <string name="msg_nothing_playing">Nothing is playing at the moment</string>
     <string name="msg_queue_smth">EnQ something!</string>
+    <string name="nav_suggestions">Suggestions</string>
 </resources>

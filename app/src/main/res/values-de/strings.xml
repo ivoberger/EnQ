@@ -19,4 +19,5 @@
     <string name="msg_password_wrong">Falsches passwort oder Nutzername</string>
     <string name="msg_nothing_playing">Zur Zeit wird nichts abgespielt</string>
     <string name="msg_queue_smth">Spiel was ab!</string>
+    <string name="nav_suggestions">Vorschlaege</string>
 </resources>
