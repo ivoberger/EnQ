@@ -80,4 +80,13 @@ internal interface MusicBotAPI {
 
     @PUT(URL_PLAYER)
     fun setPlayerState(@Body playerStateChange: PlayerStateChange): Call<PlayerState>
+
+    @PUT("$URL_PLAYER/pause")
+    fun pause(): Call<PlayerState>
+
+    @PUT("$URL_PLAYER/play")
+    fun play(): Call<PlayerState>
+
+    @PUT("$URL_PLAYER/next")
+    fun skip(): Call<PlayerState>
 }

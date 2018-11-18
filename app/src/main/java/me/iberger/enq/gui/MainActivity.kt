@@ -21,7 +21,6 @@ import me.iberger.enq.utils.showLoginDialog
 import me.iberger.enq.utils.showServerDiscoveryDialog
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.MusicBotPlugin
-import me.iberger.jmusicbot.data.PlayerState
 import me.iberger.jmusicbot.data.QueueEntry
 import timber.log.Timber
 
@@ -33,11 +32,10 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         CommunityMaterial.Icon2.cmd_star_outline
     )
 
-    private lateinit var mMusicBot: MusicBot
+    lateinit var musicBot: MusicBot
     lateinit var queue: List<QueueEntry>
     lateinit var provider: List<MusicBotPlugin>
     lateinit var suggester: List<MusicBotPlugin>
-    lateinit var playerState: PlayerState
 
     private val mUIScope = CoroutineScope(Dispatchers.Main)
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
@@ -63,13 +61,13 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         mBackgroundScope.launch { showLoginDialog(this@MainActivity, mBackgroundScope, mHasUser.await()) }
 
 
-    fun continueWithBot(musicBot: MusicBot) = mBackgroundScope.launch {
-        mMusicBot = musicBot
+    fun continueWithBot(mBot: MusicBot) = mBackgroundScope.launch {
+        musicBot = mBot
         // fetch relevant infos
-        val queueJob = async { mMusicBot.queue }
-        val playerStateJob = async { mMusicBot.playerState }
-        val providerJob = async { mMusicBot.provider }
-        val suggesterJob = async { mMusicBot.suggesters }
+        val queueJob = async { musicBot.queue }
+        val playerStateJob = async { musicBot.playerState }
+        val providerJob = async { musicBot.provider }
+        val suggesterJob = async { musicBot.suggesters }
         supportFragmentManager.commit { add(R.id.main_current_song, CurrentSongFragment.newInstance(), null) }
         mUIScope.launch {
             val listAdapter = ItemAdapter<QueueEntryItem>()
@@ -78,7 +76,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             listAdapter.set(queueJob.await().map { QueueEntryItem(it) })
         }
         queue = queueJob.await()
-        playerState = playerStateJob.await()
         provider = providerJob.await()
         suggester = suggesterJob.await()
     }

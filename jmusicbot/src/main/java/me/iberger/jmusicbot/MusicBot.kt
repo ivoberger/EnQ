@@ -85,9 +85,13 @@ class MusicBot(
     fun deleteSuggestion(suggester: MusicBotPlugin, song: Song, provider: MusicBotPlugin): Deferred<Unit> =
         mCRScope.async { apiClient.deleteSuggestion(suggester.id, song.id, provider.id).execute().process() }
 
-    fun changePlayerState(action: PlayerAction) = mCRScope.async {
+    private fun changePlayerState(action: PlayerAction) = mCRScope.async {
         apiClient.setPlayerState(PlayerStateChange(action)).execute().process()
     }
+
+    fun pause() = mCRScope.async { apiClient.pause().execute().process() }
+    fun play() = mCRScope.async { apiClient.play().execute().process() }
+    fun skip() = mCRScope.async { apiClient.skip().execute().process() }
 
     val provider: List<MusicBotPlugin>
         get() = apiClient.getProvider().execute().process()
@@ -123,7 +127,14 @@ class MusicBot(
             if (hasUser(context).await()) {
                 user = User.load(preferences, mMoshi)!!
                 authToken = if (user.password == null) registerUser(apiClient, user.name)
-                else loginUser(apiClient, user)
+                else try {
+                    loginUser(apiClient, user)
+                } catch (e: NotFoundException) {
+                    val tmpToken = registerUser(apiClient, user.name)
+                    instance = MusicBot(preferences, baseUrl!!, user, tmpToken)
+                    instance.changePassword(user.password!!).await()
+                    return@async instance
+                }
             } else {
                 user = User(
                     userName ?: throw IllegalArgumentException("No user saved and no username given"),

@@ -58,5 +58,8 @@ internal fun <T> Response<T>.process(
     401 -> throw AuthException(AuthException.Reason.NEEDS_AUTH)
     403 -> throw AuthException(AuthException.Reason.NEEDS_PERMISSION)
     404 -> throw NotFoundException(notFoundType)
-    else -> throw ServerErrorException(this.code())
+    else -> {
+        Timber.e("Error: ${errorBody()!!.string()}")
+        throw ServerErrorException(this.code())
+    }
 }
