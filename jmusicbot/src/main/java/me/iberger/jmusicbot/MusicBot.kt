@@ -16,7 +16,6 @@ import me.iberger.jmusicbot.network.MusicBotAPI
 import me.iberger.jmusicbot.network.process
 import me.iberger.jmusicbot.network.verifyHostAddress
 import okhttp3.OkHttpClient
-import okio.Buffer
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
@@ -30,11 +29,6 @@ class MusicBot(
 
     private val okHttpClient: OkHttpClient = OkHttpClient.Builder().apply {
         addInterceptor { chain ->
-            Timber.d("Url: ${chain.request().url()}")
-            val body = Buffer()
-            chain.request().body()!!.writeTo(body)
-            Timber.d("Body: ${body.readString(charset("UTF-8"))}")
-            Timber.d("Method: ${chain.request().method()}")
             chain.proceed(
                 chain.request().newBuilder().addHeader(
                     KEY_AUTHORIZATION,
@@ -91,15 +85,18 @@ class MusicBot(
     fun deleteSuggestion(suggester: MusicBotPlugin, song: Song, provider: MusicBotPlugin): Deferred<Unit> =
         mCRScope.async { apiClient.deleteSuggestion(suggester.id, song.id, provider.id).execute().process() }
 
+    fun changePlayerState(action: PlayerAction) = mCRScope.async {
+        apiClient.setPlayerState(PlayerStateChange(action)).execute().process()
+    }
+
     val provider: List<MusicBotPlugin>
         get() = apiClient.getProvider().execute().process()
 
     val suggesters: List<MusicBotPlugin>
         get() = apiClient.getSuggesters().execute().process()
 
-    var playerState: PlayerState
+    val playerState: PlayerState
         get() = apiClient.getPlayerState().execute().process()
-        set(value) = run { apiClient.setPlayerState(PlayerStateChange(value.state)).execute().process() }
 
     companion object {
 

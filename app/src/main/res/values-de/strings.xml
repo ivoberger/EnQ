@@ -17,4 +17,6 @@
     <string name="lbl_password">Passwort:</string>
     <string name="lbl_username">Nutername:</string>
     <string name="msg_password_wrong">Falsches passwort oder Nutzername</string>
+    <string name="msg_nothing_playing">Zur Zeit wird nichts abgespielt</string>
+    <string name="msg_queue_smth">Spiel was ab!</string>
 </resources>
