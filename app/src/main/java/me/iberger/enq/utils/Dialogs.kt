@@ -1,6 +1,8 @@
 package me.iberger.enq.utils
 
 import android.content.Context
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +11,8 @@ import kotlinx.coroutines.*
 import me.iberger.enq.R
 import me.iberger.enq.gui.MainActivity
 import me.iberger.jmusicbot.MusicBot
+import me.iberger.jmusicbot.exceptions.AuthException
+import me.iberger.jmusicbot.exceptions.UsernameTakenException
 import timber.log.Timber
 
 private fun styleButtons(context: Context, alertDialog: AlertDialog, colorResource: Int) {
@@ -18,10 +22,11 @@ private fun styleButtons(context: Context, alertDialog: AlertDialog, colorResour
     }
 }
 
+@ExperimentalCoroutinesApi
 fun showServerDiscoveryDialog(
     activity: AppCompatActivity, coroutineScope: CoroutineScope, searching: Boolean = false
 ): Job = coroutineScope.launch {
-    Timber.d("Showing Dialog, $searching")
+    Timber.d("Showing Server Discovery Dialog, $searching")
     val serverDialogBuilder = AlertDialog.Builder(activity)
         .setCancelable(false)
         .setTitle(R.string.tlt_server_discovery)
@@ -31,7 +36,7 @@ fun showServerDiscoveryDialog(
             showServerDiscoveryDialog(activity, coroutineScope, true)
             dialog.dismiss()
         }
-    if (searching) serverDialogBuilder.setView(R.layout.dialog_no_server)
+    if (searching) serverDialogBuilder.setView(R.layout.dialog_progress_spinner)
     withContext(Dispatchers.Main) {
         val serverDialog = serverDialogBuilder.create()
         if (!searching) styleButtons(activity, serverDialog, R.color.colorAccent)
@@ -44,6 +49,56 @@ fun showServerDiscoveryDialog(
         } else {
             showServerDiscoveryDialog(activity, coroutineScope, false).join()
             serverDialog.cancel()
+        }
+    }
+}
+
+@ExperimentalCoroutinesApi
+fun showLoginDialog(
+    activity: AppCompatActivity,
+    coroutineScope: CoroutineScope,
+    loggingIn: Boolean,
+    userName: String? = null,
+    password: String? = null,
+    errorMsg: Int? = null
+): Job = coroutineScope.launch {
+    Timber.d("Showing Login Dialog for user $userName, Logging in: $loggingIn")
+    val loginDialogBuilder = AlertDialog.Builder(activity)
+        .setCancelable(false)
+        .setTitle(R.string.tlt_logging_in)
+    if (!loggingIn) {
+        val dialogView =
+            async(Dispatchers.Main) { activity.layoutInflater.inflate(R.layout.dialog_login, null) }.await()
+        errorMsg?.also { dialogView.findViewById<TextView>(R.id.login_message).setText(it) }
+        loginDialogBuilder
+            .setView(dialogView)
+            .setTitle(R.string.tlt_login)
+            .setPositiveButton(R.string.btn_login) { dialog, _ ->
+                val userNameInput = dialogView.findViewById<EditText>(R.id.login_username)?.text.toString()
+                val passwordInput = dialogView.findViewById<EditText>(R.id.login_password)?.text.toString()
+                showLoginDialog(activity, coroutineScope, true, userNameInput, passwordInput)
+                dialog.dismiss()
+            }
+    }
+    if (loggingIn) loginDialogBuilder.setView(R.layout.dialog_progress_spinner)
+    withContext(Dispatchers.Main) {
+        val loginDialog = loginDialogBuilder.create()
+        if (!loggingIn) styleButtons(activity, loginDialog, R.color.colorAccent)
+        loginDialog.show()
+        if (!loggingIn) return@withContext
+        try {
+            (activity as MainActivity).continueWithBot(MusicBot.init(activity, userName, password).await())
+            Toast.makeText(activity, activity.getString(R.string.msg_logged_in, userName), Toast.LENGTH_LONG).show()
+            loginDialog.dismiss()
+        } catch (e: UsernameTakenException) {
+            Timber.w(e)
+            showLoginDialog(activity, coroutineScope, false, errorMsg = R.string.msg_username_taken)
+            loginDialog.cancel()
+        } catch (e: AuthException) {
+            Timber.w("Authentication error with reason ${e.reason}")
+            Timber.w(e)
+            showLoginDialog(activity, coroutineScope, false, errorMsg = R.string.msg_password_wrong)
+            loginDialog.cancel()
         }
     }
 }

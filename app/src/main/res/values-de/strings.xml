@@ -5,10 +5,16 @@
     <string name="nav_favourites">Favoriten</string>
     <string name="lbl_album_art">Albumcover</string>
     <string name="tlt_login">Anmelden</string>
-    <string name="msg_login">Bitte gib einen Nutzernamen und ein Passwort ein (oder melde dich als Gast an)</string>
+    <string name="msg_login">Bitte gib einen Nutzernamen und ein Passwort ein (Lasse das Passwort weg um dich als Gast anzumelden)</string>
     <string name="btn_login">Login</string>
     <string name="tlt_no_server">Kein Server gefunden</string>
     <string name="btn_retry">Erneut suchen</string>
-    <string name="msg_server_found">Server gefunden!</string>
+    <string name="msg_server_found">Server gefunden</string>
     <string name="tlt_server_discovery">Finde Server...</string>
+    <string name="tlt_logging_in">Einloggen...</string>
+    <string name="msg_logged_in">Erfolgreich als %1$s eingeloggt</string>
+    <string name="msg_username_taken">Diese Nutzername ist bereits in Verwendung</string>
+    <string name="lbl_password">Passwort:</string>
+    <string name="lbl_username">Nutername:</string>
+    <string name="msg_password_wrong">Falsches passwort oder Nutzername</string>
 </resources>

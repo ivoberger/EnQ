@@ -2,8 +2,6 @@ package me.iberger.enq.gui
 
 import android.os.Bundle
 import android.view.MenuItem
-import android.widget.EditText
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.forEachIndexed
 import androidx.fragment.app.commit
@@ -15,11 +13,13 @@ import kotlinx.coroutines.*
 import me.iberger.enq.R
 import me.iberger.enq.gui.fragments.CurrentSongFragment
 import me.iberger.enq.gui.fragments.QueueFragment
+import me.iberger.enq.utils.showLoginDialog
 import me.iberger.enq.utils.showServerDiscoveryDialog
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.exceptions.AuthException
 import timber.log.Timber
 
+@ExperimentalCoroutinesApi
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
 
     private val mMenuIcons = listOf(
@@ -27,6 +27,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         CommunityMaterial.Icon2.cmd_magnify,
         CommunityMaterial.Icon2.cmd_star_outline
     )
+
+    private lateinit var mMusicBot: MusicBot
 
     private val mUIScope = CoroutineScope(Dispatchers.Main)
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
@@ -48,23 +50,12 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         mHasUser = MusicBot.hasUser(this)
     }
 
-    @ExperimentalCoroutinesApi
-    fun continueWithLogin() = mBackgroundScope.launch {
-        if (mHasUser.await()) {
-            login()
-        } else {
-            val dialogView = async(Dispatchers.Main) { layoutInflater.inflate(R.layout.dialog_login, null) }
-            val dialogBuilder = AlertDialog.Builder(this@MainActivity)
-                .setView(dialogView.await())
-                .setTitle(R.string.tlt_login)
-                .setMessage(R.string.msg_login)
-                .setPositiveButton(R.string.btn_login) { dialog, _ ->
-                    login(dialogView.getCompleted().findViewById<EditText>(R.id.login_username).text.toString())
-                    dialog.dismiss()
-                }
-                .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.cancel() }
-            withContext(Dispatchers.Main) { dialogBuilder.show() }
-        }
+    fun continueWithLogin() =
+        mBackgroundScope.launch { showLoginDialog(this@MainActivity, mBackgroundScope, mHasUser.await()) }
+
+
+    fun continueWithBot(musicBot: MusicBot) {
+
     }
 
     private fun login(userName: String? = null, password: String? = null) = mBackgroundScope.launch {
@@ -72,7 +63,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         try {
             val musicBot = MusicBot.init(this@MainActivity, userName).await()
             password?.let { musicBot.changePassword(it).await() }
-//                Timber.d("User: ${musicBot.user}")
+//                Timber.d("User: ${mMusicBot.user}")
             withContext(Dispatchers.Main) {
                 supportFragmentManager.commit {
                     replace(R.id.main_content, QueueFragment.newInstance())

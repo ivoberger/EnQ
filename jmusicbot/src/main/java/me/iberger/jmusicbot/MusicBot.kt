@@ -20,7 +20,6 @@ import okio.Buffer
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
-import java.io.IOException
 
 class MusicBot(
     private val mPreferences: SharedPreferences,
@@ -111,16 +110,9 @@ class MusicBot(
         private val mMoshi = Moshi.Builder()
             .build()
 
-        @Throws(
-            IllegalArgumentException::class,
-            UnknownError::class,
-            UsernameTakenException::class,
-            IOException::class
-        )
+        @Throws(IllegalArgumentException::class, UsernameTakenException::class)
         fun init(
-            context: Context,
-            userName: String? = null,
-            hostAddress: String? = null
+            context: Context, userName: String? = null, password: String? = null, hostAddress: String? = null
         ): Deferred<MusicBot> = mCRScope.async {
             val preferences = context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE)
             verifyHostAddress(context, hostAddress)
@@ -136,10 +128,21 @@ class MusicBot(
                 authToken = if (user.password == null) registerUser(apiClient, user.name)
                 else loginUser(apiClient, user)
             } else {
-                user = User(userName ?: throw IllegalArgumentException("No user saved and no username given"))
-                authToken = registerUser(apiClient, userName)
+                user = User(
+                    userName ?: throw IllegalArgumentException("No user saved and no username given"),
+                    password = password
+                )
+                authToken = if (password.isNullOrBlank()) registerUser(apiClient, userName)
+                else try {
+                    loginUser(apiClient, user)
+                } catch (e: NotFoundException) {
+                    Timber.w(e)
+                    val tmpToken = registerUser(apiClient, userName)
+                    instance = MusicBot(preferences, baseUrl!!, user, tmpToken)
+                    instance.changePassword(password).await()
+                    return@async instance
+                }
             }
-
             instance = MusicBot(preferences, baseUrl!!, user, authToken)
             return@async instance
         }
@@ -151,7 +154,6 @@ class MusicBot(
             verifyHostAddress(context)
             return@async baseUrl != null
         }
-
 
         private fun loginUser(apiClient: MusicBotAPI, user: User): String {
             Timber.d("Logging in user ${user.name}")
