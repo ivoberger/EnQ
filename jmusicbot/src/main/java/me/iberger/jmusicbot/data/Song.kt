@@ -7,8 +7,8 @@ data class Song(
     val id: String,
     val title: String,
     val description: String,
-    val albumArtUrl: String,
-    val duration: Int,
+    val albumArtUrl: String?,
+    val duration: Int?,
     val provider: MusicBotPlugin
 )
 

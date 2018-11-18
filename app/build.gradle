@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-android-extensions'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -12,6 +13,10 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     buildTypes {
         release {
@@ -33,7 +38,13 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
     implementation "com.google.android.material:material:1.1.0-alpha01"
     implementation "com.jakewharton.timber:timber:$v_timber"
-    implementation 'com.mikepenz:fastadapter:4.0.0-alpha3'
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
+    implementation 'com.mikepenz:fastadapter:3.3.1'
     implementation "com.mikepenz:iconics-core:3.1.0"
+    implementation 'ru.ztrap.iconics:core-kt:1.0.3'
     implementation 'com.mikepenz:community-material-typeface:3.1.0-rc02@aar'
+
+    implementation 'com.jakewharton:butterknife:9.0.0-SNAPSHOT'
+    kapt 'com.jakewharton:butterknife-compiler:9.0.0-SNAPSHOT'
 }

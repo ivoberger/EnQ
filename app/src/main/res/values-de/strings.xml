@@ -20,4 +20,6 @@
     <string name="msg_nothing_playing">Zur Zeit wird nichts abgespielt</string>
     <string name="msg_queue_smth">Spiel was ab!</string>
     <string name="nav_suggestions">Vorschlaege</string>
+    <string name="txt_suggested"><i>Vorgeschlagen</i></string>
+    <string name="txt_enqued_by">Hinzugefuegt von %1$s</string>
 </resources>

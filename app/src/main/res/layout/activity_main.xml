@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".gui.MainActivity">
 
-    <FrameLayout
+
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/main_content"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -25,10 +26,10 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/main_bottom_navigation"
-        app:itemIconSize="22dp"
-        android:paddingTop="2dp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:paddingTop="2dp"
+        app:itemIconSize="22dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

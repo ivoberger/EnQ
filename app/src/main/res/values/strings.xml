@@ -20,4 +20,6 @@
     <string name="msg_nothing_playing">Nothing is playing at the moment</string>
     <string name="msg_queue_smth">EnQ something!</string>
     <string name="nav_suggestions">Suggestions</string>
+    <string name="txt_suggested"><i>Suggested</i></string>
+    <string name="txt_enqued_by">Enqueued by %1$s</string>
 </resources>

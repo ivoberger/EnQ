@@ -21,7 +21,6 @@ private fun styleButtons(context: Context, alertDialog: AlertDialog, colorResour
     }
 }
 
-@ExperimentalCoroutinesApi
 fun showServerDiscoveryDialog(
     activity: AppCompatActivity, coroutineScope: CoroutineScope, searching: Boolean = false
 ): Job = coroutineScope.launch {
@@ -42,7 +41,6 @@ fun showServerDiscoveryDialog(
         serverDialog.show()
         if (!searching) return@withContext
         if (MusicBot.hasServer(activity).await()) {
-            Toast.makeText(activity, R.string.msg_server_found, Toast.LENGTH_SHORT).show()
             (activity as MainActivity).continueWithLogin()
             serverDialog.dismiss()
         } else {
@@ -52,7 +50,7 @@ fun showServerDiscoveryDialog(
     }
 }
 
-@ExperimentalCoroutinesApi
+
 fun showLoginDialog(
     activity: AppCompatActivity,
     coroutineScope: CoroutineScope,
