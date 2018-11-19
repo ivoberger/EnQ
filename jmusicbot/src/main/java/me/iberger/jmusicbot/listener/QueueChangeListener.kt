@@ -1,4 +1,4 @@
-package me.iberger.enq.listener
+package me.iberger.jmusicbot.listener
 
 import me.iberger.jmusicbot.data.QueueEntry
 

@@ -12,6 +12,8 @@ import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.exceptions.InvalidParametersException
 import me.iberger.jmusicbot.exceptions.NotFoundException
 import me.iberger.jmusicbot.exceptions.UsernameTakenException
+import me.iberger.jmusicbot.listener.PlayerStateChangeListener
+import me.iberger.jmusicbot.listener.QueueChangeListener
 import me.iberger.jmusicbot.network.MusicBotAPI
 import me.iberger.jmusicbot.network.process
 import me.iberger.jmusicbot.network.verifyHostAddress
@@ -60,8 +62,9 @@ class MusicBot(
         user.save(mPreferences)
     }
 
-    var queue: List<QueueEntry> = listOf()
+    var queue: List<QueueEntry>
         get() = apiClient.getQueue().execute().process()
+        set(value) = queueChangeListener.forEach { it.onQueueChanged(value) }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     fun enqueue(song: Song): Deferred<List<QueueEntry>> = mCRScope.async {
@@ -99,8 +102,12 @@ class MusicBot(
     val suggesters: List<MusicBotPlugin>
         get() = apiClient.getSuggesters().execute().process()
 
-    val playerState: PlayerState
+    var playerState: PlayerState
         get() = apiClient.getPlayerState().execute().process()
+        set(value) = playerStateChangeListener.forEach { it.onPlayerStateChanged(value) }
+
+    val queueChangeListener: MutableList<QueueChangeListener> = mutableListOf()
+    val playerStateChangeListener: MutableList<PlayerStateChangeListener> = mutableListOf()
 
     companion object {
 

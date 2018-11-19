@@ -1,6 +1,7 @@
 package me.iberger.enq.gui
 
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.forEachIndexed
@@ -22,6 +23,7 @@ import me.iberger.enq.utils.showServerDiscoveryDialog
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.MusicBotPlugin
 import me.iberger.jmusicbot.data.QueueEntry
+import me.iberger.jmusicbot.data.Song
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
@@ -36,6 +38,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     lateinit var queue: List<QueueEntry>
     lateinit var provider: List<MusicBotPlugin>
     lateinit var suggester: List<MusicBotPlugin>
+    val favourites: MutableList<Song> = mutableListOf()
 
     private val mUIScope = CoroutineScope(Dispatchers.Main)
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
@@ -65,19 +68,20 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         musicBot = mBot
         // fetch relevant infos
         val queueJob = async { musicBot.queue }
-        val playerStateJob = async { musicBot.playerState }
         val providerJob = async { musicBot.provider }
         val suggesterJob = async { musicBot.suggesters }
         supportFragmentManager.commit { add(R.id.main_current_song, CurrentSongFragment.newInstance(), null) }
-        mUIScope.launch {
-            val listAdapter = ItemAdapter<QueueEntryItem>()
-            main_content.layoutManager = LinearLayoutManager(this@MainActivity)
-            main_content.adapter = FastAdapter.with<QueueEntryItem, ItemAdapter<QueueEntryItem>>(listAdapter)
-            listAdapter.set(queueJob.await().map { QueueEntryItem(it) })
-        }
         queue = queueJob.await()
+        loadQueue()
         provider = providerJob.await()
         suggester = suggesterJob.await()
+    }
+
+    private fun loadQueue() = mUIScope.launch {
+        val listAdapter = ItemAdapter<QueueEntryItem>()
+        main_content.layoutManager = LinearLayoutManager(this@MainActivity)
+        main_content.adapter = FastAdapter.with<QueueEntryItem, ItemAdapter<QueueEntryItem>>(listAdapter)
+        listAdapter.set(queue.map { QueueEntryItem(it) })
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -94,6 +98,11 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             else -> false
         }
     }
+
+    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
+        super.onSaveInstanceState(outState, outPersistentState)
+    }
+
 
     override fun onDestroy() {
         mUIScope.coroutineContext.cancel()

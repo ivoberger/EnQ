@@ -17,10 +17,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.iberger.enq.R
 import me.iberger.enq.gui.MainActivity
-import me.iberger.enq.listener.PlayerStateChangeListener
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.PlayerState
 import me.iberger.jmusicbot.data.PlayerStates
+import me.iberger.jmusicbot.listener.PlayerStateChangeListener
 
 class CurrentSongFragment : Fragment(), PlayerStateChangeListener {
     companion object {
@@ -63,7 +63,7 @@ class CurrentSongFragment : Fragment(), PlayerStateChangeListener {
         onPlayerStateChanged(mPlayerState)
         song_title.isSelected = true
         song_description.isSelected = true
-        song_action_2.setImageDrawable(
+        song_favourite.setImageDrawable(
             IconicsDrawable(
                 context,
                 CommunityMaterial.Icon2.cmd_star_outline
@@ -71,7 +71,7 @@ class CurrentSongFragment : Fragment(), PlayerStateChangeListener {
         )
     }
 
-    @OnClick(R.id.song_action_1)
+    @OnClick(R.id.song_play_pause)
     fun changePlaybackState(view: View) {
         when (mPlayerState.state) {
             PlayerStates.STOP -> mBackgroundScope.launch { onPlayerStateChanged(mMusicBot.play().await()) }
@@ -81,6 +81,11 @@ class CurrentSongFragment : Fragment(), PlayerStateChangeListener {
         }
     }
 
+    @OnClick(R.id.song_favourite)
+    fun addToFavourites(view: View) {
+        mMainActivity.favourites.add(mPlayerState.songEntry!!.song)
+    }
+
     override fun onPlayerStateChanged(newState: PlayerState) {
         mUIScope.launch {
             mPlayerState = newState
@@ -88,13 +93,21 @@ class CurrentSongFragment : Fragment(), PlayerStateChangeListener {
                 PlayerStates.STOP -> {
                     song_title.setText(R.string.msg_nothing_playing)
                     song_description.setText(R.string.msg_queue_smth)
-                    song_action_1.setImageDrawable(mStoppedDrawable)
+                    song_play_pause.setImageDrawable(mStoppedDrawable)
+                    song_favourite.visibility = View.GONE
                     return@launch
                 }
-                PlayerStates.PLAY -> song_action_1.setImageDrawable(mPauseDrawable)
-                PlayerStates.PAUSE -> song_action_1.setImageDrawable(mPlayDrawable)
+                PlayerStates.PLAY -> {
+                    song_favourite.visibility = View.VISIBLE
+                    song_play_pause.setImageDrawable(mPauseDrawable)
+                }
+                PlayerStates.PAUSE -> {
+                    song_favourite.visibility = View.VISIBLE
+                    song_play_pause.setImageDrawable(mPlayDrawable)
+                }
                 PlayerStates.ERROR -> {
-                    song_action_1.setImageDrawable(mStoppedDrawable)
+                    song_play_pause.setImageDrawable(mStoppedDrawable)
+                    song_favourite.visibility = View.GONE
                     return@launch
                 }
             }
