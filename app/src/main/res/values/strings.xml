@@ -2,7 +2,7 @@
     <string name="app_name" translatable="false">EnQ</string>
     <string name="nav_queue">Queue</string>
     <string name="nav_search">Search</string>
-    <string name="nav_favourites">Favourites</string>
+    <string name="nav_favorites">Favorites</string>
     <string name="lbl_album_art">Album Art</string>
     <string name="tlt_login">Login</string>
     <string name="msg_login">Please provide  a username and password (omit password to login as guest)</string>

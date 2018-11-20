@@ -31,24 +31,10 @@ class QueueEntryItem(
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        //        @BindView(R.id.song_album_art)
-        lateinit var imgAlbumArt: ImageView
-        //        @BindView(R.id.song_title)
-        lateinit var txtTitle: TextView
-        //        @BindView(R.id.song_description)
-        lateinit var txtDescription: TextView
-        //        @BindView(R.id.song_chosen_by)
-        lateinit var txtChosenBy: TextView
-        //        @BindView(R.id.song_duration)
-        lateinit var txtDuration: TextView
-
-        init {
-//            ButterKnife.bind(this, view)
-            imgAlbumArt = view.findViewById(R.id.song_album_art)
-            txtTitle = view.findViewById(R.id.song_title)
-            txtDescription = view.findViewById(R.id.song_description)
-            txtChosenBy = view.findViewById(R.id.song_chosen_by)
-            txtDuration = view.findViewById(R.id.song_duration)
-        }
+        var imgAlbumArt: ImageView = view.findViewById(R.id.song_album_art)
+        var txtTitle: TextView = view.findViewById(R.id.song_title)
+        var txtDescription: TextView = view.findViewById(R.id.song_description)
+        var txtChosenBy: TextView = view.findViewById(R.id.song_chosen_by)
+        var txtDuration: TextView = view.findViewById(R.id.song_duration)
     }
 }

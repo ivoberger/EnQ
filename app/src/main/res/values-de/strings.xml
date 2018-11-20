@@ -2,7 +2,7 @@
 <resources>
     <string name="nav_queue">Warteschlange</string>
     <string name="nav_search">Suche</string>
-    <string name="nav_favourites">Favoriten</string>
+    <string name="nav_favorites">Favoriten</string>
     <string name="lbl_album_art">Albumcover</string>
     <string name="tlt_login">Anmelden</string>
     <string name="msg_login">Bitte gib einen Nutzernamen und ein Passwort ein (Lasse das Passwort weg um dich als Gast anzumelden)</string>

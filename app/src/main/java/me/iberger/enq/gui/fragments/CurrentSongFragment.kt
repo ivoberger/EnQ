@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.IconicsDrawable
@@ -41,18 +42,27 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
     private lateinit var mStoppedDrawable: IconicsDrawable
     private lateinit var mErrorDrawable: IconicsDrawable
 
+    private lateinit var mFavoritesAddDrawable: IconicsDrawable
+    private lateinit var mFavoritesDeleteDrawable: IconicsDrawable
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mMainActivity = activity as MainActivity
         mMusicBot = mMainActivity.musicBot
         mMusicBot.startPlayerUpdates(this@CurrentSongFragment)
+        // pre-load drawables for player buttons
         mBackgroundScope.launch {
-            mPlayDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_play).color(Color.WHITE)
-            mPauseDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_pause).color(Color.WHITE)
-            mStoppedDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_stop).color(Color.WHITE)
-            mErrorDrawable =
-                    IconicsDrawable(context, CommunityMaterial.Icon.cmd_alert_circle_outline).color(Color.WHITE)
+            val color = Color.WHITE
+            mPlayDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_play).color(color)
+            mPauseDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_pause).color(color)
+            mStoppedDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_stop).color(color)
+            mErrorDrawable = IconicsDrawable(context, CommunityMaterial.Icon.cmd_alert_circle_outline).color(color)
+
+            mFavoritesAddDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_star_outline).color(color)
+            mFavoritesDeleteDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_star).color(
+                ContextCompat.getColor(context!!, R.color.colorAccent)
+            )
         }
     }
 
@@ -65,14 +75,8 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
 //        ButterKnife.bind(this, view)
         song_title.isSelected = true
         song_description.isSelected = true
-        song_favourite.setImageDrawable(
-            IconicsDrawable(
-                context,
-                CommunityMaterial.Icon2.cmd_star_outline
-            ).color(Color.WHITE)
-        )
         song_play_pause.setOnClickListener { changePlaybackState() }
-        song_favourite.setOnClickListener { addToFavourites() }
+        song_favorite.setOnClickListener { addToFavorites() }
     }
 
     //    @OnClick(R.id.song_play_pause)
@@ -85,13 +89,17 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
         }
     }
 
-    //    @OnClick(R.id.song_favourite)
-    private fun addToFavourites() {
-        mMainActivity.favourites.add(mPlayerState.songEntry!!.song)
+    //    @OnClick(R.id.song_favorite)
+    private fun addToFavorites() {
+        mBackgroundScope.launch {
+            mMainActivity.changeFavoriteStatus(mPlayerState.songEntry!!.song).join()
+            onPlayerStateChanged(mPlayerState, true)
+        }
     }
 
-    override fun onPlayerStateChanged(newState: PlayerState) {
-        if (newState == mPlayerState) return
+
+    override fun onPlayerStateChanged(newState: PlayerState, force: Boolean) {
+        if (newState == mPlayerState && !force) return
         mUIScope.launch {
             mPlayerState = newState
             when (newState.state) {
@@ -99,31 +107,38 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
                     song_title.setText(R.string.msg_nothing_playing)
                     song_description.setText(R.string.msg_queue_smth)
                     song_play_pause.setImageDrawable(mStoppedDrawable)
-                    song_favourite.visibility = View.GONE
+                    song_favorite.visibility = View.GONE
                     return@launch
                 }
                 PlayerStates.PLAY -> {
-                    song_favourite.visibility = View.VISIBLE
+                    song_favorite.visibility = View.VISIBLE
                     song_play_pause.setImageDrawable(mPauseDrawable)
                 }
                 PlayerStates.PAUSE -> {
-                    song_favourite.visibility = View.VISIBLE
+                    song_favorite.visibility = View.VISIBLE
                     song_play_pause.setImageDrawable(mPlayDrawable)
                 }
                 PlayerStates.ERROR -> {
                     song_play_pause.setImageDrawable(mStoppedDrawable)
-                    song_favourite.visibility = View.GONE
+                    song_favorite.visibility = View.GONE
                     return@launch
                 }
             }
             val songEntry = newState.songEntry!!
             val song = songEntry.song
+            // fill in song metadata
             song_title.text = song.title
             song_description.text = song.description
             song.albumArtUrl?.also { Picasso.get().load(it).into(song_album_art) }
             song.duration?.also { song_duration.text = String.format("%02d:%02d", it / 60, it % 60) }
             song_chosen_by.setText(R.string.txt_suggested)
             songEntry.userName?.also { song_chosen_by.text = it }
+            // set Fav status
+            song_favorite.setImageDrawable(
+                if (mMainActivity.isInFavorites(song)) mFavoritesDeleteDrawable
+                else mFavoritesAddDrawable
+            )
+
         }
     }
 

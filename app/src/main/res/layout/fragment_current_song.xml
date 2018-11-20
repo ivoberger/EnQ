@@ -79,11 +79,11 @@
         android:layout_marginBottom="1dp"
         android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/song_favourite"
+        app:layout_constraintRight_toLeftOf="@id/song_favorite"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
-        android:id="@+id/song_favourite"
+        android:id="@+id/song_favorite"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginHorizontal="@dimen/song_imgButton_margin"
