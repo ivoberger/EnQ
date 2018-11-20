@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import me.iberger.enq.R
 import me.iberger.enq.gui.fragments.CurrentSongFragment
+import me.iberger.enq.gui.fragments.FavoritesFragment
 import me.iberger.enq.gui.fragments.QueueFragment
 import me.iberger.enq.utils.showLoginDialog
 import me.iberger.enq.utils.showServerDiscoveryDialog
@@ -58,17 +59,14 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     fun continueWithBot(mBot: MusicBot) = mBackgroundScope.launch {
         musicBot = mBot
-        switchToQueue()
         val providerJob = async { musicBot.provider }
         val suggesterJob = async { musicBot.suggesters }
 
         val currentSongFragment = CurrentSongFragment.newInstance()
-        val queueFragment = QueueFragment.newInstance()
         musicBot.startPlayerUpdates(currentSongFragment)
-        musicBot.startQueueUpdates(queueFragment)
         supportFragmentManager.commit {
-            add(R.id.main_current_song, currentSongFragment, null)
-            add(R.id.main_content, queueFragment, null)
+            replace(R.id.main_current_song, currentSongFragment, null)
+            replace(R.id.main_content, QueueFragment.newInstance(), null)
         }
         provider = providerJob.await()
         suggester = suggesterJob.await()
@@ -76,20 +74,17 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.nav_queue -> {
-            switchToQueue()
+            supportFragmentManager.commit { replace(R.id.main_content, QueueFragment.newInstance()) }
             true
         }
         R.id.nav_suggestions -> {
             true
         }
         R.id.nav_starred -> {
+            supportFragmentManager.commit { replace(R.id.main_content, FavoritesFragment.newInstance()) }
             true
         }
         else -> false
-    }
-
-    private fun switchToQueue() = mUIScope.launch {
-
     }
 
     override fun onDestroy() {

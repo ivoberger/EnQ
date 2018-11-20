@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.iberger.enq.R
 import me.iberger.enq.gui.MainActivity
+import me.iberger.enq.utils.loadFavorites
 import me.iberger.enq.utils.saveFavorites
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.PlayerState
@@ -63,6 +64,8 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
             mFavoritesDeleteDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_star).color(
                 ContextCompat.getColor(context!!, R.color.colorAccent)
             )
+
+            mFavorites = loadFavorites(context!!)
         }
     }
 

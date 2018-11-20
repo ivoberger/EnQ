@@ -106,10 +106,12 @@ class MusicBot(
         mQueueUpdateTimer = fixedRateTimer(period = period) { updateQueue() }
     }
 
-    fun stopQueueUpdates() {
-        mQueueUpdateListeners.clear()
-        mQueueUpdateTimer?.cancel()
-        mQueueUpdateTimer = null
+    fun stopQueueUpdates(listener: QueueUpdateListener) {
+        mQueueUpdateListeners.remove(listener)
+        if (mQueueUpdateListeners.isEmpty()) {
+            mQueueUpdateTimer?.cancel()
+            mQueueUpdateTimer = null
+        }
     }
 
     fun startPlayerUpdates(listener: PlayerUpdateListener, period: Long = 500) {
@@ -117,10 +119,12 @@ class MusicBot(
         mPlayerUpdateTimer = fixedRateTimer(period = period) { updatePlayer() }
     }
 
-    fun stopQPlayerUpdates() {
-        mPlayerUpdateListeners.clear()
-        mPlayerUpdateTimer?.cancel()
-        mPlayerUpdateTimer = null
+    fun stopPlayerUpdates(listener: PlayerUpdateListener) {
+        mPlayerUpdateListeners.remove(listener)
+        if (mPlayerUpdateListeners.isEmpty()) {
+            mPlayerUpdateTimer?.cancel()
+            mPlayerUpdateTimer = null
+        }
     }
 
     private fun updateQueue(queue: List<QueueEntry>? = null) {
