@@ -115,7 +115,7 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
 
 
     override fun onPlayerStateChanged(newState: PlayerState) {
-        if (newState == mPlayerState) return
+        if (newState == mPlayerState || view == null) return
         mUIScope.launch {
             mPlayerState = newState
             when (newState.state) {

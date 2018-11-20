@@ -10,7 +10,7 @@ import me.iberger.enq.R
 import me.iberger.jmusicbot.data.Song
 
 class SongEntryItem(
-    private val song: Song
+    val song: Song
 ) :
     AbstractItem<SongEntryItem, SongEntryItem.ViewHolder>() {
     override fun getType(): Int = R.id.queue_entry

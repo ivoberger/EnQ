@@ -15,6 +15,7 @@ import me.iberger.enq.R
 import me.iberger.enq.gui.fragments.CurrentSongFragment
 import me.iberger.enq.gui.fragments.FavoritesFragment
 import me.iberger.enq.gui.fragments.QueueFragment
+import me.iberger.enq.gui.fragments.SuggestionsFragment
 import me.iberger.enq.utils.showLoginDialog
 import me.iberger.enq.utils.showServerDiscoveryDialog
 import me.iberger.jmusicbot.MusicBot
@@ -31,7 +32,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     lateinit var musicBot: MusicBot
     lateinit var provider: List<MusicBotPlugin>
-    lateinit var suggester: List<MusicBotPlugin>
 
     private val mUIScope = CoroutineScope(Dispatchers.Main)
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
@@ -60,7 +60,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     fun continueWithBot(mBot: MusicBot) = mBackgroundScope.launch {
         musicBot = mBot
         val providerJob = async { musicBot.provider }
-        val suggesterJob = async { musicBot.suggesters }
 
         val currentSongFragment = CurrentSongFragment.newInstance()
         musicBot.startPlayerUpdates(currentSongFragment)
@@ -69,7 +68,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             replace(R.id.main_content, QueueFragment.newInstance(), null)
         }
         provider = providerJob.await()
-        suggester = suggesterJob.await()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean = when (item.itemId) {
@@ -78,6 +76,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             true
         }
         R.id.nav_suggestions -> {
+            supportFragmentManager.commit { replace(R.id.main_content, SuggestionsFragment.newInstance()) }
             true
         }
         R.id.nav_starred -> {
