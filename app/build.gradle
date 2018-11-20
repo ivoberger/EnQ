@@ -45,6 +45,6 @@ dependencies {
     implementation 'ru.ztrap.iconics:core-kt:1.0.3'
     implementation 'com.mikepenz:community-material-typeface:3.1.0-rc02@aar'
 
-    implementation 'com.jakewharton:butterknife:9.0.0-SNAPSHOT'
-    kapt 'com.jakewharton:butterknife-compiler:9.0.0-SNAPSHOT'
+//    implementation 'com.jakewharton:butterknife:9.0.0-SNAPSHOT'
+//    kapt 'com.jakewharton:butterknife-compiler:9.0.0-SNAPSHOT'
 }

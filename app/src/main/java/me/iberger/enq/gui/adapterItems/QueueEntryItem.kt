@@ -4,8 +4,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.mikepenz.fastadapter.items.AbstractItem
 import com.squareup.picasso.Picasso
 import me.iberger.enq.R
@@ -33,19 +31,24 @@ class QueueEntryItem(
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        init {
-            ButterKnife.bind(this, view)
-        }
-
-        @BindView(R.id.song_album_art)
+        //        @BindView(R.id.song_album_art)
         lateinit var imgAlbumArt: ImageView
-        @BindView(R.id.song_title)
+        //        @BindView(R.id.song_title)
         lateinit var txtTitle: TextView
-        @BindView(R.id.song_description)
+        //        @BindView(R.id.song_description)
         lateinit var txtDescription: TextView
-        @BindView(R.id.song_chosen_by)
+        //        @BindView(R.id.song_chosen_by)
         lateinit var txtChosenBy: TextView
-        @BindView(R.id.song_duration)
+        //        @BindView(R.id.song_duration)
         lateinit var txtDuration: TextView
+
+        init {
+//            ButterKnife.bind(this, view)
+            imgAlbumArt = view.findViewById(R.id.song_album_art)
+            txtTitle = view.findViewById(R.id.song_title)
+            txtDescription = view.findViewById(R.id.song_description)
+            txtChosenBy = view.findViewById(R.id.song_chosen_by)
+            txtDuration = view.findViewById(R.id.song_duration)
+        }
     }
 }

@@ -5,9 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import butterknife.ButterKnife
-import butterknife.OnClick
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import com.squareup.picasso.Picasso
@@ -20,30 +19,34 @@ import me.iberger.enq.gui.MainActivity
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.PlayerState
 import me.iberger.jmusicbot.data.PlayerStates
-import me.iberger.jmusicbot.listener.PlayerStateChangeListener
+import me.iberger.jmusicbot.listener.PlayerUpdateListener
+import timber.log.Timber
 
-class CurrentSongFragment : Fragment(), PlayerStateChangeListener {
+class CurrentSongFragment : Fragment(), PlayerUpdateListener {
     companion object {
+
         fun newInstance(): CurrentSongFragment = CurrentSongFragment()
     }
 
     private val mUIScope = CoroutineScope(Dispatchers.Main)
+
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
-
     private lateinit var mMainActivity: MainActivity
-    private lateinit var mMusicBot: MusicBot
-    private lateinit var mPlayerState: PlayerState
 
+    private lateinit var mMusicBot: MusicBot
+    private var mPlayerState: PlayerState = PlayerState(PlayerStates.STOP, null)
     private lateinit var mPlayDrawable: IconicsDrawable
+
     private lateinit var mPauseDrawable: IconicsDrawable
     private lateinit var mStoppedDrawable: IconicsDrawable
     private lateinit var mErrorDrawable: IconicsDrawable
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mMainActivity = activity as MainActivity
         mMusicBot = mMainActivity.musicBot
-        mBackgroundScope.launch { mPlayerState = mMusicBot.playerState }
+        mMusicBot.startPlayerUpdates(this@CurrentSongFragment)
         mBackgroundScope.launch {
             mPlayDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_play).color(Color.WHITE)
             mPauseDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_pause).color(Color.WHITE)
@@ -59,8 +62,7 @@ class CurrentSongFragment : Fragment(), PlayerStateChangeListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        ButterKnife.bind(this, view)
-        onPlayerStateChanged(mPlayerState)
+//        ButterKnife.bind(this, view)
         song_title.isSelected = true
         song_description.isSelected = true
         song_favourite.setImageDrawable(
@@ -69,10 +71,12 @@ class CurrentSongFragment : Fragment(), PlayerStateChangeListener {
                 CommunityMaterial.Icon2.cmd_star_outline
             ).color(Color.WHITE)
         )
+        song_play_pause.setOnClickListener { changePlaybackState() }
+        song_favourite.setOnClickListener { addToFavourites() }
     }
 
-    @OnClick(R.id.song_play_pause)
-    fun changePlaybackState(view: View) {
+    //    @OnClick(R.id.song_play_pause)
+    private fun changePlaybackState() {
         when (mPlayerState.state) {
             PlayerStates.STOP -> mBackgroundScope.launch { onPlayerStateChanged(mMusicBot.play().await()) }
             PlayerStates.PLAY -> mBackgroundScope.launch { onPlayerStateChanged(mMusicBot.pause().await()) }
@@ -81,12 +85,13 @@ class CurrentSongFragment : Fragment(), PlayerStateChangeListener {
         }
     }
 
-    @OnClick(R.id.song_favourite)
-    fun addToFavourites(view: View) {
+    //    @OnClick(R.id.song_favourite)
+    private fun addToFavourites() {
         mMainActivity.favourites.add(mPlayerState.songEntry!!.song)
     }
 
     override fun onPlayerStateChanged(newState: PlayerState) {
+        if (newState == mPlayerState) return
         mUIScope.launch {
             mPlayerState = newState
             when (newState.state) {
@@ -120,5 +125,10 @@ class CurrentSongFragment : Fragment(), PlayerStateChangeListener {
             song_chosen_by.setText(R.string.txt_suggested)
             songEntry.userName?.also { song_chosen_by.text = it }
         }
+    }
+
+    override fun onUpdateError(e: Exception) {
+        Timber.e(e)
+        mUIScope.launch { Toast.makeText(context, "Error when updating player state", Toast.LENGTH_SHORT).show() }
     }
 }
