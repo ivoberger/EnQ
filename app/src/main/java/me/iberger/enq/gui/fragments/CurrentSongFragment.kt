@@ -17,9 +17,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.iberger.enq.R
 import me.iberger.enq.gui.MainActivity
+import me.iberger.enq.utils.saveFavorites
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.PlayerState
 import me.iberger.jmusicbot.data.PlayerStates
+import me.iberger.jmusicbot.data.Song
 import me.iberger.jmusicbot.listener.PlayerUpdateListener
 import timber.log.Timber
 
@@ -30,14 +32,13 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
     }
 
     private val mUIScope = CoroutineScope(Dispatchers.Main)
-
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
-    private lateinit var mMainActivity: MainActivity
 
     private lateinit var mMusicBot: MusicBot
     private var mPlayerState: PlayerState = PlayerState(PlayerStates.STOP, null)
-    private lateinit var mPlayDrawable: IconicsDrawable
+    private var mFavorites: MutableList<Song> = mutableListOf()
 
+    private lateinit var mPlayDrawable: IconicsDrawable
     private lateinit var mPauseDrawable: IconicsDrawable
     private lateinit var mStoppedDrawable: IconicsDrawable
     private lateinit var mErrorDrawable: IconicsDrawable
@@ -48,8 +49,7 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mMainActivity = activity as MainActivity
-        mMusicBot = mMainActivity.musicBot
+        mMusicBot = (activity as MainActivity).musicBot
         mMusicBot.startPlayerUpdates(this@CurrentSongFragment)
         // pre-load drawables for player buttons
         mBackgroundScope.launch {
@@ -72,14 +72,12 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        ButterKnife.bind(this, view)
         song_title.isSelected = true
         song_description.isSelected = true
         song_play_pause.setOnClickListener { changePlaybackState() }
         song_favorite.setOnClickListener { addToFavorites() }
     }
 
-    //    @OnClick(R.id.song_play_pause)
     private fun changePlaybackState() {
         when (mPlayerState.state) {
             PlayerStates.STOP -> mBackgroundScope.launch { onPlayerStateChanged(mMusicBot.play().await()) }
@@ -89,17 +87,32 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
         }
     }
 
-    //    @OnClick(R.id.song_favorite)
     private fun addToFavorites() {
         mBackgroundScope.launch {
-            mMainActivity.changeFavoriteStatus(mPlayerState.songEntry!!.song).join()
-            onPlayerStateChanged(mPlayerState, true)
+            changeFavoriteStatus(mPlayerState.songEntry!!.song).join()
+        }
+    }
+
+    private fun changeFavoriteStatus(song: Song) = mBackgroundScope.launch {
+        if (song in mFavorites) {
+            Timber.d("Removing $song from favorites")
+            mFavorites.remove(song)
+        } else {
+            Timber.d("Adding $song to favorites")
+            mFavorites.add(song)
+        }
+        saveFavorites(context!!, mFavorites)
+        mUIScope.launch {
+            song_favorite.setImageDrawable(
+                if (song in mFavorites) mFavoritesDeleteDrawable
+                else mFavoritesAddDrawable
+            )
         }
     }
 
 
-    override fun onPlayerStateChanged(newState: PlayerState, force: Boolean) {
-        if (newState == mPlayerState && !force) return
+    override fun onPlayerStateChanged(newState: PlayerState) {
+        if (newState == mPlayerState) return
         mUIScope.launch {
             mPlayerState = newState
             when (newState.state) {
@@ -133,12 +146,11 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
             song.duration?.also { song_duration.text = String.format("%02d:%02d", it / 60, it % 60) }
             song_chosen_by.setText(R.string.txt_suggested)
             songEntry.userName?.also { song_chosen_by.text = it }
-            // set Fav status
+            // set fav status
             song_favorite.setImageDrawable(
-                if (mMainActivity.isInFavorites(song)) mFavoritesDeleteDrawable
+                if (song in mFavorites) mFavoritesDeleteDrawable
                 else mFavoritesAddDrawable
             )
-
         }
     }
 

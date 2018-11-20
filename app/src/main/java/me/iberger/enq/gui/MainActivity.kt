@@ -2,35 +2,25 @@ package me.iberger.enq.gui
 
 import android.os.Bundle
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.forEachIndexed
 import androidx.fragment.app.commit
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
-import com.mikepenz.fastadapter.FastAdapter
-import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.IIcon
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import me.iberger.enq.R
-import me.iberger.enq.TABS
-import me.iberger.enq.gui.adapterItems.QueueEntryItem
 import me.iberger.enq.gui.fragments.CurrentSongFragment
-import me.iberger.enq.utils.loadFavorites
-import me.iberger.enq.utils.saveFavorites
+import me.iberger.enq.gui.fragments.QueueFragment
 import me.iberger.enq.utils.showLoginDialog
 import me.iberger.enq.utils.showServerDiscoveryDialog
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.MusicBotPlugin
-import me.iberger.jmusicbot.data.QueueEntry
-import me.iberger.jmusicbot.data.Song
-import me.iberger.jmusicbot.listener.QueueUpdateListener
 import timber.log.Timber
 
-class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener, QueueUpdateListener {
+class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
 
     private val mMenuIcons = listOf<IIcon>(
         CommunityMaterial.Icon2.cmd_playlist_play,
@@ -46,13 +36,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
     private lateinit var mHasUser: Deferred<Boolean>
 
-    private var mFavorites: MutableList<Song> = mutableListOf()
-    private var mQueue: List<QueueEntry> = listOf()
-
-    private var mCurrentTab = TABS.QUEUE
-    private lateinit var mItemAdapters: MutableMap<TABS, ItemAdapter<QueueEntryItem>>
-    private lateinit var mFastAdapters: MutableMap<TABS, FastAdapter<QueueEntryItem>>
-
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.plant(Timber.DebugTree())
         super.onCreate(savedInstanceState)
@@ -67,7 +50,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         }
         showServerDiscoveryDialog(this@MainActivity, mBackgroundScope, true)
         mHasUser = MusicBot.hasUser(this)
-        mBackgroundScope.launch { mFavorites = this@MainActivity.loadFavorites() }
     }
 
     fun continueWithLogin() =
@@ -79,11 +61,17 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         switchToQueue()
         val providerJob = async { musicBot.provider }
         val suggesterJob = async { musicBot.suggesters }
-        supportFragmentManager.commit { add(R.id.main_current_song, CurrentSongFragment.newInstance(), null) }
+
+        val currentSongFragment = CurrentSongFragment.newInstance()
+        val queueFragment = QueueFragment.newInstance()
+        musicBot.startPlayerUpdates(currentSongFragment)
+        musicBot.startQueueUpdates(queueFragment)
+        supportFragmentManager.commit {
+            add(R.id.main_current_song, currentSongFragment, null)
+            add(R.id.main_content, queueFragment, null)
+        }
         provider = providerJob.await()
         suggester = suggesterJob.await()
-        joinAll()
-        musicBot.startQueueUpdates(this@MainActivity)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean = when (item.itemId) {
@@ -101,40 +89,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
     private fun switchToQueue() = mUIScope.launch {
-        main_content.layoutManager = LinearLayoutManager(this@MainActivity)
-        mItemAdapters[TABS.QUEUE] = ItemAdapter()
-        mFastAdapters[TABS.QUEUE] =
-                FastAdapter.with<QueueEntryItem, ItemAdapter<QueueEntryItem>>(mItemAdapters[TABS.QUEUE]!!)
-        main_content.adapter = mFastAdapters[TABS.QUEUE]
+
     }
-
-    override fun onQueueChanged(newQueue: List<QueueEntry>) {
-        if (mQueue == newQueue) return
-        mQueue = newQueue
-        val itemQueue = newQueue.map { QueueEntryItem((it)) }
-        mUIScope.launch { mItemAdapters[TABS.QUEUE]?.set(itemQueue) }
-    }
-
-    override fun onUpdateError(e: Exception) {
-        Timber.e(e)
-        Toast.makeText(this, "Something horrific just happened", Toast.LENGTH_SHORT).show()
-    }
-
-    // Favorite management
-
-    fun isInFavorites(song: Song) = song in mFavorites
-
-    fun changeFavoriteStatus(song: Song) = mBackgroundScope.launch {
-        if (song in mFavorites) {
-            Timber.d("Removing $song from favorites")
-            mFavorites.remove(song)
-        } else {
-            Timber.d("Adding $song to favorites")
-            mFavorites.add(song)
-        }
-        saveFavorites(mFavorites)
-    }
-
 
     override fun onDestroy() {
         mUIScope.coroutineContext.cancel()
