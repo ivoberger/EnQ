@@ -34,9 +34,9 @@ dependencies {
 //    implementation "androidx.room:room-runtime:$v_room"
 //    kapt "androidx.room:room-compiler:$v_room"
 
-    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
-    implementation 'com.squareup.retrofit2:converter-moshi:2.4.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
+    implementation 'com.squareup.retrofit2:converter-moshi:2.5.0'
     implementation 'com.squareup.moshi:moshi:1.8.0'
     kapt "com.squareup.moshi:moshi-kotlin-codegen:1.8.0"
 
