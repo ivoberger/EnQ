@@ -17,8 +17,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.iberger.enq.R
 import me.iberger.enq.gui.MainActivity
-import me.iberger.enq.utils.loadFavorites
-import me.iberger.enq.utils.saveFavorites
+import me.iberger.enq.gui.MainActivity.Companion.mFavorites
+import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.PlayerState
 import me.iberger.jmusicbot.data.PlayerStates
@@ -37,7 +37,6 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
 
     private lateinit var mMusicBot: MusicBot
     private var mPlayerState: PlayerState = PlayerState(PlayerStates.STOP, null)
-    private var mFavorites: MutableList<Song> = mutableListOf()
 
     private lateinit var mPlayDrawable: IconicsDrawable
     private lateinit var mPauseDrawable: IconicsDrawable
@@ -62,10 +61,8 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
 
             mFavoritesAddDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_star_outline).color(color)
             mFavoritesDeleteDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_star).color(
-                ContextCompat.getColor(context!!, R.color.colorAccent)
+                ContextCompat.getColor(context!!, R.color.favorites)
             )
-
-            mFavorites = loadFavorites(context!!)
         }
     }
 
@@ -97,14 +94,7 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
     }
 
     private fun changeFavoriteStatus(song: Song) = mBackgroundScope.launch {
-        if (song in mFavorites) {
-            Timber.d("Removing $song from favorites")
-            mFavorites.remove(song)
-        } else {
-            Timber.d("Adding $song to favorites")
-            mFavorites.add(song)
-        }
-        saveFavorites(context!!, mFavorites)
+        changeFavoriteStatus(context!!, song)
         mUIScope.launch {
             song_favorite.setImageDrawable(
                 if (song in mFavorites) mFavoritesDeleteDrawable

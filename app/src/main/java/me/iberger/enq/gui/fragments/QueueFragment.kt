@@ -6,24 +6,32 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mikepenz.fastadapter.FastAdapter
-import com.mikepenz.fastadapter.adapters.ItemAdapter
+import com.mikepenz.community_material_typeface_library.CommunityMaterial
+import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter
+import com.mikepenz.fastadapter_extensions.swipe.SimpleSwipeCallback
 import kotlinx.android.synthetic.main.fragment_queue.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.iberger.enq.R
 import me.iberger.enq.gui.MainActivity
-import me.iberger.enq.gui.adapterItems.QueueEntryItem
+import me.iberger.enq.gui.adapter.QueueItem
+import me.iberger.enq.utils.changeFavoriteStatus
+import me.iberger.enq.utils.setupSwipeActions
+import me.iberger.enq.utils.toastShort
+import me.iberger.jmusicbot.KEY_QUEUE
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.QueueEntry
+import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.listener.QueueUpdateListener
 import timber.log.Timber
 
-class QueueFragment : Fragment(), QueueUpdateListener {
-
+class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemSwipeCallback {
     companion object {
+
         fun newInstance() = QueueFragment()
     }
 
@@ -31,9 +39,9 @@ class QueueFragment : Fragment(), QueueUpdateListener {
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
     private lateinit var mMusicBot: MusicBot
-    private var mQueue: List<QueueEntry> = listOf()
-    private lateinit var mItemAdapter: ItemAdapter<QueueEntryItem>
 
+    private var mQueue: List<QueueEntry> = listOf()
+    private lateinit var mFastItemAdapter: FastItemAdapter<QueueItem>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mMusicBot = (activity as MainActivity).musicBot
@@ -45,21 +53,58 @@ class QueueFragment : Fragment(), QueueUpdateListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mItemAdapter = ItemAdapter()
-        queue.layoutManager = LinearLayoutManager(context)
-        queue.adapter = FastAdapter.with<QueueEntryItem, ItemAdapter<QueueEntryItem>>(mItemAdapter)
+        mFastItemAdapter = FastItemAdapter()
+        queue.layoutManager = LinearLayoutManager(context).apply { reverseLayout = true }
+        queue.adapter = mFastItemAdapter
+        savedInstanceState?.also { mFastItemAdapter.withSavedInstanceState(it, KEY_QUEUE) }
+
+        setupSwipeActions(
+            context!!, queue, this,
+            CommunityMaterial.Icon2.cmd_star, R.color.favorites,
+            CommunityMaterial.Icon.cmd_delete, R.color.delete
+        )
     }
 
     override fun onQueueChanged(newQueue: List<QueueEntry>) {
         if (mQueue == newQueue) return
         mQueue = newQueue
-        val itemQueue = newQueue.map { QueueEntryItem((it)) }
-        mUIScope.launch { mItemAdapter.set(itemQueue) }
+        val itemQueue = mQueue.map { QueueItem((it)) }
+        mUIScope.launch {
+            mFastItemAdapter.set(itemQueue)
+        }
     }
 
     override fun onUpdateError(e: Exception) {
         Timber.e(e)
         Toast.makeText(context, "Something horrific just happened", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun itemSwiped(position: Int, direction: Int) {
+        mBackgroundScope.launch {
+            val entry = mFastItemAdapter.getAdapterItem(position)
+            when (direction) {
+                ItemTouchHelper.RIGHT -> {
+                    try {
+                        mMusicBot.dequeue(entry.song).await()
+                    } catch (e: AuthException) {
+                        withContext(Dispatchers.Main) {
+                            context!!.toastShort(R.string.msg_no_permission)
+                            mFastItemAdapter.notifyAdapterItemChanged(position)
+                        }
+                    }
+                }
+                ItemTouchHelper.LEFT -> {
+                    changeFavoriteStatus(context!!, entry.song)
+                    withContext(Dispatchers.Main) {
+                        mFastItemAdapter.notifyAdapterItemChanged(position)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(mFastItemAdapter.saveInstanceState(outState, KEY_QUEUE))
     }
 
     override fun onDestroy() {

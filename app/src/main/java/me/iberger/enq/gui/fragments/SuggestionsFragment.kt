@@ -17,7 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.iberger.enq.R
 import me.iberger.enq.gui.MainActivity
-import me.iberger.enq.gui.adapterItems.SongEntryItem
+import me.iberger.enq.gui.adapter.FavoritesItem
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.MusicBotPlugin
 
@@ -33,7 +33,7 @@ class SuggestionsFragment : Fragment(), BottomNavigationView.OnNavigationItemSel
     private lateinit var mMusicBot: MusicBot
 
     private lateinit var mSuggesters: List<MusicBotPlugin>
-    private lateinit var mItemAdapter: ItemAdapter<SongEntryItem>
+    private lateinit var mItemAdapter: ItemAdapter<FavoritesItem>
     private val mMenuItems: MutableList<MenuItem> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +48,7 @@ class SuggestionsFragment : Fragment(), BottomNavigationView.OnNavigationItemSel
         super.onViewCreated(view, savedInstanceState)
         mItemAdapter = ItemAdapter()
         suggest_list.layoutManager = LinearLayoutManager(context)
-        val fastAdapter = FastAdapter.with<SongEntryItem, ItemAdapter<SongEntryItem>>(mItemAdapter)
+        val fastAdapter = FastAdapter.with<FavoritesItem, ItemAdapter<FavoritesItem>>(mItemAdapter)
         fastAdapter.withOnClickListener { _, _, item, position ->
             mBackgroundScope.launch {
                 mMusicBot.enqueue(item.song).await()
@@ -69,14 +69,14 @@ class SuggestionsFragment : Fragment(), BottomNavigationView.OnNavigationItemSel
                 mSuggesters.forEach { mMenuItems.add(menu.add(it.name)) }
             }
             val suggestions = mMusicBot.getSuggestions(mSuggesters[0])
-            mUIScope.launch { mItemAdapter.set(suggestions.await().map { SongEntryItem(it) }) }
+            mUIScope.launch { mItemAdapter.set(suggestions.await().map { FavoritesItem(it) }) }
         }
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         mBackgroundScope.launch {
             val suggestions = mMusicBot.getSuggestions(mSuggesters[mMenuItems.indexOf(item)])
-            mUIScope.launch { mItemAdapter.set(suggestions.await().map { SongEntryItem(it) }) }
+            mUIScope.launch { mItemAdapter.set(suggestions.await().map { FavoritesItem(it) }) }
         }
         return true
     }

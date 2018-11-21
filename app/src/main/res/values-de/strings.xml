@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="nav_queue">Warteschlange</string>
     <string name="nav_search">Suche</string>
     <string name="nav_favorites">Favoriten</string>
     <string name="lbl_album_art">Albumcover</string>
@@ -21,5 +20,7 @@
     <string name="msg_queue_smth">Spiel was ab!</string>
     <string name="nav_suggestions">Vorschlaege</string>
     <string name="txt_suggested"><i>Vorgeschlagen</i></string>
-    <string name="txt_enqued_by">Hinzugefuegt von %1$s</string>
+    <string name="msg_removed_from_favs">%1$s von den Favoriten entfernt</string>
+    <string name="msg_no_permission">Du darfst das nicht</string>
+    <string name="msg_added_to_favs">%1$s wurde favorisiert</string>
 </resources>

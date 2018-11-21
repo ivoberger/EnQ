@@ -37,13 +37,16 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
     implementation "com.google.android.material:material:1.1.0-alpha01"
-    
+
     implementation "com.jakewharton.timber:timber:$v_timber"
 
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.squareup.moshi:moshi:1.8.0'
 
     implementation 'com.mikepenz:fastadapter:3.3.1'
+    implementation 'com.mikepenz:fastadapter-commons:3.3.1'
+    implementation 'com.mikepenz:fastadapter-extensions:3.3.1'
+    
     implementation "com.mikepenz:iconics-core:3.1.0"
     implementation 'ru.ztrap.iconics:core-kt:1.0.3'
     implementation 'com.mikepenz:community-material-typeface:3.1.0-rc02@aar'

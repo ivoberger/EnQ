@@ -19,6 +19,7 @@
         android:id="@+id/suggestions_bottom_navigation"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:paddingTop="-10dp"
         app:itemIconSize="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
