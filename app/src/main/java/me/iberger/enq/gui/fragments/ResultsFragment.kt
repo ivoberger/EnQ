@@ -15,6 +15,7 @@ import kotlinx.coroutines.withContext
 import me.iberger.enq.R
 import me.iberger.enq.gui.MainActivity.Companion.musicBot
 import me.iberger.enq.gui.adapter.SuggestionsItem
+import me.iberger.enq.utils.toastShort
 
 open class ResultsFragment : Fragment() {
 
@@ -37,6 +38,7 @@ open class ResultsFragment : Fragment() {
                 musicBot.enqueue(item.song).await()
                 withContext(Dispatchers.Main) {
                     mFastItemAdapter.remove(position)
+                    context!!.toastShort(context!!.getString(R.string.msg_enqueued, item.song.title))
                 }
             }
             true
