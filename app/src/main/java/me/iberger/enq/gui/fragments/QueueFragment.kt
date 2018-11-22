@@ -17,13 +17,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.iberger.enq.R
-import me.iberger.enq.gui.MainActivity
+import me.iberger.enq.gui.MainActivity.Companion.musicBot
 import me.iberger.enq.gui.adapter.QueueItem
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.setupSwipeActions
 import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.KEY_QUEUE
-import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.QueueEntry
 import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.listener.QueueUpdateListener
@@ -38,14 +37,11 @@ class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemS
     private val mUIScope = CoroutineScope(Dispatchers.Main)
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
-    private lateinit var mMusicBot: MusicBot
-
     private var mQueue: List<QueueEntry> = listOf()
     private lateinit var mFastItemAdapter: FastItemAdapter<QueueItem>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mMusicBot = (activity as MainActivity).musicBot
-        mMusicBot.startQueueUpdates(this)
+        musicBot.startQueueUpdates(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
@@ -85,7 +81,7 @@ class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemS
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
                     try {
-                        mMusicBot.dequeue(entry.song).await()
+                        musicBot.dequeue(entry.song).await()
                     } catch (e: AuthException) {
                         withContext(Dispatchers.Main) {
                             context!!.toastShort(R.string.msg_no_permission)
@@ -109,6 +105,6 @@ class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemS
 
     override fun onDestroy() {
         super.onDestroy()
-        mMusicBot.stopQueueUpdates(this)
+        musicBot.stopQueueUpdates(this)
     }
 }

@@ -16,10 +16,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.iberger.enq.R
-import me.iberger.enq.gui.MainActivity
 import me.iberger.enq.gui.MainActivity.Companion.mFavorites
+import me.iberger.enq.gui.MainActivity.Companion.musicBot
 import me.iberger.enq.utils.changeFavoriteStatus
-import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.PlayerState
 import me.iberger.jmusicbot.data.PlayerStates
 import me.iberger.jmusicbot.data.Song
@@ -35,7 +34,6 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
     private val mUIScope = CoroutineScope(Dispatchers.Main)
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
-    private lateinit var mMusicBot: MusicBot
     private var mPlayerState: PlayerState = PlayerState(PlayerStates.STOP, null)
 
     private lateinit var mPlayDrawable: IconicsDrawable
@@ -49,8 +47,7 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mMusicBot = (activity as MainActivity).musicBot
-        mMusicBot.startPlayerUpdates(this@CurrentSongFragment)
+        musicBot.startPlayerUpdates(this@CurrentSongFragment)
         // pre-load drawables for player buttons
         mBackgroundScope.launch {
             val color = Color.WHITE
@@ -80,10 +77,10 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
 
     private fun changePlaybackState() {
         when (mPlayerState.state) {
-            PlayerStates.STOP -> mBackgroundScope.launch { onPlayerStateChanged(mMusicBot.play().await()) }
-            PlayerStates.PLAY -> mBackgroundScope.launch { onPlayerStateChanged(mMusicBot.pause().await()) }
-            PlayerStates.PAUSE -> mBackgroundScope.launch { onPlayerStateChanged(mMusicBot.play().await()) }
-            PlayerStates.ERROR -> mBackgroundScope.launch { onPlayerStateChanged(mMusicBot.play().await()) }
+            PlayerStates.STOP -> mBackgroundScope.launch { onPlayerStateChanged(musicBot.play().await()) }
+            PlayerStates.PLAY -> mBackgroundScope.launch { onPlayerStateChanged(musicBot.pause().await()) }
+            PlayerStates.PAUSE -> mBackgroundScope.launch { onPlayerStateChanged(musicBot.play().await()) }
+            PlayerStates.ERROR -> mBackgroundScope.launch { onPlayerStateChanged(musicBot.play().await()) }
         }
     }
 

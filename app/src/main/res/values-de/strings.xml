@@ -23,4 +23,7 @@
     <string name="msg_removed_from_favs">%1$s von den Favoriten entfernt</string>
     <string name="msg_no_permission">Du darfst das nicht</string>
     <string name="msg_added_to_favs">%1$s wurde favorisiert</string>
+    <string name="nav_settings">Einstellungen</string>
+    <string name="hint_search">Suche nach einem Song</string>
+    <string name="lbl_search">Suche</string>
 </resources>

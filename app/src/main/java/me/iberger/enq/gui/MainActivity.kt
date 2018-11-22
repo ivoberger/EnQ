@@ -1,8 +1,10 @@
 package me.iberger.enq.gui
 
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.forEachIndexed
 import androidx.fragment.app.commit
@@ -13,10 +15,7 @@ import com.mikepenz.iconics.typeface.IIcon
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import me.iberger.enq.R
-import me.iberger.enq.gui.fragments.CurrentSongFragment
-import me.iberger.enq.gui.fragments.FavoritesFragment
-import me.iberger.enq.gui.fragments.QueueFragment
-import me.iberger.enq.gui.fragments.SuggestionsFragment
+import me.iberger.enq.gui.fragments.*
 import me.iberger.enq.utils.loadFavorites
 import me.iberger.enq.utils.showLoginDialog
 import me.iberger.enq.utils.showServerDiscoveryDialog
@@ -29,6 +28,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     companion object {
         var mFavorites: MutableList<Song> = mutableListOf()
+        lateinit var musicBot: MusicBot
     }
 
     private val mMenuIcons = listOf<IIcon>(
@@ -36,13 +36,15 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         CommunityMaterial.Icon.cmd_all_inclusive,
         CommunityMaterial.Icon2.cmd_star_outline
     )
-
-    lateinit var musicBot: MusicBot
+    lateinit var optionsMenu: Menu
     lateinit var provider: List<MusicBotPlugin>
 
     private val mUIScope = CoroutineScope(Dispatchers.Main)
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
     private lateinit var mHasUser: Deferred<Boolean>
+
+    private var mPlayerCollapsed = false
+    private var mBottomNavCollapsed = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.plant(Timber.DebugTree())
@@ -78,37 +80,68 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         provider = providerJob.await()
     }
 
-    private var mPlayerCollapsed = false
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.options_main, menu)
+        optionsMenu = menu
+        val searchView = (menu.findItem(R.id.app_bar_search).actionView as SearchView)
+
+        searchView.setOnSearchClickListener {
+            changePlayerCollapse(true, 0)
+            changeBottomNavCollapse(true, 0)
+            supportFragmentManager.commit { replace(R.id.main_content, SearchFragment.newInstance()) }
+        }
+        searchView.setOnCloseListener {
+            changeBottomNavCollapse(false)
+            changePlayerCollapse(false)
+            supportFragmentManager.commit { replace(R.id.main_content, QueueFragment.newInstance()) }
+            return@setOnCloseListener false
+        }
+        return true
+    }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.nav_queue -> {
-            if (mPlayerCollapsed) {
-                main_current_song.animate().setDuration(1000).translationYBy(-main_current_song.height.toFloat())
-                    .withStartAction { main_current_song.visibility = View.VISIBLE }.start()
-                mPlayerCollapsed = false
-            }
+            changePlayerCollapse(false)
             supportFragmentManager.commit { replace(R.id.main_content, QueueFragment.newInstance()) }
             true
         }
         R.id.nav_suggestions -> {
-            if (!mPlayerCollapsed) {
-                main_current_song.animate().setDuration(1000).translationYBy(main_current_song.height.toFloat())
-                    .withEndAction { main_current_song.visibility = View.GONE }.start()
-                mPlayerCollapsed = true
-            }
+            changePlayerCollapse(true)
             supportFragmentManager.commit { replace(R.id.main_content, SuggestionsFragment.newInstance()) }
             true
         }
         R.id.nav_starred -> {
-            if (!mPlayerCollapsed) {
-                main_current_song.animate().setDuration(1000).translationYBy(main_current_song.height.toFloat())
-                    .withEndAction { main_current_song.visibility = View.GONE }.start()
-                mPlayerCollapsed = true
-            }
+            changePlayerCollapse(true)
             supportFragmentManager.commit { replace(R.id.main_content, FavoritesFragment.newInstance()) }
             true
         }
         else -> false
+    }
+
+    private fun changePlayerCollapse(requestCollapse: Boolean, duration: Long = 1000) {
+        if (mPlayerCollapsed == requestCollapse) return
+        if (!mPlayerCollapsed) {
+            main_current_song.animate().setDuration(duration).translationYBy(main_current_song.height.toFloat())
+                .withEndAction { main_current_song.visibility = View.GONE }.start()
+            mPlayerCollapsed = true
+        } else {
+            main_current_song.animate().setDuration(duration).translationYBy(-main_current_song.height.toFloat())
+                .withStartAction { main_current_song.visibility = View.VISIBLE }.start()
+            mPlayerCollapsed = false
+        }
+    }
+
+    private fun changeBottomNavCollapse(requestCollapse: Boolean, duration: Long = 1000) {
+        if (mBottomNavCollapsed == requestCollapse) return
+        if (!mBottomNavCollapsed) {
+            main_bottom_navigation.animate().setDuration(duration).translationYBy(main_current_song.height.toFloat())
+                .withEndAction { main_current_song.visibility = View.GONE }.start()
+            mBottomNavCollapsed = true
+        } else {
+            main_bottom_navigation.animate().setDuration(duration).translationYBy(-main_current_song.height.toFloat())
+                .withStartAction { main_current_song.visibility = View.VISIBLE }.start()
+            mBottomNavCollapsed = false
+        }
     }
 
     override fun onDestroy() {

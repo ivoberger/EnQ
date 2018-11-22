@@ -76,6 +76,9 @@ class MusicBot(
         user.save(mPreferences)
     }
 
+    fun search(providerId: String, query: String): Deferred<List<Song>> =
+        mCRScope.async { apiClient.searchForSong(providerId, query).execute().process() }
+
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     fun enqueue(song: Song) =
         mCRScope.async { updateQueue(apiClient.enqueue(song.id, song.provider.id).execute().process()) }
