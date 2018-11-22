@@ -7,25 +7,20 @@ import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentStatePagerAdapter
 import kotlinx.android.synthetic.main.fragment_search.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import me.iberger.enq.R
 import me.iberger.enq.gui.MainActivity
 import me.iberger.jmusicbot.data.MusicBotPlugin
 import timber.log.Timber
 
-class SearchFragment : Fragment() {
+class SearchFragment : TabbedSongListFragment() {
 
     companion object {
         fun newInstance() = SearchFragment()
     }
-
-    private val mUIScope = CoroutineScope(Dispatchers.Main)
-    private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
-
-    private lateinit var mProvider: Deferred<List<MusicBotPlugin>>
-    private lateinit var mPagerAdapter: Deferred<Pager>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,34 +57,23 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mBackgroundScope.launch {
-            mPagerAdapter = async { Pager(childFragmentManager, mProvider.await()) }
-            mUIScope.launch { search_view_pager.adapter = mPagerAdapter.await() }
+            mFragmentPagerAdapter = async { SearchFragmentPager(childFragmentManager, mProvider.await()) }
+            mUIScope.launch { search_view_pager.adapter = mFragmentPagerAdapter.await() }
         }
     }
 
     fun search(query: String) {
-        mBackgroundScope.launch { mPagerAdapter.await().search(query) }
+        mBackgroundScope.launch { (mFragmentPagerAdapter.await() as SearchFragmentPager).search(query) }
     }
 
-    class Pager(fm: FragmentManager, private val provider: List<MusicBotPlugin>) : FragmentStatePagerAdapter(fm) {
-
-        private val searchResultFragments: MutableList<SearchResultsFragment> = mutableListOf()
+    class SearchFragmentPager(fm: FragmentManager, provider: List<MusicBotPlugin>) :
+        TabbedSongListFragment.SongListFragmentPager(fm, provider) {
 
         override fun getItem(position: Int): Fragment = SearchResultsFragment.newInstance(provider[position].id)
 
-        override fun getCount(): Int = provider.size
-
-        override fun getPageTitle(position: Int): CharSequence? = provider[position].name
-
-        override fun instantiateItem(container: ViewGroup, position: Int): Any {
-            val currentFragment = super.instantiateItem(container, position) as SearchResultsFragment
-            searchResultFragments.add(currentFragment)
-            return currentFragment
-        }
-
         fun search(query: String) {
             Timber.d("Searching for $query")
-            searchResultFragments.forEach { it.search(query) }
+            resultFragments.forEach { (it as SearchResultsFragment).search(query) }
         }
     }
 }

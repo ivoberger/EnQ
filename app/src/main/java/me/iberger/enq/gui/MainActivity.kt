@@ -123,25 +123,26 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         if (!mPlayerCollapsed) {
             main_current_song.animate().setDuration(duration).translationYBy(main_current_song.height.toFloat())
                 .withEndAction { main_current_song.visibility = View.GONE }.start()
-            mPlayerCollapsed = true
         } else {
             main_current_song.animate().setDuration(duration).translationYBy(-main_current_song.height.toFloat())
                 .withStartAction { main_current_song.visibility = View.VISIBLE }.start()
-            mPlayerCollapsed = false
         }
+        mPlayerCollapsed = requestCollapse
     }
 
     private fun changeBottomNavCollapse(requestCollapse: Boolean, duration: Long = 1000) {
         if (mBottomNavCollapsed == requestCollapse) return
         if (!mBottomNavCollapsed) {
-            main_bottom_navigation.animate().setDuration(duration).translationYBy(main_current_song.height.toFloat())
-                .withEndAction { main_current_song.visibility = View.GONE }.start()
-            mBottomNavCollapsed = true
+            main_bottom_navigation.animate().setDuration(duration)
+                .translationYBy(main_current_song.height.toFloat())
+                .withEndAction { main_bottom_navigation.visibility = View.GONE }.start()
+            
         } else {
-            main_bottom_navigation.animate().setDuration(duration).translationYBy(-main_current_song.height.toFloat())
-                .withStartAction { main_current_song.visibility = View.VISIBLE }.start()
-            mBottomNavCollapsed = false
+            main_bottom_navigation.animate().setDuration(duration)
+                .translationYBy(-main_current_song.height.toFloat())
+                .withStartAction { main_bottom_navigation.visibility = View.VISIBLE }.start()
         }
+        mBottomNavCollapsed = requestCollapse
     }
 
     override fun onDestroy() {

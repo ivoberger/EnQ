@@ -90,8 +90,8 @@ class MusicBot(
     val history: List<QueueEntry>
         get() = apiClient.getHistory().execute().process()
 
-    fun getSuggestions(suggester: MusicBotPlugin): Deferred<List<Song>> = mCRScope.async {
-        apiClient.getSuggestions(suggester.id).execute().process()
+    fun getSuggestions(suggesterId: String): Deferred<List<Song>> = mCRScope.async {
+        apiClient.getSuggestions(suggesterId).execute().process()
     }
 
     fun deleteSuggestion(suggester: MusicBotPlugin, song: Song, provider: MusicBotPlugin): Deferred<Unit> =
