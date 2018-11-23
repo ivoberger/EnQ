@@ -22,7 +22,7 @@ open class ResultsFragment : Fragment() {
     val mUIScope = CoroutineScope(Dispatchers.Main)
     val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
-    private lateinit var mFastItemAdapter: FastItemAdapter<SuggestionsItem>
+    lateinit var mFastItemAdapter: FastItemAdapter<SuggestionsItem>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_queue, container, false)

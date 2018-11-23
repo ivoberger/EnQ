@@ -51,10 +51,10 @@ internal fun <T> Call<T>.process(
     errorCodes: Map<Int, Exception> = mapOf(),
     notFoundType: NotFoundException.Type = NotFoundException.Type.SONG,
     invalidParamsType: InvalidParametersException.Type = InvalidParametersException.Type.MISSING
-): T {
+): T? {
     val response = execute()
     return when (response.code()) {
-        in successCodes -> response.body()!!
+        in successCodes -> response.body()
         in errorCodes -> throw errorCodes[response.code()]!!
         400 -> throw InvalidParametersException(invalidParamsType, response.errorBody()!!.string())
         401 -> throw AuthException(AuthException.Reason.NEEDS_AUTH, response.errorBody()!!.string())

@@ -81,7 +81,6 @@ class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemS
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
                     try {
-                        Timber.d("Trying dequeue")
                         MusicBot.instance.dequeue(entry.song).await()
                     } catch (e: AuthException) {
                         Timber.e("AuthException with reason ${e.reason}")
