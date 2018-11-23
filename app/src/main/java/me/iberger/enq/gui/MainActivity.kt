@@ -28,7 +28,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     companion object {
         var mFavorites: MutableList<Song> = mutableListOf()
-        lateinit var musicBot: MusicBot
     }
 
     private val mMenuIcons = listOf<IIcon>(
@@ -67,12 +66,10 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         mBackgroundScope.launch { showLoginDialog(this@MainActivity, mBackgroundScope, mHasUser.await()) }
 
 
-    fun continueWithBot(mBot: MusicBot) = mBackgroundScope.launch {
-        musicBot = mBot
-        val providerJob = async { musicBot.provider }
+    fun continueWithBot() = mBackgroundScope.launch {
+        val providerJob = async { MusicBot.instance.provider }
 
         val currentSongFragment = CurrentSongFragment.newInstance()
-        musicBot.startPlayerUpdates(currentSongFragment)
         supportFragmentManager.commit {
             replace(R.id.main_current_song, currentSongFragment, null)
             replace(R.id.main_content, QueueFragment.newInstance(), null)
@@ -136,7 +133,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             main_bottom_navigation.animate().setDuration(duration)
                 .translationYBy(main_current_song.height.toFloat())
                 .withEndAction { main_bottom_navigation.visibility = View.GONE }.start()
-            
+
         } else {
             main_bottom_navigation.animate().setDuration(duration)
                 .translationYBy(-main_current_song.height.toFloat())

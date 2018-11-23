@@ -16,12 +16,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.iberger.enq.R
-import me.iberger.enq.gui.MainActivity.Companion.musicBot
 import me.iberger.enq.gui.adapter.FavoritesItem
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.loadFavorites
 import me.iberger.enq.utils.setupSwipeActions
 import me.iberger.enq.utils.toastShort
+import me.iberger.jmusicbot.MusicBot
 
 class FavoritesFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback {
 
@@ -56,7 +56,7 @@ class FavoritesFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback {
             val item = mFastItemAdapter.getAdapterItem(position)
             when (direction) {
                 ItemTouchHelper.LEFT -> {
-                    musicBot.enqueue(item.song).await()
+                    MusicBot.instance.enqueue(item.song).await()
                     withContext(Dispatchers.Main) {
                         context!!.toastShort(context!!.getString(R.string.msg_enqueued, item.song.title))
                         mFastItemAdapter.notifyAdapterItemChanged(position)

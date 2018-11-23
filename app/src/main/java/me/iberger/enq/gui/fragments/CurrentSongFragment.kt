@@ -17,8 +17,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.iberger.enq.R
 import me.iberger.enq.gui.MainActivity.Companion.mFavorites
-import me.iberger.enq.gui.MainActivity.Companion.musicBot
 import me.iberger.enq.utils.changeFavoriteStatus
+import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.PlayerState
 import me.iberger.jmusicbot.data.PlayerStates
 import me.iberger.jmusicbot.data.Song
@@ -47,7 +47,7 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        musicBot.startPlayerUpdates(this@CurrentSongFragment)
+        MusicBot.instance.startPlayerUpdates(this@CurrentSongFragment)
         // pre-load drawables for player buttons
         mBackgroundScope.launch {
             val color = Color.WHITE
@@ -75,12 +75,12 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
         song_favorite.setOnClickListener { addToFavorites() }
     }
 
-    private fun changePlaybackState() {
+    private fun changePlaybackState() = mBackgroundScope.launch {
         when (mPlayerState.state) {
-            PlayerStates.STOP -> mBackgroundScope.launch { onPlayerStateChanged(musicBot.play().await()) }
-            PlayerStates.PLAY -> mBackgroundScope.launch { onPlayerStateChanged(musicBot.pause().await()) }
-            PlayerStates.PAUSE -> mBackgroundScope.launch { onPlayerStateChanged(musicBot.play().await()) }
-            PlayerStates.ERROR -> mBackgroundScope.launch { onPlayerStateChanged(musicBot.play().await()) }
+            PlayerStates.STOP -> onPlayerStateChanged(MusicBot.instance.play().await())
+            PlayerStates.PLAY -> onPlayerStateChanged(MusicBot.instance.pause().await())
+            PlayerStates.PAUSE -> onPlayerStateChanged(MusicBot.instance.play().await())
+            PlayerStates.ERROR -> onPlayerStateChanged(MusicBot.instance.play().await())
         }
     }
 

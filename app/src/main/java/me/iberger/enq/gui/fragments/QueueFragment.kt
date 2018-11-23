@@ -17,12 +17,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.iberger.enq.R
-import me.iberger.enq.gui.MainActivity.Companion.musicBot
 import me.iberger.enq.gui.adapter.QueueItem
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.setupSwipeActions
 import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.KEY_QUEUE
+import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.QueueEntry
 import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.listener.QueueUpdateListener
@@ -41,7 +41,7 @@ class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemS
     private lateinit var mFastItemAdapter: FastItemAdapter<QueueItem>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        musicBot.startQueueUpdates(this)
+        MusicBot.instance.startQueueUpdates(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
@@ -81,8 +81,10 @@ class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemS
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
                     try {
-                        musicBot.dequeue(entry.song).await()
+                        Timber.d("Trying dequeue")
+                        MusicBot.instance.dequeue(entry.song).await()
                     } catch (e: AuthException) {
+                        Timber.e("AuthException with reason ${e.reason}")
                         withContext(Dispatchers.Main) {
                             context!!.toastShort(R.string.msg_no_permission)
                             mFastItemAdapter.notifyAdapterItemChanged(position)
@@ -105,6 +107,6 @@ class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemS
 
     override fun onDestroy() {
         super.onDestroy()
-        musicBot.stopQueueUpdates(this)
+        MusicBot.instance.stopQueueUpdates(this)
     }
 }

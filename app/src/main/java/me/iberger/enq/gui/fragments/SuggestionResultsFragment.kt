@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
 import kotlinx.coroutines.launch
-import me.iberger.enq.gui.MainActivity.Companion.musicBot
 import me.iberger.enq.gui.adapter.SuggestionsItem
 import me.iberger.jmusicbot.KEY_SUGGESTER_ID
+import me.iberger.jmusicbot.MusicBot
 import timber.log.Timber
 
 class SuggestionResultsFragment : ResultsFragment() {
@@ -29,7 +29,7 @@ class SuggestionResultsFragment : ResultsFragment() {
         super.onViewCreated(view, savedInstanceState)
         Timber.d("Getting suggestions for suggester $mSuggesterId")
         mBackgroundScope.launch {
-            val results = musicBot.getSuggestions(mSuggesterId).await()
+            val results = MusicBot.instance.getSuggestions(mSuggesterId).await()
             super.displayResults(results.map { SuggestionsItem(it) })
         }
     }

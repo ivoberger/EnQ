@@ -3,6 +3,7 @@ package me.iberger.enq.utils
 import android.content.Context
 import android.widget.EditText
 import android.widget.Toast
+import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -14,10 +15,10 @@ import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.exceptions.UsernameTakenException
 import timber.log.Timber
 
-private fun styleButtons(context: Context, alertDialog: AlertDialog, colorResource: Int) {
+private fun styleButtons(context: Context, alertDialog: AlertDialog, @ColorRes colorResource: Int) {
     alertDialog.setOnShowListener {
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            .setTextColor(ContextCompat.getColor(context, R.color.colorAccent))
+            .setTextColor(ContextCompat.getColor(context, colorResource))
     }
 }
 
@@ -83,7 +84,7 @@ fun showLoginDialog(
         if (!loggingIn) return@withContext
         try {
             val musicBot = MusicBot.init(activity, userName, password).await()
-            (activity as MainActivity).continueWithBot(musicBot)
+            (activity as MainActivity).continueWithBot()
             Toast.makeText(activity, activity.getString(R.string.msg_logged_in, musicBot.user.name), Toast.LENGTH_SHORT)
                 .show()
             loginDialog.dismiss()

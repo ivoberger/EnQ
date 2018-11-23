@@ -13,6 +13,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.iberger.enq.R
 import me.iberger.enq.gui.MainActivity
+import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.MusicBotPlugin
 import timber.log.Timber
 
@@ -24,7 +25,7 @@ class SearchFragment : TabbedSongListFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mProvider = mBackgroundScope.async { MainActivity.musicBot.provider }
+        mProvider = mBackgroundScope.async { MusicBot.instance.provider }
 
         val searchView = ((activity as MainActivity).optionsMenu.findItem(R.id.app_bar_search).actionView as SearchView)
 

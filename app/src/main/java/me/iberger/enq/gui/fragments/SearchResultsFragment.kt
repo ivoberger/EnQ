@@ -3,9 +3,9 @@ package me.iberger.enq.gui.fragments
 import android.os.Bundle
 import androidx.core.os.bundleOf
 import kotlinx.coroutines.launch
-import me.iberger.enq.gui.MainActivity.Companion.musicBot
 import me.iberger.enq.gui.adapter.SuggestionsItem
 import me.iberger.jmusicbot.KEY_PROVIDER_ID
+import me.iberger.jmusicbot.MusicBot
 import timber.log.Timber
 
 class SearchResultsFragment : ResultsFragment() {
@@ -27,7 +27,7 @@ class SearchResultsFragment : ResultsFragment() {
     fun search(query: String) {
         Timber.d("Searching for $query on provider $mProviderID")
         mBackgroundScope.launch {
-            val results = musicBot.search(mProviderID, query).await()
+            val results = MusicBot.instance.search(mProviderID, query).await()
             Timber.d("Got ${results.size} results on provider $mProviderID")
             super.displayResults(results.map { SuggestionsItem(it) })
         }

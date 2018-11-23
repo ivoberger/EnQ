@@ -3,9 +3,8 @@ package me.iberger.jmusicbot
 import android.content.Context
 import android.content.SharedPreferences
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import me.iberger.jmusicbot.data.*
 import me.iberger.jmusicbot.exceptions.AuthException
@@ -35,15 +34,10 @@ class MusicBot(
 
     private val okHttpClient: OkHttpClient = OkHttpClient.Builder().apply {
         addInterceptor { chain ->
-            chain.proceed(
-                chain.request().newBuilder().addHeader(
-                    KEY_AUTHORIZATION,
-                    authToken
-                ).build()
-            )
+            chain.proceed(chain.request().newBuilder().addHeader(KEY_AUTHORIZATION, authToken).build())
         }
-    }.authenticator(TokenAuthenticator()).build()
-    
+    }.authenticator(TokenAuthenticator()).cache(null).build()
+
     private val apiClient: MusicBotAPI = Retrofit.Builder()
         .addConverterFactory(MoshiConverterFactory.create(mMoshi).asLenient())
         .baseUrl(baseUrl)
@@ -71,7 +65,7 @@ class MusicBot(
     private val mPlayerUpdateListeners: MutableList<PlayerUpdateListener> = mutableListOf()
 
     @Throws(InvalidParametersException::class, AuthException::class)
-    fun changePassword(newPassword: String) = mCRScope.async {
+    fun changePassword(newPassword: String) = GlobalScope.async {
         authToken = apiClient.changePassword(
             Credentials.PasswordChange((newPassword))
         ).process()
@@ -82,34 +76,34 @@ class MusicBot(
     fun refreshToken(): Response<String> = apiClient.login(Credentials.Login(user)).execute()
 
     fun search(providerId: String, query: String): Deferred<List<Song>> =
-        mCRScope.async { apiClient.searchForSong(providerId, query).process() }
+        GlobalScope.async { apiClient.searchForSong(providerId, query).process() }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     fun enqueue(song: Song) =
-        mCRScope.async { updateQueue(apiClient.enqueue(song.id, song.provider.id).process()) }
+        GlobalScope.async { updateQueue(apiClient.enqueue(song.id, song.provider.id).process()) }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     fun dequeue(song: Song) =
-        mCRScope.async { updateQueue(apiClient.dequeue(song.id, song.provider.id).process()) }
+        GlobalScope.async { updateQueue(apiClient.dequeue(song.id, song.provider.id).process()) }
 
     val history: List<QueueEntry>
         get() = apiClient.getHistory().process()
 
-    fun getSuggestions(suggesterId: String): Deferred<List<Song>> = mCRScope.async {
+    fun getSuggestions(suggesterId: String): Deferred<List<Song>> = GlobalScope.async {
         apiClient.getSuggestions(suggesterId).process()
     }
 
     fun deleteSuggestion(suggester: MusicBotPlugin, song: Song, provider: MusicBotPlugin): Deferred<Unit> =
-        mCRScope.async { apiClient.deleteSuggestion(suggester.id, song.id, provider.id).process() }
+        GlobalScope.async { apiClient.deleteSuggestion(suggester.id, song.id, provider.id).process() }
 
     private fun changePlayerState(action: PlayerAction) =
-        mCRScope.async { updatePlayer(apiClient.setPlayerState(PlayerStateChange(action)).process()) }
+        GlobalScope.async { updatePlayer(apiClient.setPlayerState(PlayerStateChange(action)).process()) }
 
-    fun pause() = mCRScope.async { apiClient.pause().process() }
-    fun play() = mCRScope.async { apiClient.play().process() }
-    fun skip() = mCRScope.async { apiClient.skip().process() }
+    fun pause() = GlobalScope.async { apiClient.pause().process() }
+    fun play() = GlobalScope.async { apiClient.play().process() }
+    fun skip() = GlobalScope.async { apiClient.skip().process() }
 
-    fun startQueueUpdates(listener: QueueUpdateListener, period: Long = 500) {
+    fun startQueueUpdates(listener: QueueUpdateListener, period: Long = 50000) {
         mQueueUpdateListeners.add(listener)
         mQueueUpdateTimer = fixedRateTimer(period = period) { updateQueue() }
     }
@@ -122,7 +116,7 @@ class MusicBot(
         }
     }
 
-    fun startPlayerUpdates(listener: PlayerUpdateListener, period: Long = 500) {
+    fun startPlayerUpdates(listener: PlayerUpdateListener, period: Long = 5000) {
         mPlayerUpdateListeners.add(listener)
         mPlayerUpdateTimer = fixedRateTimer(period = period) { updatePlayer() }
     }
@@ -158,7 +152,6 @@ class MusicBot(
 
     companion object {
 
-        internal val mCRScope = CoroutineScope(Dispatchers.IO)
         lateinit var instance: MusicBot
         internal var baseUrl: String? = null
 
@@ -168,7 +161,7 @@ class MusicBot(
         @Throws(IllegalArgumentException::class, UsernameTakenException::class)
         fun init(
             context: Context, userName: String? = null, password: String? = null, hostAddress: String? = null
-        ): Deferred<MusicBot> = mCRScope.async {
+        ): Deferred<MusicBot> = GlobalScope.async {
             val preferences = context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE)
             verifyHostAddress(context, hostAddress)
             val apiClient = Retrofit.Builder()
@@ -210,9 +203,9 @@ class MusicBot(
         }
 
         fun hasUser(context: Context) =
-            mCRScope.async { context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE).contains(KEY_USER) }
+            GlobalScope.async { context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE).contains(KEY_USER) }
 
-        fun hasServer(context: Context): Deferred<Boolean> = mCRScope.async {
+        fun hasServer(context: Context): Deferred<Boolean> = GlobalScope.async {
             verifyHostAddress(context)
             return@async baseUrl != null
         }
