@@ -7,7 +7,7 @@ import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.exceptions.InvalidParametersException
 import me.iberger.jmusicbot.exceptions.NotFoundException
 import me.iberger.jmusicbot.exceptions.ServerErrorException
-import retrofit2.Response
+import retrofit2.Call
 import timber.log.Timber
 import java.io.IOException
 import java.net.DatagramPacket
@@ -46,20 +46,23 @@ private fun discoverHost(context: Context): String? {
     }
 }
 
-internal fun <T> Response<T>.process(
+internal fun <T> Call<T>.process(
     successCodes: List<Int> = listOf(200, 201, 204),
     errorCodes: Map<Int, Exception> = mapOf(),
     notFoundType: NotFoundException.Type = NotFoundException.Type.SONG,
     invalidParamsType: InvalidParametersException.Type = InvalidParametersException.Type.MISSING
-): T = when (this.code()) {
-    in successCodes -> body()!!
-    in errorCodes -> throw errorCodes[this.code()]!!
-    400 -> throw InvalidParametersException(invalidParamsType)
-    401 -> throw AuthException(AuthException.Reason.NEEDS_AUTH)
-    403 -> throw AuthException(AuthException.Reason.NEEDS_PERMISSION)
-    404 -> throw NotFoundException(notFoundType)
-    else -> {
-        Timber.e("Error: ${errorBody()!!.string()}")
-        throw ServerErrorException(this.code())
+): T {
+    val response = execute()
+    return when (response.code()) {
+        in successCodes -> response.body()!!
+        in errorCodes -> throw errorCodes[response.code()]!!
+        400 -> throw InvalidParametersException(invalidParamsType, response.errorBody()!!.string())
+        401 -> throw AuthException(AuthException.Reason.NEEDS_AUTH, response.errorBody()!!.string())
+        403 -> throw AuthException(AuthException.Reason.NEEDS_PERMISSION, response.errorBody()!!.string())
+        404 -> throw NotFoundException(notFoundType, response.errorBody()!!.string())
+        else -> {
+            Timber.e("Error: ${response.errorBody()!!.string()}")
+            throw ServerErrorException(response.code())
+        }
     }
 }

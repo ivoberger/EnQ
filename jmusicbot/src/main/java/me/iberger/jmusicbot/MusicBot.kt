@@ -15,9 +15,11 @@ import me.iberger.jmusicbot.exceptions.UsernameTakenException
 import me.iberger.jmusicbot.listener.PlayerUpdateListener
 import me.iberger.jmusicbot.listener.QueueUpdateListener
 import me.iberger.jmusicbot.network.MusicBotAPI
+import me.iberger.jmusicbot.network.TokenAuthenticator
 import me.iberger.jmusicbot.network.process
 import me.iberger.jmusicbot.network.verifyHostAddress
 import okhttp3.OkHttpClient
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
@@ -40,7 +42,8 @@ class MusicBot(
                 ).build()
             )
         }
-    }.build()
+    }.authenticator(TokenAuthenticator()).build()
+    
     private val apiClient: MusicBotAPI = Retrofit.Builder()
         .addConverterFactory(MoshiConverterFactory.create(mMoshi).asLenient())
         .baseUrl(baseUrl)
@@ -56,10 +59,10 @@ class MusicBot(
         }
 
     val provider: List<MusicBotPlugin>
-        get() = apiClient.getProvider().execute().process()
+        get() = apiClient.getProvider().process()
 
     val suggesters: List<MusicBotPlugin>
-        get() = apiClient.getSuggesters().execute().process()
+        get() = apiClient.getSuggesters().process()
 
     private var mQueueUpdateTimer: Timer? = null
     private var mPlayerUpdateTimer: Timer? = null
@@ -71,38 +74,40 @@ class MusicBot(
     fun changePassword(newPassword: String) = mCRScope.async {
         authToken = apiClient.changePassword(
             Credentials.PasswordChange((newPassword))
-        ).execute().process()
+        ).process()
         user.password = newPassword
         user.save(mPreferences)
     }
 
+    fun refreshToken(): Response<String> = apiClient.login(Credentials.Login(user)).execute()
+
     fun search(providerId: String, query: String): Deferred<List<Song>> =
-        mCRScope.async { apiClient.searchForSong(providerId, query).execute().process() }
+        mCRScope.async { apiClient.searchForSong(providerId, query).process() }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     fun enqueue(song: Song) =
-        mCRScope.async { updateQueue(apiClient.enqueue(song.id, song.provider.id).execute().process()) }
+        mCRScope.async { updateQueue(apiClient.enqueue(song.id, song.provider.id).process()) }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     fun dequeue(song: Song) =
-        mCRScope.async { updateQueue(apiClient.dequeue(song.id, song.provider.id).execute().process()) }
+        mCRScope.async { updateQueue(apiClient.dequeue(song.id, song.provider.id).process()) }
 
     val history: List<QueueEntry>
-        get() = apiClient.getHistory().execute().process()
+        get() = apiClient.getHistory().process()
 
     fun getSuggestions(suggesterId: String): Deferred<List<Song>> = mCRScope.async {
-        apiClient.getSuggestions(suggesterId).execute().process()
+        apiClient.getSuggestions(suggesterId).process()
     }
 
     fun deleteSuggestion(suggester: MusicBotPlugin, song: Song, provider: MusicBotPlugin): Deferred<Unit> =
-        mCRScope.async { apiClient.deleteSuggestion(suggester.id, song.id, provider.id).execute().process() }
+        mCRScope.async { apiClient.deleteSuggestion(suggester.id, song.id, provider.id).process() }
 
     private fun changePlayerState(action: PlayerAction) =
-        mCRScope.async { updatePlayer(apiClient.setPlayerState(PlayerStateChange(action)).execute().process()) }
+        mCRScope.async { updatePlayer(apiClient.setPlayerState(PlayerStateChange(action)).process()) }
 
-    fun pause() = mCRScope.async { apiClient.pause().execute().process() }
-    fun play() = mCRScope.async { apiClient.play().execute().process() }
-    fun skip() = mCRScope.async { apiClient.skip().execute().process() }
+    fun pause() = mCRScope.async { apiClient.pause().process() }
+    fun play() = mCRScope.async { apiClient.play().process() }
+    fun skip() = mCRScope.async { apiClient.skip().process() }
 
     fun startQueueUpdates(listener: QueueUpdateListener, period: Long = 500) {
         mQueueUpdateListeners.add(listener)
@@ -132,7 +137,7 @@ class MusicBot(
 
     private fun updateQueue(queue: List<QueueEntry>? = null) {
         try {
-            val newQueue = queue ?: apiClient.getQueue().execute().process()
+            val newQueue = queue ?: apiClient.getQueue().process()
             mQueueUpdateListeners.forEach { it.onQueueChanged(newQueue) }
         } catch (e: Exception) {
             mQueueUpdateListeners.forEach { it.onUpdateError(e) }
@@ -141,7 +146,7 @@ class MusicBot(
 
     private fun updatePlayer(playerState: PlayerState? = null) {
         try {
-            val newState = playerState ?: apiClient.getPlayerState().execute().process()
+            val newState = playerState ?: apiClient.getPlayerState().process()
             mPlayerUpdateListeners.forEach { it.onPlayerStateChanged(newState) }
         } catch (e: Exception) {
             mPlayerUpdateListeners.forEach { it.onUpdateError(e) }
@@ -216,14 +221,13 @@ class MusicBot(
             Timber.d("Logging in user ${user.name}")
             Timber.d(mMoshi.adapter<Credentials.Login>(Credentials.Login::class.java).toJson(Credentials.Login(user)))
             return apiClient
-                .login(Credentials.Login(user)).execute()
-                .process()
+                .login(Credentials.Login(user)).process()
         }
 
         private fun registerUser(apiClient: MusicBotAPI, name: String): String {
             Timber.d("Registering user $name")
             return apiClient
-                .registerUser(Credentials.Register(name)).execute()
+                .registerUser(Credentials.Register(name))
                 .process(errorCodes = mapOf(409 to UsernameTakenException()))
         }
     }
