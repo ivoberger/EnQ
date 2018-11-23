@@ -162,6 +162,7 @@ class MusicBot(
         fun init(
             context: Context, userName: String? = null, password: String? = null, hostAddress: String? = null
         ): Deferred<MusicBot> = GlobalScope.async {
+            Timber.d("Initiating MusicBot")
             val preferences = context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE)
             verifyHostAddress(context, hostAddress)
             val apiClient = Retrofit.Builder()
@@ -171,6 +172,7 @@ class MusicBot(
                 .create(MusicBotAPI::class.java)
             val user: User
             val authToken: String
+            Timber.d("User setup")
             if (hasUser(context).await()) {
                 user = User.load(preferences, mMoshi)!!
                 authToken = if (user.password == null) registerUser(apiClient, user.name)

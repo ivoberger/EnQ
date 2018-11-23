@@ -15,6 +15,7 @@ import com.mikepenz.iconics.typeface.IIcon
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import me.iberger.enq.R
+import me.iberger.enq.Views
 import me.iberger.enq.gui.fragments.*
 import me.iberger.enq.utils.loadFavorites
 import me.iberger.enq.utils.showLoginDialog
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
     private lateinit var mHasUser: Deferred<Boolean>
 
+    private var currentView: Views = Views.QUEUE
     private var mPlayerCollapsed = false
     private var mBottomNavCollapsed = false
 
@@ -90,7 +92,16 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         searchView.setOnCloseListener {
             changeBottomNavCollapse(false)
             changePlayerCollapse(false)
-            supportFragmentManager.commit { replace(R.id.main_content, QueueFragment.newInstance()) }
+            supportFragmentManager.commit {
+                replace(
+                    R.id.main_content,
+                    when (currentView) {
+                        Views.QUEUE -> QueueFragment.newInstance()
+                        Views.SUGGESTIONS -> SuggestionsFragment.newInstance()
+                        Views.FAVORITES -> FavoritesFragment.newInstance()
+                    }
+                )
+            }
             return@setOnCloseListener false
         }
         return true
@@ -98,16 +109,19 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.nav_queue -> {
+            currentView = Views.QUEUE
             changePlayerCollapse(false)
             supportFragmentManager.commit { replace(R.id.main_content, QueueFragment.newInstance()) }
             true
         }
         R.id.nav_suggestions -> {
+            currentView = Views.SUGGESTIONS
             changePlayerCollapse(true)
             supportFragmentManager.commit { replace(R.id.main_content, SuggestionsFragment.newInstance()) }
             true
         }
         R.id.nav_starred -> {
+            currentView = Views.FAVORITES
             changePlayerCollapse(true)
             supportFragmentManager.commit { replace(R.id.main_content, FavoritesFragment.newInstance()) }
             true
