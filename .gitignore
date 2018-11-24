@@ -69,3 +69,5 @@ fastlane/readme.md
 \.idea/markdown-navigator\.xml
 
 keystore\.properties
+
+app/play_credentials\.json
