@@ -13,14 +13,7 @@ jobs:
       - checkout
       - run:
           name: Signing Setup
-          command: |
-            cat \<\<EOF > keystore.properties
-            storePassword=${SIGNING_KEYSTORE_PW}
-            keyPassword=${SIGNING_KEY_PW}
-            keyAlias=metsatie
-            storeFile=keystore.jks
-            EOF
-            echo ${SIGNING_KEYSTORE} | base64 -d keystore.jks
+          command: bash .circeci/signing_setup.sh
       - restore_cache:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}-{{ checksum  "gradle.properties" }}-{{ checksum  "gradle/wrapper/gradle-wrapper.properties" }}
       - run:
