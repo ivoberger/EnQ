@@ -2,6 +2,7 @@ package me.iberger.jmusicbot
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
@@ -29,8 +30,13 @@ class MusicBot(
     private val mPreferences: SharedPreferences,
     baseUrl: String,
     user: User,
-    var authToken: String
+    initToken: String
 ) {
+
+    init {
+        user.save(mPreferences)
+        mPreferences.edit { putString(KEY_AUTHORIZATION, initToken) }
+    }
 
     private val okHttpClient: OkHttpClient = OkHttpClient.Builder().apply {
         addInterceptor { chain ->
@@ -50,6 +56,13 @@ class MusicBot(
     var user: User = user
         set(newUser) {
             newUser.save(mPreferences)
+            field = newUser
+        }
+
+    var authToken: String = initToken
+        set(newToken) {
+            mPreferences.edit { putString(KEY_AUTHORIZATION, newToken) }
+            field = newToken
         }
 
     val provider: List<MusicBotPlugin>
@@ -103,7 +116,7 @@ class MusicBot(
     fun play() = GlobalScope.async { apiClient.play().process()!! }
     fun skip() = GlobalScope.async { apiClient.skip().process()!! }
 
-    fun startQueueUpdates(listener: QueueUpdateListener, period: Long = 50000) {
+    fun startQueueUpdates(listener: QueueUpdateListener, period: Long = 500) {
         mQueueUpdateListeners.add(listener)
         mQueueUpdateTimer = fixedRateTimer(period = period) { updateQueue() }
     }
@@ -116,7 +129,7 @@ class MusicBot(
         }
     }
 
-    fun startPlayerUpdates(listener: PlayerUpdateListener, period: Long = 5000) {
+    fun startPlayerUpdates(listener: PlayerUpdateListener, period: Long = 500) {
         mPlayerUpdateListeners.add(listener)
         mPlayerUpdateTimer = fixedRateTimer(period = period) { updatePlayer() }
     }
@@ -170,33 +183,34 @@ class MusicBot(
                 .baseUrl(baseUrl!!)
                 .build()
                 .create(MusicBotAPI::class.java)
-            val user: User
+
             val authToken: String
             Timber.d("User setup")
-            if (hasUser(context).await()) {
-                user = User.load(preferences, mMoshi)!!
-                authToken = if (user.password == null) registerUser(apiClient, user.name)
+            val user: User = if (hasUser(context).await()) {
+                User.load(preferences, mMoshi)!!
+            } else {
+                User(
+                    userName ?: throw IllegalArgumentException("No user saved and no username given"),
+                    password = password
+                )
+            }
+            try {
+                val tmpToken = preferences.getString(KEY_AUTHORIZATION, null)
+                tmpToken?.also {
+                    Timber.d("Trying saved token")
+                    apiClient.attemptLogin(it)
+                    instance = MusicBot(preferences, baseUrl!!, user, it)
+                    return@async instance
+                }
+                throw AuthException(AuthException.Reason.NEEDS_AUTH)
+            } catch (e: AuthException) {
+                authToken = if (user.password.isNullOrBlank()) registerUser(apiClient, user.name)
                 else try {
                     loginUser(apiClient, user)
                 } catch (e: NotFoundException) {
                     val tmpToken = registerUser(apiClient, user.name)
                     instance = MusicBot(preferences, baseUrl!!, user, tmpToken)
                     instance.changePassword(user.password!!).await()
-                    return@async instance
-                }
-            } else {
-                user = User(
-                    userName ?: throw IllegalArgumentException("No user saved and no username given"),
-                    password = password
-                )
-                authToken = if (password.isNullOrBlank()) registerUser(apiClient, userName)
-                else try {
-                    loginUser(apiClient, user)
-                } catch (e: NotFoundException) {
-                    Timber.w(e)
-                    val tmpToken = registerUser(apiClient, userName)
-                    instance = MusicBot(preferences, baseUrl!!, user, tmpToken)
-                    instance.changePassword(password).await()
                     return@async instance
                 }
             }
@@ -215,15 +229,12 @@ class MusicBot(
         private fun loginUser(apiClient: MusicBotAPI, user: User): String {
             Timber.d("Logging in user ${user.name}")
             Timber.d(mMoshi.adapter<Credentials.Login>(Credentials.Login::class.java).toJson(Credentials.Login(user)))
-            return apiClient
-                .login(Credentials.Login(user)).process()!!
+            return apiClient.login(Credentials.Login(user)).process()!!
         }
 
         private fun registerUser(apiClient: MusicBotAPI, name: String): String {
             Timber.d("Registering user $name")
-            return apiClient
-                .registerUser(Credentials.Register(name))
-                .process(errorCodes = mapOf(409 to UsernameTakenException()))!!
+            return apiClient.registerUser(Credentials.Register(name)).process(errorCodes = mapOf(409 to UsernameTakenException()))!!
         }
     }
 }

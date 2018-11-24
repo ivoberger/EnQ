@@ -35,5 +35,6 @@ data class User(
         sharedPreferences.edit {
             putString(KEY_USER, userAdapter.toJson(this@User))
         }
+        Timber.d("Saved user $this")
     }
 }

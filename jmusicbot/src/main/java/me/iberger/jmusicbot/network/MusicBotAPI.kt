@@ -1,9 +1,6 @@
 package me.iberger.jmusicbot.network
 
-import me.iberger.jmusicbot.KEY_PROVIDER_ID
-import me.iberger.jmusicbot.KEY_QUERY
-import me.iberger.jmusicbot.KEY_SONG_ID
-import me.iberger.jmusicbot.KEY_SUGGESTER_ID
+import me.iberger.jmusicbot.*
 import me.iberger.jmusicbot.data.*
 import retrofit2.Call
 import retrofit2.http.*
@@ -27,6 +24,9 @@ internal interface MusicBotAPI {
 
     @PUT("token")
     fun login(@Body loginCredentials: Credentials.Login): Call<String>
+
+    @GET(URL_PLAYER)
+    fun attemptLogin(@Header(KEY_AUTHORIZATION) authToken: String): Call<PlayerState>
 
     // Song operations
 

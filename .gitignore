@@ -67,3 +67,5 @@ fastlane/readme.md
 \.idea/misc\.xml
 
 \.idea/markdown-navigator\.xml
+
+keystore\.properties
