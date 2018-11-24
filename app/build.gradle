@@ -3,6 +3,7 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-android-extensions'
     id 'kotlin-kapt'
+    id 'com.github.triplet.play' version '2.0.0-rc2'
 }
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -38,6 +39,13 @@ android {
             signingConfig signingConfigs.release
         }
     }
+}
+
+play {
+    serviceAccountCredentials = file("play_credentials.json")
+    track = "beta"
+    defaultToAppBundles = true
+    resolutionStrategy = "auto"
 }
 
 dependencies {
