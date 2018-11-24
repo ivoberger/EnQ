@@ -53,10 +53,6 @@ jobs:
       - store_artifacts:
           path: app/build/outputs/bundle/debug/app.aab
           destination: debug-bundle
-      - persist_to_workspace:
-          root: /tmp/workspace/
-          paths:
-            - .gradle
   build_release:
     executor: android-executor
     steps:
