@@ -3,3 +3,4 @@
 
 [Kiu](https://github.com/BjoernPetersen/Kiu) Reloaded: Android App for [JMusicBot](https://github.com/BjoernPetersen/JMusicBot)
 
+[Sign up for testing](https://play.google.com/apps/testing/me.iberger.enq)
