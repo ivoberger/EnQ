@@ -13,7 +13,7 @@ jobs:
       - checkout
       - run:
           name: Signing Setup
-          command: bash .circeci/signing_setup.sh
+          command: bash .circleci/signing_setup.sh
       - restore_cache:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}-{{ checksum  "gradle.properties" }}-{{ checksum  "gradle/wrapper/gradle-wrapper.properties" }}
       - run:
