@@ -26,7 +26,7 @@ jobs:
       - run:
           name: Signing Setup
           command: |
-            cat <<EOF > keystore.properties
+            cat \<\<EOF > keystore.properties
             storePassword=${SIGNING_KEYSTORE_PW}
             keyPassword=${SIGNING_KEY_PW}
             keyAlias=metsatie
