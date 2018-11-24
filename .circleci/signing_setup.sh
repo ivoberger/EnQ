@@ -5,4 +5,4 @@ cat <<EOF > keystore.properties
     keyAlias=enq
     storeFile=keystore.jks
 EOF
-echo ${SIGNING_KEYSTORE} | base64 -d > keystore.jks
+echo $SIGNING_KEYSTORE | base64 -d > keystore.jks
