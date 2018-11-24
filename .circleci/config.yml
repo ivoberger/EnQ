@@ -45,11 +45,11 @@ jobs:
           at: /tmp/workspace/
       - checkout
       - run:
-          name: Build debug apk
-          command: ./gradlew assembleDebug
+          name: Bundle debug
+          command: ./gradlew bundleDebug
       - store_artifacts:
-          path: app/build/outputs/apk/debug/app-debug.apk
-          destination: debug-apk
+          path: app/build/outputs/bundle/debug/app.aab
+          destination: debug-bundle
       - persist_to_workspace:
           root: /tmp/workspace/
           paths:
@@ -64,10 +64,10 @@ jobs:
           name: Signing Setup
           command: .circleci/signing_setup.sh
       - run:
-          name: Build release apk
+          name: Bundle release
           command: ./gradlew bundleRelease
       - store_artifacts:
-          path: app/build/outputs/bunlde/release/app.aab
+          path: app/build/outputs/bundle/release/app.aab
           destination: release-bundle
   #      - persist_to_workspace:
   #          root: /tmp/workspace/
