@@ -11,6 +11,16 @@ jobs:
     executor: android-executor
     steps:
       - checkout
+      - run:
+          name: Signing Setup
+          command: |
+            cat \<\<EOF > keystore.properties
+            storePassword=${SIGNING_KEYSTORE_PW}
+            keyPassword=${SIGNING_KEY_PW}
+            keyAlias=metsatie
+            storeFile=keystore.jks
+            EOF
+            echo ${SIGNING_KEYSTORE} | base64 -d keystore.jks
       - restore_cache:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}-{{ checksum  "gradle.properties" }}-{{ checksum  "gradle/wrapper/gradle-wrapper.properties" }}
       - run:
@@ -23,16 +33,6 @@ jobs:
       - run:
           name: Disable Pre-Dexing
           command: cp .circleci/init.gradle $GRADLE_USER_HOME/init.gradle
-      - run:
-          name: Signing Setup
-          command: |
-            cat \<\<EOF > keystore.properties
-            storePassword=${SIGNING_KEYSTORE_PW}
-            keyPassword=${SIGNING_KEY_PW}
-            keyAlias=metsatie
-            storeFile=keystore.jks
-            EOF
-            echo ${SIGNING_KEYSTORE} | base64 -d keystore.jks
       - run:
           name: Lint & Test
           command: ./gradlew lint test
