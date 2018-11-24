@@ -1,15 +1,16 @@
 package me.iberger.jmusicbot.data
 
+import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class Song(
-    val id: String,
-    val title: String,
-    val description: String,
-    val albumArtUrl: String?,
-    val duration: Int?,
-    val provider: MusicBotPlugin
+    @Json(name = "id") val id: String,
+    @Json(name = "title") val title: String,
+    @Json(name = "description") val description: String,
+    @Json(name = "albumArtUrl") val albumArtUrl: String?,
+    @Json(name = "duration") val duration: Int?,
+    @Json(name = "provider") val provider: MusicBotPlugin
 ) {
     override fun hashCode(): Int = id.hashCode()
 
@@ -26,6 +27,6 @@ data class Song(
 
 @JsonClass(generateAdapter = true)
 data class SongEntry(
-    val song: Song,
-    val userName: String?
+    @Json(name = "song") val song: Song,
+    @Json(name = "userName") val userName: String?
 )

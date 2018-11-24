@@ -2,6 +2,7 @@ package me.iberger.jmusicbot.data
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.Moshi
@@ -11,9 +12,9 @@ import java.util.*
 
 @JsonClass(generateAdapter = true)
 data class User(
-    val name: String,
-    val uuid: String = UUID.randomUUID().toString(),
-    var password: String? = null
+    @Json(name = "name") val name: String,
+    @Json(name = "uuid") val uuid: String = UUID.randomUUID().toString(),
+    @Json(name = "password") var password: String? = null
 ) {
     init {
         Timber.d("Creating User $this")

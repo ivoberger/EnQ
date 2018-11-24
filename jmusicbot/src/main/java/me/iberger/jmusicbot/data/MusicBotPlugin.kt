@@ -1,6 +1,8 @@
 package me.iberger.jmusicbot.data
 
+import com.squareup.moshi.Json
+
 data class MusicBotPlugin(
-    val id: String,
-    val name: String
+    @Json(name = "id") val id: String,
+    @Json(name = "name") val name: String
 )
