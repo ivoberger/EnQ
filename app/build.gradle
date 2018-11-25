@@ -48,8 +48,12 @@ play {
     resolutionStrategy = "auto"
 }
 
+sentry {
+    autoProguardConfig true
+    autoUpload true
+}
+
 dependencies {
-    implementation project(path: ":jmusicbot")
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$v_kotlin"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$v_coroutines"
     implementation "androidx.core:core-ktx:$v_ktx"
@@ -57,6 +61,8 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$v_appcompat"
     implementation "androidx.constraintlayout:constraintlayout:$v_contraint_layout"
     implementation "com.google.android.material:material:$v_material"
+
+    implementation "com.github.IIIuminator:JMusicBotAndroid:$v_jmusicbot"
 
     implementation "io.sentry:sentry-android:$v_sentry"
     implementation "org.slf4j:slf4j-nop:$v_slf4j"
