@@ -40,6 +40,11 @@ android {
             signingConfig signingConfigs.release
         }
     }
+    sourceSets {
+        main {
+            res.srcDirs = ['src/main/resources', 'src/main/res']
+        }
+    }
     lintOptions {
         abortOnError false
     }
