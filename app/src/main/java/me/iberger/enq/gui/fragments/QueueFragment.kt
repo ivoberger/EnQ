@@ -40,8 +40,14 @@ class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemS
     private var mQueue: List<QueueEntry> = listOf()
     private lateinit var mFastItemAdapter: FastItemAdapter<QueueItem>
     override fun onCreate(savedInstanceState: Bundle?) {
+        Timber.d("Creating Queue Fragment")
         super.onCreate(savedInstanceState)
         MusicBot.instance.startQueueUpdates(this)
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        Timber.d("Hidden: $hidden")
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =

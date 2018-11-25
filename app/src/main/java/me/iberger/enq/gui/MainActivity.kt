@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.forEachIndexed
+import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
@@ -17,14 +18,12 @@ import io.sentry.android.AndroidSentryClientFactory
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import me.iberger.enq.R
-import me.iberger.enq.Views
 import me.iberger.enq.gui.fragments.*
 import me.iberger.enq.utils.LoggingTree
 import me.iberger.enq.utils.loadFavorites
 import me.iberger.enq.utils.showLoginDialog
 import me.iberger.enq.utils.showServerDiscoveryDialog
 import me.iberger.jmusicbot.MusicBot
-import me.iberger.jmusicbot.data.MusicBotPlugin
 import me.iberger.jmusicbot.data.Song
 import timber.log.Timber
 
@@ -40,12 +39,10 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         CommunityMaterial.Icon2.cmd_star_outline
     )
     lateinit var optionsMenu: Menu
-    lateinit var provider: List<MusicBotPlugin>
 
     private val mUIScope = CoroutineScope(Dispatchers.Main)
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
-    private var currentView: Views = Views.QUEUE
     private var mPlayerCollapsed = false
     private var mBottomNavCollapsed = false
 
@@ -79,14 +76,11 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
 
     fun continueWithBot() = mBackgroundScope.launch {
-        val providerJob = async { MusicBot.instance.provider }
-
         val currentSongFragment = CurrentSongFragment.newInstance()
         supportFragmentManager.commit {
             replace(R.id.main_current_song, currentSongFragment, null)
             replace(R.id.main_content, QueueFragment.newInstance(), null)
         }
-        provider = providerJob.await()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -94,23 +88,26 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         optionsMenu = menu
         val searchView = (menu.findItem(R.id.app_bar_search).actionView as SearchView)
 
+        var playerCollapse = mPlayerCollapsed
+
         searchView.setOnSearchClickListener {
+            playerCollapse = mPlayerCollapsed
             changePlayerCollapse(true, 0)
             changeBottomNavCollapse(true, 0)
-            supportFragmentManager.commit { replace(R.id.main_content, SearchFragment.newInstance()) }
+            supportFragmentManager.commit {
+                hide(supportFragmentManager.fragments[1])
+                add(R.id.main_content, SearchFragment.newInstance())
+                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                addToBackStack(null)
+            }
         }
         searchView.setOnCloseListener {
             changeBottomNavCollapse(false)
-            changePlayerCollapse(false)
+            changePlayerCollapse(playerCollapse)
+            supportFragmentManager.popBackStack()
             supportFragmentManager.commit {
-                replace(
-                    R.id.main_content,
-                    when (currentView) {
-                        Views.QUEUE -> QueueFragment.newInstance()
-                        Views.SUGGESTIONS -> SuggestionsFragment.newInstance()
-                        Views.FAVORITES -> FavoritesFragment.newInstance()
-                    }
-                )
+                show(supportFragmentManager.fragments[1])
+                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             }
             return@setOnCloseListener false
         }
@@ -119,21 +116,27 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.nav_queue -> {
-            currentView = Views.QUEUE
             changePlayerCollapse(false)
-            supportFragmentManager.commit { replace(R.id.main_content, QueueFragment.newInstance()) }
+            supportFragmentManager.commit {
+                replace(R.id.main_content, QueueFragment.newInstance())
+                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+            }
             true
         }
         R.id.nav_suggestions -> {
-            currentView = Views.SUGGESTIONS
             changePlayerCollapse(true)
-            supportFragmentManager.commit { replace(R.id.main_content, SuggestionsFragment.newInstance()) }
+            supportFragmentManager.commit {
+                replace(R.id.main_content, SuggestionsFragment.newInstance())
+                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+            }
             true
         }
         R.id.nav_starred -> {
-            currentView = Views.FAVORITES
             changePlayerCollapse(true)
-            supportFragmentManager.commit { replace(R.id.main_content, FavoritesFragment.newInstance()) }
+            supportFragmentManager.commit {
+                replace(R.id.main_content, FavoritesFragment.newInstance())
+                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+            }
             true
         }
         else -> false
