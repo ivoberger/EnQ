@@ -1,0 +1,1 @@
+EnQ is your control panel for JMusicBot. It requires a running instance of JMusicBot (https://github.com/BjoernPetersen/JMusicBot-desktop/releases) in the local network.
