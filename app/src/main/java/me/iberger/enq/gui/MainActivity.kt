@@ -19,6 +19,7 @@ import kotlinx.coroutines.*
 import me.iberger.enq.R
 import me.iberger.enq.Views
 import me.iberger.enq.gui.fragments.*
+import me.iberger.enq.utils.LoggingTree
 import me.iberger.enq.utils.loadFavorites
 import me.iberger.enq.utils.showLoginDialog
 import me.iberger.enq.utils.showServerDiscoveryDialog
@@ -52,7 +53,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         mBackgroundScope.launch {
-            Timber.plant(Timber.DebugTree())
+            Timber.plant(LoggingTree())
             Sentry.init(AndroidSentryClientFactory(applicationContext))
             mFavorites = loadFavorites(this@MainActivity)
         }
@@ -68,7 +69,13 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
     fun continueWithLogin() =
-        mBackgroundScope.launch { showLoginDialog(this@MainActivity, mBackgroundScope, MusicBot.hasUser(this).await()) }
+        mBackgroundScope.launch {
+            showLoginDialog(
+                this@MainActivity,
+                mBackgroundScope,
+                MusicBot.hasUser(this@MainActivity).await()
+            )
+        }
 
 
     fun continueWithBot() = mBackgroundScope.launch {
