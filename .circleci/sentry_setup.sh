@@ -6,6 +6,7 @@ echo "Setting version"
 export APP_VERSION=`sed -n 's/^\s*versionName\s//p' app/build.gradle | sed 's/"//g'`
 echo "App version is ${APP_VERSION}"
 echo "Writing ${SENTRY_FILE}"
+mkdir -p app/src/main/resources
 cat <<EOF > ${SENTRY_FILE}
 dsn=${SENTRY_DSN}
 stacktrace.app.packages=me.iberger.enq
