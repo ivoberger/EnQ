@@ -77,10 +77,10 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
 
     private fun changePlaybackState() = mBackgroundScope.launch {
         when (mPlayerState.state) {
-            PlayerStates.STOP -> onPlayerStateChanged(MusicBot.instance.play().await())
-            PlayerStates.PLAY -> onPlayerStateChanged(MusicBot.instance.pause().await())
-            PlayerStates.PAUSE -> onPlayerStateChanged(MusicBot.instance.play().await())
-            PlayerStates.ERROR -> onPlayerStateChanged(MusicBot.instance.play().await())
+            PlayerStates.STOP -> MusicBot.instance.play().await()
+            PlayerStates.PLAY -> MusicBot.instance.pause().await()
+            PlayerStates.PAUSE -> MusicBot.instance.play().await()
+            PlayerStates.ERROR -> MusicBot.instance.play().await()
         }
     }
 

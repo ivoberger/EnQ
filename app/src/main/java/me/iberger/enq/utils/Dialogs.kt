@@ -23,8 +23,8 @@ private fun styleButtons(context: Context, alertDialog: AlertDialog, @ColorRes c
 }
 
 fun showServerDiscoveryDialog(
-    activity: AppCompatActivity, coroutineScope: CoroutineScope, searching: Boolean = false
-): Job = coroutineScope.launch {
+    activity: AppCompatActivity, searching: Boolean = false
+): Job = GlobalScope.launch {
     Timber.d("Showing Server Discovery Dialog, $searching")
     val serverDialogBuilder = AlertDialog.Builder(activity)
         .setCancelable(false)
@@ -32,7 +32,7 @@ fun showServerDiscoveryDialog(
     if (!searching) serverDialogBuilder
         .setTitle(R.string.tlt_no_server)
         .setPositiveButton(R.string.btn_retry) { dialog, _ ->
-            showServerDiscoveryDialog(activity, coroutineScope, true)
+            showServerDiscoveryDialog(activity, true)
             dialog.dismiss()
         }
     if (searching) serverDialogBuilder.setView(R.layout.dialog_progress_spinner)
@@ -41,11 +41,11 @@ fun showServerDiscoveryDialog(
         if (!searching) styleButtons(activity, serverDialog, R.color.colorAccent)
         serverDialog.show()
         if (!searching) return@withContext
-        if (MusicBot.hasServer(activity).await()) {
+        if (async(Dispatchers.IO) { MusicBot.hasServer(activity.applicationContext) }.await()) {
             (activity as MainActivity).continueWithLogin()
             serverDialog.dismiss()
         } else {
-            showServerDiscoveryDialog(activity, coroutineScope, false).join()
+            showServerDiscoveryDialog(activity, false).join()
             serverDialog.cancel()
         }
     }
@@ -54,11 +54,10 @@ fun showServerDiscoveryDialog(
 
 fun showLoginDialog(
     activity: AppCompatActivity,
-    coroutineScope: CoroutineScope,
     loggingIn: Boolean,
     userName: String? = null,
     password: String? = null
-): Job = coroutineScope.launch {
+): Job = GlobalScope.launch {
     Timber.d("Showing Login Dialog for user $userName, Logging in: $loggingIn")
     val loginDialogBuilder = AlertDialog.Builder(activity)
         .setCancelable(false)
@@ -72,7 +71,7 @@ fun showLoginDialog(
             .setPositiveButton(R.string.btn_login) { dialog, _ ->
                 val userNameInput = dialogView.findViewById<EditText>(R.id.login_username)?.text.toString()
                 val passwordInput = dialogView.findViewById<EditText>(R.id.login_password)?.text.toString()
-                showLoginDialog(activity, coroutineScope, true, userNameInput, passwordInput)
+                showLoginDialog(activity, true, userNameInput, passwordInput)
                 dialog.dismiss()
             }
     }
@@ -91,13 +90,13 @@ fun showLoginDialog(
         } catch (e: UsernameTakenException) {
             Timber.w(e)
             Toast.makeText(activity, activity.getString(R.string.msg_username_taken), Toast.LENGTH_LONG).show()
-            showLoginDialog(activity, coroutineScope, false)
+            showLoginDialog(activity, false)
             loginDialog.cancel()
         } catch (e: AuthException) {
             Timber.w("Authentication error with reason ${e.reason}")
             Timber.w(e)
             Toast.makeText(activity, activity.getString(R.string.msg_password_wrong), Toast.LENGTH_LONG).show()
-            showLoginDialog(activity, coroutineScope, false)
+            showLoginDialog(activity, false)
             loginDialog.cancel()
         }
     }
