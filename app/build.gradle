@@ -1,9 +1,9 @@
 plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-    id 'kotlin-android-extensions'
-    id 'kotlin-kapt'
-    id 'com.github.triplet.play' version '2.0.0-rc2'
+    id "com.android.application"
+    id "kotlin-android"
+    id "kotlin-android-extensions"
+    id "kotlin-kapt"
+    id "com.github.triplet.play" version "2.0.0-rc2"
 }
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -25,16 +25,16 @@ android {
     }
     signingConfigs {
         release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties["keyAlias"]
+            keyPassword keystoreProperties["keyPassword"]
+            storeFile file(keystoreProperties["storeFile"])
+            storePassword keystoreProperties["storePassword"]
         }
     }
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
         }
     }
@@ -48,29 +48,27 @@ play {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(path: ':jmusicbot')
+    implementation project(path: ":jmusicbot")
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$v_kotlin"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$v_coroutines"
-    implementation 'androidx.core:core-ktx:1.0.1'
-    implementation "androidx.fragment:fragment-ktx:1.1.0-alpha01"
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
-    implementation "com.google.android.material:material:1.1.0-alpha01"
+    implementation "androidx.core:core-ktx:$v_ktx"
+    implementation "androidx.fragment:fragment-ktx:$v_ktx_fragments"
+    implementation "androidx.appcompat:appcompat:$v_appcompat"
+    implementation "androidx.constraintlayout:constraintlayout:$v_contraint_layout"
+    implementation "com.google.android.material:material:$v_material"
 
+    implementation "io.sentry:sentry-android:$v_sentry"
+    implementation "org.slf4j:slf4j-nop:$v_slf4j"
     implementation "com.jakewharton.timber:timber:$v_timber"
 
-    implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'com.squareup.moshi:moshi:1.8.0'
+    implementation "com.squareup.picasso:picasso:$v_picasso"
+    implementation "com.squareup.moshi:moshi:$v_moshi"
 
-    implementation 'com.mikepenz:fastadapter:3.3.1'
-    implementation 'com.mikepenz:fastadapter-commons:3.3.1'
-    implementation 'com.mikepenz:fastadapter-extensions:3.3.1'
+    implementation "com.mikepenz:fastadapter:$v_fastadapter"
+    implementation "com.mikepenz:fastadapter-commons:$v_fastadapter_commons"
+    implementation "com.mikepenz:fastadapter-extensions:$v_fastadapter_extensions"
 
-    implementation "com.mikepenz:iconics-core:3.1.0"
-    implementation 'ru.ztrap.iconics:core-kt:1.0.3'
-    implementation 'com.mikepenz:community-material-typeface:3.1.0-rc02@aar'
-
-//    implementation 'com.jakewharton:butterknife:9.0.0-SNAPSHOT'
-//    kapt 'com.jakewharton:butterknife-compiler:9.0.0-SNAPSHOT'
+    implementation "com.mikepenz:iconics-core:$v_iconics"
+    implementation "com.mikepenz:community-material-typeface:$v_iconics_tf_community_material@aar"
+    implementation "ru.ztrap.iconics:core-kt:$v_iconics_ktx"
 }
