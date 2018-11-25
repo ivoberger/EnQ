@@ -8,6 +8,7 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:$v_agp"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$v_kotlin"
+        classpath "io.sentry:sentry-android-gradle-plugin:$v_sentry"
     }
 }
 

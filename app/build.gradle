@@ -4,6 +4,7 @@ plugins {
     id "kotlin-android-extensions"
     id "kotlin-kapt"
     id "com.github.triplet.play" version "2.0.0-rc2"
+    id 'io.sentry.android.gradle'
 }
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
