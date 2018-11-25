@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.forEachIndexed
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -83,12 +84,18 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         }
     }
 
+    override fun onBackPressed() {
+        if (supportFragmentManager.backStackEntryCount == 0) super.onBackPressed()
+        else supportFragmentManager.popBackStack()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.options_main, menu)
         optionsMenu = menu
         val searchView = (menu.findItem(R.id.app_bar_search).actionView as SearchView)
 
         var playerCollapse = mPlayerCollapsed
+        val backStackListener = FragmentManager.OnBackStackChangedListener { searchView.isIconified = true }
 
         searchView.setOnSearchClickListener {
             playerCollapse = mPlayerCollapsed
@@ -100,6 +107,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 addToBackStack(null)
             }
+            supportFragmentManager.executePendingTransactions()
+            supportFragmentManager.addOnBackStackChangedListener(backStackListener)
         }
         searchView.setOnCloseListener {
             changeBottomNavCollapse(false)
@@ -109,6 +118,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 show(supportFragmentManager.fragments[1])
                 setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             }
+            supportFragmentManager.removeOnBackStackChangedListener(backStackListener)
             return@setOnCloseListener false
         }
         return true
