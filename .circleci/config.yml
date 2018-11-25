@@ -80,7 +80,10 @@ jobs:
       - checkout
       - run:
           name: Signing Setup
-          command: bash .circleci/signing_setup.sh
+          command: .circleci/signing_setup.sh
+      - run:
+          name: Sentry Setup
+          command: .circleci/sentry_setup.sh
       - run:
           name: Deploy
           command: ./gradlew publishRelease

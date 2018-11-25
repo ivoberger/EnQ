@@ -12,6 +12,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.IIcon
+import io.sentry.Sentry
+import io.sentry.android.AndroidSentryClientFactory
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import me.iberger.enq.R
@@ -41,16 +43,19 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     private val mUIScope = CoroutineScope(Dispatchers.Main)
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
-    private lateinit var mHasUser: Deferred<Boolean>
 
     private var currentView: Views = Views.QUEUE
     private var mPlayerCollapsed = false
     private var mBottomNavCollapsed = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Timber.plant(Timber.DebugTree())
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        mBackgroundScope.launch {
+            Timber.plant(Timber.DebugTree())
+            Sentry.init(AndroidSentryClientFactory(applicationContext))
+            mFavorites = loadFavorites(this@MainActivity)
+        }
 
         main_bottom_navigation.setOnNavigationItemSelectedListener(this)
         mUIScope.launch {
@@ -60,12 +65,10 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             }
         }
         showServerDiscoveryDialog(this@MainActivity, mBackgroundScope, true)
-        mHasUser = MusicBot.hasUser(this)
-        mBackgroundScope.launch { mFavorites = loadFavorites(this@MainActivity) }
     }
 
     fun continueWithLogin() =
-        mBackgroundScope.launch { showLoginDialog(this@MainActivity, mBackgroundScope, mHasUser.await()) }
+        mBackgroundScope.launch { showLoginDialog(this@MainActivity, mBackgroundScope, MusicBot.hasUser(this).await()) }
 
 
     fun continueWithBot() = mBackgroundScope.launch {
