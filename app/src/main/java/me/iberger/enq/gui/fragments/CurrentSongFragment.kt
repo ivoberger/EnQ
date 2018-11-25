@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import me.iberger.enq.R
 import me.iberger.enq.gui.MainActivity.Companion.mFavorites
 import me.iberger.enq.utils.changeFavoriteStatus
+import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.PlayerState
 import me.iberger.jmusicbot.data.PlayerStates
@@ -35,10 +36,12 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
     private var mPlayerState: PlayerState = PlayerState(PlayerStates.STOP, null)
+    private var mShowSkip = false
 
     private lateinit var mPlayDrawable: IconicsDrawable
     private lateinit var mPauseDrawable: IconicsDrawable
     private lateinit var mStoppedDrawable: IconicsDrawable
+    private lateinit var mSkipDrawable: IconicsDrawable
     private lateinit var mErrorDrawable: IconicsDrawable
 
     private lateinit var mFavoritesAddDrawable: IconicsDrawable
@@ -54,6 +57,7 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
             mPlayDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_play).color(color)
             mPauseDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_pause).color(color)
             mStoppedDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_stop).color(color)
+            mSkipDrawable = IconicsDrawable(context, CommunityMaterial.Icon.cmd_fast_forward).color(color)
             mErrorDrawable = IconicsDrawable(context, CommunityMaterial.Icon.cmd_alert_circle_outline).color(color)
 
             mFavoritesAddDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_star_outline).color(color)
@@ -73,9 +77,31 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
         song_description.isSelected = true
         song_play_pause.setOnClickListener { changePlaybackState() }
         song_favorite.setOnClickListener { addToFavorites() }
+        view.setOnClickListener {
+            song_play_pause.setImageDrawable(
+                if (mShowSkip) {
+                    mShowSkip = false
+                    if (mPlayerState.state == PlayerStates.PLAY) mPauseDrawable
+                    else mPlayDrawable
+                } else {
+                    mShowSkip = true
+                    mSkipDrawable
+                }
+            )
+        }
     }
 
     private fun changePlaybackState() = mBackgroundScope.launch {
+        if (mShowSkip) {
+            try {
+                MusicBot.instance.skip().await()
+            } catch (e: Exception) {
+                Timber.e(e)
+                mUIScope.launch { context?.toastShort(R.string.msg_no_permission) }
+            } finally {
+                return@launch
+            }
+        }
         when (mPlayerState.state) {
             PlayerStates.STOP -> MusicBot.instance.play().await()
             PlayerStates.PLAY -> MusicBot.instance.pause().await()
@@ -87,6 +113,12 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
     private fun addToFavorites() {
         mBackgroundScope.launch {
             changeFavoriteStatus(mPlayerState.songEntry!!.song).join()
+            mUIScope.launch {
+                song_favorite.setImageDrawable(
+                    if (mPlayerState.songEntry!!.song in mFavorites) mFavoritesDeleteDrawable
+                    else mFavoritesAddDrawable
+                )
+            }
         }
     }
 
@@ -127,6 +159,7 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
                     return@launch
                 }
             }
+            if (mShowSkip) song_play_pause.setImageDrawable(mSkipDrawable)
             val songEntry = newState.songEntry!!
             val song = songEntry.song
             // fill in song metadata
