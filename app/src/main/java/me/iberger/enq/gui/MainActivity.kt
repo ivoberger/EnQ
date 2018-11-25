@@ -63,15 +63,14 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 item.icon = icons[index].await()
             }
         }
-        showServerDiscoveryDialog(this@MainActivity, mBackgroundScope, true)
+        showServerDiscoveryDialog(this@MainActivity, true)
     }
 
     fun continueWithLogin() =
         mBackgroundScope.launch {
             showLoginDialog(
                 this@MainActivity,
-                mBackgroundScope,
-                MusicBot.hasUser(this@MainActivity).await()
+                MusicBot.hasAuthorization(this@MainActivity)
             )
         }
 

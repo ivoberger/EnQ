@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.fastadapter.items.AbstractItem
+import com.mikepenz.fastadapter_extensions.drag.IDraggable
 import com.mikepenz.iconics.IconicsDrawable
 import com.squareup.picasso.Picasso
 import me.iberger.enq.R
@@ -15,14 +16,14 @@ import me.iberger.jmusicbot.data.QueueEntry
 import me.iberger.jmusicbot.data.Song
 
 class QueueItem(
-    private val queueEntry: QueueEntry,
+    val queueEntry: QueueEntry,
     val song: Song = queueEntry.song
 ) :
-    AbstractItem<QueueItem, QueueItem.ViewHolder>() {
+    AbstractItem<QueueItem, QueueItem.ViewHolder>(), IDraggable<QueueItem, QueueItem> {
     override fun getType(): Int = R.id.queue_entry
+
     override fun getLayoutRes(): Int = R.layout.adapter_queue_entry
     override fun getViewHolder(v: View) = ViewHolder(v)
-
     override fun bindView(holder: ViewHolder, payloads: MutableList<Any>) {
         super.bindView(holder, payloads)
         val context = holder.itemView.context
@@ -43,6 +44,10 @@ class QueueItem(
             ).sizeDp(10), null, null, null
         )
     }
+
+    override fun withIsDraggable(draggable: Boolean): QueueItem = this
+
+    override fun isDraggable(): Boolean = true
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var imgAlbumArt: ImageView = view.findViewById(R.id.song_album_art)
