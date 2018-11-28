@@ -16,7 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.iberger.enq.R
-import me.iberger.enq.gui.MainActivity.Companion.mFavorites
+import me.iberger.enq.gui.MainActivity.Companion.favorites
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.MusicBot
@@ -55,19 +55,31 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
         mBackgroundScope.launch {
             val color = Color.WHITE
             mPlayDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_play).color(color)
-            mPauseDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_pause).color(color)
-            mStoppedDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_stop).color(color)
-            mSkipDrawable = IconicsDrawable(context, CommunityMaterial.Icon.cmd_fast_forward).color(color)
-            mErrorDrawable = IconicsDrawable(context, CommunityMaterial.Icon.cmd_alert_circle_outline).color(color)
+            mPauseDrawable =
+                    IconicsDrawable(context, CommunityMaterial.Icon2.cmd_pause).color(color)
+            mStoppedDrawable =
+                    IconicsDrawable(context, CommunityMaterial.Icon2.cmd_stop).color(color)
+            mSkipDrawable =
+                    IconicsDrawable(context, CommunityMaterial.Icon.cmd_fast_forward).color(color)
+            mErrorDrawable =
+                    IconicsDrawable(context, CommunityMaterial.Icon.cmd_alert_circle_outline).color(
+                        color
+                    )
 
-            mFavoritesAddDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_star_outline).color(color)
-            mFavoritesDeleteDrawable = IconicsDrawable(context, CommunityMaterial.Icon2.cmd_star).color(
-                ContextCompat.getColor(context!!, R.color.favorites)
-            )
+            mFavoritesAddDrawable =
+                    IconicsDrawable(context, CommunityMaterial.Icon2.cmd_star_outline).color(color)
+            mFavoritesDeleteDrawable =
+                    IconicsDrawable(context, CommunityMaterial.Icon2.cmd_star).color(
+                        ContextCompat.getColor(context!!, R.color.favorites)
+                    )
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_current_song, container, false)
     }
 
@@ -115,7 +127,7 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
             changeFavoriteStatus(mPlayerState.songEntry!!.song).join()
             mUIScope.launch {
                 song_favorite.setImageDrawable(
-                    if (mPlayerState.songEntry!!.song in mFavorites) mFavoritesDeleteDrawable
+                    if (mPlayerState.songEntry!!.song in favorites) mFavoritesDeleteDrawable
                     else mFavoritesAddDrawable
                 )
             }
@@ -126,7 +138,7 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
         changeFavoriteStatus(context!!, song)
         mUIScope.launch {
             song_favorite.setImageDrawable(
-                if (song in mFavorites) mFavoritesDeleteDrawable
+                if (song in favorites) mFavoritesDeleteDrawable
                 else mFavoritesAddDrawable
             )
         }
@@ -166,12 +178,14 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
             song_title.text = song.title
             song_description.text = song.description
             song.albumArtUrl?.also { Picasso.get().load(it).into(song_album_art) }
-            song.duration?.also { song_duration.text = String.format("%02d:%02d", it / 60, it % 60) }
+            song.duration?.also {
+                song_duration.text = String.format("%02d:%02d", it / 60, it % 60)
+            }
             song_chosen_by.setText(R.string.txt_suggested)
             songEntry.userName?.also { song_chosen_by.text = it }
             // set fav status
             song_favorite.setImageDrawable(
-                if (song in mFavorites) mFavoritesDeleteDrawable
+                if (song in favorites) mFavoritesDeleteDrawable
                 else mFavoritesAddDrawable
             )
         }
@@ -179,6 +193,12 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener {
 
     override fun onUpdateError(e: Exception) {
         Timber.e(e)
-        mUIScope.launch { Toast.makeText(context, "Error when updating player state", Toast.LENGTH_SHORT).show() }
+        mUIScope.launch {
+            Toast.makeText(
+                context,
+                "Error when updating player state",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 }

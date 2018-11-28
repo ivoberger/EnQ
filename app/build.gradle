@@ -70,6 +70,8 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$v_appcompat"
     implementation "androidx.constraintlayout:constraintlayout:$v_contraint_layout"
     implementation "com.google.android.material:material:$v_material"
+//    implementation project(":jmusicbot")
+
 
     implementation "com.github.IIIuminator:JMusicBotAndroid:$v_jmusicbot"
 

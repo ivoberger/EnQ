@@ -40,7 +40,7 @@ class QueueItem(
         queueEntry.userName.also { holder.txtChosenBy.text = it }
 
         holder.txtDuration.compoundDrawablePadding = 20
-        if (song in MainActivity.mFavorites) holder.txtDuration.setCompoundDrawables(
+        if (song in MainActivity.favorites) holder.txtDuration.setCompoundDrawables(
             IconicsDrawable(context, CommunityMaterial.Icon2.cmd_star).color(
                 ContextCompat.getColor(context, R.color.favorites)
             ).sizeDp(10), null, null, null

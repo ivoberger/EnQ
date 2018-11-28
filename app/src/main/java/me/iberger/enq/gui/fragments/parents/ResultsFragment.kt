@@ -1,4 +1,4 @@
-package me.iberger.enq.gui.fragments
+package me.iberger.enq.gui.fragments.parents
 
 import android.os.Bundle
 import android.view.LayoutInflater

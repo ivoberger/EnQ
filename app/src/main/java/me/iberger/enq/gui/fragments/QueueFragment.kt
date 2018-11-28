@@ -33,9 +33,7 @@ import timber.log.Timber
 class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemSwipeCallback,
     ItemTouchCallback {
     companion object {
-
         fun newInstance() = QueueFragment()
-
     }
 
     private val mUIScope = CoroutineScope(Dispatchers.Main)
@@ -48,11 +46,6 @@ class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemS
         Timber.d("Creating Queue Fragment")
         super.onCreate(savedInstanceState)
         MusicBot.instance.startQueueUpdates(this)
-    }
-
-    override fun onHiddenChanged(hidden: Boolean) {
-        super.onHiddenChanged(hidden)
-        Timber.d("Hidden: $hidden")
     }
 
     override fun onCreateView(

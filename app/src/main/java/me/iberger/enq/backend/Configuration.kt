@@ -7,6 +7,7 @@ import androidx.core.content.edit
 import com.squareup.moshi.Moshi
 import me.iberger.jmusicbot.data.MusicBotPlugin
 import me.iberger.jmusicbot.data.MusicBotPluginJsonAdapter
+import timber.log.Timber
 
 class Configuration(private val preferences: SharedPreferences) {
 
@@ -19,16 +20,26 @@ class Configuration(private val preferences: SharedPreferences) {
 
     private val mMoshi by lazy { Moshi.Builder().build() }
     private val mMusicBotPluginAdapter: MusicBotPluginJsonAdapter by lazy {
+        Timber.d("Getting JSON adapter")
         MusicBotPluginJsonAdapter((mMoshi))
     }
 
     var lastProvider: MusicBotPlugin?
-        get() = loadString(KEY_LAST_PROVIDER)?.let { mMusicBotPluginAdapter.fromJson(it) }
+        get() = loadString(KEY_LAST_PROVIDER)?.let {
+            Timber.d("Getting provider")
+            mMusicBotPluginAdapter.fromJson(it)
+        }
         set(value) = saveString(KEY_LAST_PROVIDER, mMusicBotPluginAdapter.toJson(value))
     var lastSuggester: MusicBotPlugin?
-        get() = loadString(KEY_LAST_SUGGESTER)?.let { mMusicBotPluginAdapter.fromJson(it) }
-        set(value) = saveString(KEY_LAST_SUGGESTER, mMusicBotPluginAdapter.toJson(value))
+        get() = loadString(KEY_LAST_SUGGESTER)?.let {
+            Timber.d("Getting suggester")
+            mMusicBotPluginAdapter.fromJson(it)
+        }
+        set(value) {
+            Timber.d("Saving suggester")
+            saveString(KEY_LAST_SUGGESTER, mMusicBotPluginAdapter.toJson(value))
+        }
 
-    fun saveString(key: String, value: String) = preferences.edit { putString(key, value) }
-    fun loadString(key: String): String? = preferences.getString(key, null)
+    private fun saveString(key: String, value: String) = preferences.edit { putString(key, value) }
+    private fun loadString(key: String): String? = preferences.getString(key, null)
 }

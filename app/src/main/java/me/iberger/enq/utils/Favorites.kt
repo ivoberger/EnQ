@@ -16,20 +16,20 @@ import me.iberger.jmusicbot.data.Song
 import timber.log.Timber
 
 fun changeFavoriteStatus(context: Context, song: Song) = GlobalScope.launch {
-    if (song in MainActivity.mFavorites) {
+    if (song in MainActivity.favorites) {
         Timber.d("Removing $song from favorites")
-        MainActivity.mFavorites.remove(song)
+        MainActivity.favorites.remove(song)
         withContext(Dispatchers.Main) {
             context.toastShort(context.getString(R.string.msg_removed_from_favs, song.title))
         }
     } else {
         Timber.d("Adding $song to favorites")
-        MainActivity.mFavorites.add(song)
+        MainActivity.favorites.add(song)
         withContext(Dispatchers.Main) {
             context.toastShort(context.getString(R.string.msg_added_to_favs, song.title))
         }
     }
-    saveFavorites(context, MainActivity.mFavorites)
+    saveFavorites(context, MainActivity.favorites)
 }
 
 fun saveFavorites(context: Context, favorites: List<Song>) {
@@ -45,7 +45,8 @@ fun loadFavorites(context: Context): MutableList<Song> {
     Timber.d("Loading Favorites")
     val adapter = Moshi.Builder().build().adapter<List<Song>>(MoshiTypes.SongList)
 
-    val favoritesString = PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_FAVORITES, "")
+    val favoritesString =
+        PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_FAVORITES, "")
     if (!favoritesString.isNullOrBlank()) adapter.fromJson(favoritesString)?.also { return it.toMutableList() }
     return mutableListOf()
 }

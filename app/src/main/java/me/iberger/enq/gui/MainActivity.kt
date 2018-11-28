@@ -19,6 +19,7 @@ import io.sentry.android.AndroidSentryClientFactory
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import me.iberger.enq.R
+import me.iberger.enq.backend.Configuration
 import me.iberger.enq.gui.fragments.*
 import me.iberger.enq.utils.LoggingTree
 import me.iberger.enq.utils.loadFavorites
@@ -31,7 +32,8 @@ import timber.log.Timber
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
 
     companion object {
-        var mFavorites: MutableList<Song> = mutableListOf()
+        var favorites: MutableList<Song> = mutableListOf()
+        lateinit var config: Configuration
     }
 
     private val mMenuIcons = listOf<IIcon>(
@@ -53,12 +55,14 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         mBackgroundScope.launch {
             Timber.plant(LoggingTree())
             Sentry.init(AndroidSentryClientFactory(applicationContext))
-            mFavorites = loadFavorites(this@MainActivity)
+            favorites = loadFavorites(this@MainActivity)
+            config = Configuration(this@MainActivity)
         }
 
         main_bottom_navigation.setOnNavigationItemSelectedListener(this)
         mUIScope.launch {
-            val icons = mMenuIcons.map { mBackgroundScope.async { IconicsDrawable(this@MainActivity, it) } }
+            val icons =
+                mMenuIcons.map { mBackgroundScope.async { IconicsDrawable(this@MainActivity, it) } }
             main_bottom_navigation.menu.forEachIndexed { index, item ->
                 item.icon = icons[index].await()
             }
@@ -94,7 +98,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         val searchView = (menu.findItem(R.id.app_bar_search).actionView as SearchView)
 
         var playerCollapse = mPlayerCollapsed
-        val backStackListener = FragmentManager.OnBackStackChangedListener { searchView.isIconified = true }
+        val backStackListener =
+            FragmentManager.OnBackStackChangedListener { searchView.isIconified = true }
 
         searchView.setOnSearchClickListener {
             playerCollapse = mPlayerCollapsed
@@ -154,10 +159,12 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     private fun changePlayerCollapse(requestCollapse: Boolean, duration: Long = 1000) {
         if (mPlayerCollapsed == requestCollapse) return
         if (!mPlayerCollapsed) {
-            main_current_song.animate().setDuration(duration).translationYBy(main_current_song.height.toFloat())
+            main_current_song.animate().setDuration(duration)
+                .translationYBy(main_current_song.height.toFloat())
                 .withEndAction { main_current_song.visibility = View.GONE }.start()
         } else {
-            main_current_song.animate().setDuration(duration).translationYBy(-main_current_song.height.toFloat())
+            main_current_song.animate().setDuration(duration)
+                .translationYBy(-main_current_song.height.toFloat())
                 .withStartAction { main_current_song.visibility = View.VISIBLE }.start()
         }
         mPlayerCollapsed = requestCollapse

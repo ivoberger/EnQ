@@ -12,8 +12,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.iberger.enq.R
-import me.iberger.enq.backend.Configuration
 import me.iberger.enq.gui.MainActivity
+import me.iberger.enq.gui.fragments.parents.TabbedSongListFragment
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.MusicBotPlugin
 import timber.log.Timber
@@ -26,7 +26,12 @@ class SearchFragment : TabbedSongListFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mProvider = mBackgroundScope.async { MusicBot.instance.provider }
+        mProviderPlugins = mBackgroundScope.async { MusicBot.instance.provider }
+        mBackgroundScope.launch {
+            mConfig.lastProvider?.also {
+                if (mProviderPlugins.await().contains(it)) mSelectedPlugin = it
+            }
+        }
 
         val searchView =
             ((activity as MainActivity).optionsMenu.findItem(R.id.app_bar_search).actionView as SearchView)
@@ -65,7 +70,9 @@ class SearchFragment : TabbedSongListFragment() {
         super.onViewCreated(view, savedInstanceState)
         mBackgroundScope.launch {
             mFragmentPagerAdapter =
-                    async { SearchFragmentPager(childFragmentManager, mProvider.await()) }
+                    async {
+                        SearchFragmentPager(childFragmentManager, mProviderPlugins.await())
+                    }
             mUIScope.launch { search_view_pager.adapter = mFragmentPagerAdapter.await() }
         }
     }
@@ -80,10 +87,10 @@ class SearchFragment : TabbedSongListFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Configuration(context!!).lastProvider = mSelectedProvider
+        mConfig.lastProvider = mSelectedPlugin
     }
 
-    class SearchFragmentPager(fm: FragmentManager, provider: List<MusicBotPlugin>) :
+    inner class SearchFragmentPager(fm: FragmentManager, provider: List<MusicBotPlugin>) :
         TabbedSongListFragment.SongListFragmentPager(fm, provider) {
 
         override fun getItem(position: Int): Fragment =

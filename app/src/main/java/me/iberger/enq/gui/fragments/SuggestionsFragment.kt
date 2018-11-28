@@ -7,7 +7,7 @@ import androidx.fragment.app.FragmentManager
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import me.iberger.enq.backend.Configuration
+import me.iberger.enq.gui.fragments.parents.TabbedSongListFragment
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.MusicBotPlugin
 
@@ -18,24 +18,34 @@ class SuggestionsFragment : TabbedSongListFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mProvider = mBackgroundScope.async { MusicBot.instance.suggesters }
+        mProviderPlugins = mBackgroundScope.async { MusicBot.instance.suggesters }
+        mBackgroundScope.launch {
+            mConfig.lastSuggester?.also {
+                if (mProviderPlugins.await().contains(it)) mSelectedPlugin = it
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mBackgroundScope.launch {
             mFragmentPagerAdapter =
-                    async { SuggestionsFragmentPager(childFragmentManager, mProvider.await()) }
+                    async {
+                        SuggestionsFragmentPager(
+                            childFragmentManager,
+                            mProviderPlugins.await()
+                        )
+                    }
             mUIScope.launch { search_view_pager.adapter = mFragmentPagerAdapter.await() }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Configuration(context!!).lastSuggester = mSelectedProvider
+        mConfig.lastSuggester = mSelectedPlugin
     }
 
-    class SuggestionsFragmentPager(fm: FragmentManager, provider: List<MusicBotPlugin>) :
+    inner class SuggestionsFragmentPager(fm: FragmentManager, provider: List<MusicBotPlugin>) :
         TabbedSongListFragment.SongListFragmentPager(fm, provider) {
 
         override fun getItem(position: Int): Fragment =
