@@ -11,7 +11,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.iberger.enq.R
-import me.iberger.enq.gui.adapter.SuggestionsItem
+import me.iberger.enq.gui.fragments.parents.ResultsFragment
+import me.iberger.enq.gui.items.SuggestionsItem
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.setupSwipeActions
 import me.iberger.enq.utils.toastShort

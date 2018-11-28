@@ -1,4 +1,4 @@
-package me.iberger.enq.gui.adapter
+package me.iberger.enq.gui.items
 
 import android.view.View
 import android.widget.ImageView
@@ -33,12 +33,14 @@ class QueueItem(
         holder.txtTitle.text = song.title
         holder.txtDescription.text = song.description
         song.albumArtUrl?.also { Picasso.get().load(it).into(holder.imgAlbumArt) }
-        song.duration?.also { holder.txtDuration.text = String.format("%02d:%02d", it / 60, it % 60) }
+        song.duration?.also {
+            holder.txtDuration.text = String.format("%02d:%02d", it / 60, it % 60)
+        }
         holder.txtChosenBy.setText(R.string.txt_suggested)
         queueEntry.userName.also { holder.txtChosenBy.text = it }
 
         holder.txtDuration.compoundDrawablePadding = 20
-        if (song in MainActivity.mFavorites) holder.txtDuration.setCompoundDrawables(
+        if (song in MainActivity.favorites) holder.txtDuration.setCompoundDrawables(
             IconicsDrawable(context, CommunityMaterial.Icon2.cmd_star).color(
                 ContextCompat.getColor(context, R.color.favorites)
             ).sizeDp(10), null, null, null

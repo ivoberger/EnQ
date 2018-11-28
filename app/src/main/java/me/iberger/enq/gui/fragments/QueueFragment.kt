@@ -19,7 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.iberger.enq.R
-import me.iberger.enq.gui.adapter.QueueItem
+import me.iberger.enq.gui.items.QueueItem
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.setupSwipeDragActions
 import me.iberger.enq.utils.toastShort
@@ -30,11 +30,10 @@ import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.listener.QueueUpdateListener
 import timber.log.Timber
 
-class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemSwipeCallback, ItemTouchCallback {
+class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemSwipeCallback,
+    ItemTouchCallback {
     companion object {
-
         fun newInstance() = QueueFragment()
-
     }
 
     private val mUIScope = CoroutineScope(Dispatchers.Main)
@@ -49,12 +48,11 @@ class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemS
         MusicBot.instance.startQueueUpdates(this)
     }
 
-    override fun onHiddenChanged(hidden: Boolean) {
-        super.onHiddenChanged(hidden)
-        Timber.d("Hidden: $hidden")
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? =
         inflater.inflate(R.layout.fragment_queue, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -82,7 +80,13 @@ class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemS
 
     override fun onUpdateError(e: Exception) {
         Timber.e(e)
-        mUIScope.launch { Toast.makeText(context, "Something horrific just happened", Toast.LENGTH_SHORT).show() }
+        mUIScope.launch {
+            Toast.makeText(
+                context,
+                "Something horrific just happened",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     override fun itemSwiped(position: Int, direction: Int) {

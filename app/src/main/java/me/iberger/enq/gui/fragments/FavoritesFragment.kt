@@ -16,7 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.iberger.enq.R
-import me.iberger.enq.gui.adapter.FavoritesItem
+import me.iberger.enq.gui.items.FavoritesItem
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.loadFavorites
 import me.iberger.enq.utils.setupSwipeActions
@@ -33,7 +33,11 @@ class FavoritesFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback {
 
     private lateinit var mFastItemAdapter: FastItemAdapter<FavoritesItem>
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? =
         inflater.inflate(R.layout.fragment_queue, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,7 +62,12 @@ class FavoritesFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback {
                 ItemTouchHelper.LEFT -> {
                     MusicBot.instance.enqueue(item.song).await()
                     withContext(Dispatchers.Main) {
-                        context!!.toastShort(context!!.getString(R.string.msg_enqueued, item.song.title))
+                        context!!.toastShort(
+                            context!!.getString(
+                                R.string.msg_enqueued,
+                                item.song.title
+                            )
+                        )
                         mFastItemAdapter.notifyAdapterItemChanged(position)
                     }
                 }
