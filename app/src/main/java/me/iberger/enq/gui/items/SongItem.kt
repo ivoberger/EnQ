@@ -1,4 +1,4 @@
-package me.iberger.enq.gui.adapter
+package me.iberger.enq.gui.items
 
 import android.view.View
 import android.widget.ImageView
@@ -22,7 +22,9 @@ open class SongItem(val song: Song) : AbstractItem<SongItem, SongItem.ViewHolder
         holder.txtTitle.text = song.title
         holder.txtDescription.text = song.description
         song.albumArtUrl?.also { Picasso.get().load(it).into(holder.imgAlbumArt) }
-        song.duration?.also { holder.txtDuration.text = String.format("%02d:%02d", it / 60, it % 60) }
+        song.duration?.also {
+            holder.txtDuration.text = String.format("%02d:%02d", it / 60, it % 60)
+        }
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
