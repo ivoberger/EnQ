@@ -7,22 +7,42 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.viewpager.widget.ViewPager
+import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import me.iberger.enq.R
 import me.iberger.jmusicbot.data.MusicBotPlugin
 
-open class TabbedSongListFragment : Fragment() {
-
+open class TabbedSongListFragment : Fragment(), ViewPager.OnPageChangeListener {
     val mUIScope = CoroutineScope(Dispatchers.Main)
+
     val mBackgroundScope = CoroutineScope(Dispatchers.IO)
-
     lateinit var mProvider: Deferred<List<MusicBotPlugin>>
-    lateinit var mFragmentPagerAdapter: Deferred<SongListFragmentPager>
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    lateinit var mSelectedProvider: MusicBotPlugin
+    lateinit var mFragmentPagerAdapter: Deferred<SongListFragmentPager>
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? =
         inflater.inflate(R.layout.fragment_search, container, false)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        search_view_pager.addOnPageChangeListener(this)
+    }
+
+    override fun onPageScrollStateChanged(state: Int) {}
+
+    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
+
+    override fun onPageSelected(position: Int) {
+        mBackgroundScope.launch { mSelectedProvider = mProvider.await()[position] }
+    }
 
     abstract class SongListFragmentPager(fm: FragmentManager, val provider: List<MusicBotPlugin>) :
         FragmentStatePagerAdapter(fm) {
