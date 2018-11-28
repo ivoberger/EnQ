@@ -13,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.iberger.enq.R
-import me.iberger.enq.gui.adapter.SuggestionsItem
+import me.iberger.enq.gui.items.SuggestionsItem
 import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.MusicBot
 
@@ -24,7 +24,11 @@ open class ResultsFragment : Fragment() {
 
     lateinit var mFastItemAdapter: FastItemAdapter<SuggestionsItem>
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? =
         inflater.inflate(R.layout.fragment_queue, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -38,12 +42,18 @@ open class ResultsFragment : Fragment() {
                 MusicBot.instance.enqueue(item.song).await()
                 withContext(Dispatchers.Main) {
                     mFastItemAdapter.remove(position)
-                    context!!.toastShort(context!!.getString(R.string.msg_enqueued, item.song.title))
+                    context!!.toastShort(
+                        context!!.getString(
+                            R.string.msg_enqueued,
+                            item.song.title
+                        )
+                    )
                 }
             }
             true
         }
     }
 
-    fun displayResults(results: List<SuggestionsItem>) = mUIScope.launch { mFastItemAdapter.set(results) }
+    fun displayResults(results: List<SuggestionsItem>) =
+        mUIScope.launch { mFastItemAdapter.set(results) }
 }

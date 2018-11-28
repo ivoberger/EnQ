@@ -1,4 +1,4 @@
-package me.iberger.enq.gui.adapter
+package me.iberger.enq.gui.items
 
 import me.iberger.jmusicbot.data.Song
 

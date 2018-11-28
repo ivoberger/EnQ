@@ -1,4 +1,4 @@
-package me.iberger.enq.gui.adapter
+package me.iberger.enq.gui.items
 
 import androidx.core.content.ContextCompat
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
