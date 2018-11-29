@@ -49,8 +49,8 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
     }
 
     private fun getSuggestions() = mBackgroundScope.launch {
-        val results = MusicBot.instance.getSuggestions(mSuggesterId).await()
-        super.displayResults(results.map { SuggestionsItem(it) })
+        val results = MusicBot.instance?.getSuggestions(mSuggesterId)?.await()
+        super.displayResults(results?.map { SuggestionsItem(it) })
     }
 
     override fun itemSwiped(position: Int, direction: Int) {
@@ -59,7 +59,7 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
                     try {
-                        MusicBot.instance.deleteSuggestion(mSuggesterId, entry.song).await()
+                        MusicBot.instance?.deleteSuggestion(mSuggesterId, entry.song)?.await()
                         getSuggestions()
                     } catch (e: AuthException) {
                         Timber.e("AuthException with reason ${e.reason}")

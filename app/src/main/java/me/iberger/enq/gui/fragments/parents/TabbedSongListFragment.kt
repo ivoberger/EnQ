@@ -1,6 +1,5 @@
 package me.iberger.enq.gui.fragments.parents
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,13 +14,15 @@ import me.iberger.enq.R
 import me.iberger.enq.backend.Configuration
 import me.iberger.enq.gui.MainActivity
 import me.iberger.jmusicbot.data.MusicBotPlugin
+import me.iberger.jmusicbot.listener.ConnectionChangeListener
 import timber.log.Timber
 
-open class TabbedSongListFragment : Fragment(), ViewPager.OnPageChangeListener {
+abstract class TabbedSongListFragment : Fragment(), ViewPager.OnPageChangeListener,
+    ConnectionChangeListener {
     val mUIScope = CoroutineScope(Dispatchers.Main)
 
     val mBackgroundScope = CoroutineScope(Dispatchers.IO)
-    lateinit var mProviderPlugins: Deferred<List<MusicBotPlugin>>
+    lateinit var mProviderPlugins: Deferred<List<MusicBotPlugin>?>
     var mConfig: Configuration = MainActivity.config
 
     var mSelectedPlugin: MusicBotPlugin? = null
@@ -36,17 +37,28 @@ open class TabbedSongListFragment : Fragment(), ViewPager.OnPageChangeListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        search_view_pager.addOnPageChangeListener(this)
+        view_pager.addOnPageChangeListener(this)
         mUIScope.launch {
-            if (mSelectedPlugin == null) mSelectedPlugin = mProviderPlugins.await()[0]
+            if (mSelectedPlugin == null) mSelectedPlugin = mProviderPlugins.await()?.get(0)
             mSelectedPlugin?.let {
-                Timber.d("Setting tab to ${mProviderPlugins.await().indexOf(it)}")
-                val idx = mProviderPlugins.await().indexOf(it)
-                search_view_pager.postDelayed(Runnable {
-                    search_view_pager.setCurrentItem(idx, false)
+                Timber.d("Setting tab to ${mProviderPlugins.await()!!.indexOf(it)}")
+                val idx = mProviderPlugins.await()!!.indexOf(it)
+                view_pager.postDelayed(Runnable {
+                    view_pager.setCurrentItem(idx, false)
                 }, 0)
             }
         }
+        initializeTabs()
+    }
+
+    abstract fun initializeTabs()
+
+    override fun onConnectionLost(e: Exception) {
+        view_pager.adapter = null
+    }
+
+    override fun onConnectionRecovered() {
+        initializeTabs()
     }
 
     override fun onPageScrollStateChanged(state: Int) {}
@@ -59,7 +71,7 @@ open class TabbedSongListFragment : Fragment(), ViewPager.OnPageChangeListener {
     }
 
     override fun onPageSelected(position: Int) {
-        mBackgroundScope.launch { mSelectedPlugin = mProviderPlugins.await()[position] }
+        mBackgroundScope.launch { mSelectedPlugin = mProviderPlugins.await()?.get(position) }
     }
 
     abstract inner class SongListFragmentPager(

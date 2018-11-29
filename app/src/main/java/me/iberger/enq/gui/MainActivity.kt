@@ -18,15 +18,18 @@ import kotlinx.coroutines.*
 import me.iberger.enq.R
 import me.iberger.enq.backend.Configuration
 import me.iberger.enq.gui.fragments.*
+import me.iberger.enq.gui.listener.ConnectionListener
 import me.iberger.enq.gui.listener.MainNavigationListener
 import me.iberger.enq.utils.*
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.Song
+import me.iberger.jmusicbot.listener.ConnectionChangeListener
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
+        var connected = false
         var favorites: MutableList<Song> = mutableListOf()
         lateinit var config: Configuration
     }
@@ -79,6 +82,8 @@ class MainActivity : AppCompatActivity() {
      * continueWithBot is called by showLoginDialog after login is complete
      */
     fun continueWithBot() = mBackgroundScope.launch {
+        connected = true
+        MusicBot.instance?.connectionChangeListeners?.add((ConnectionListener(this@MainActivity)))
         val currentSongFragment = CurrentSongFragment.newInstance()
         supportFragmentManager.commit {
             replace(R.id.main_current_song, currentSongFragment, null)
@@ -103,6 +108,7 @@ class MainActivity : AppCompatActivity() {
             FragmentManager.OnBackStackChangedListener { searchView.isIconified = true }
 
         searchView.setOnSearchClickListener {
+            if (!connected) return@setOnSearchClickListener
             // save player collapse state
             playerCollapse = mPlayerCollapsed
             // collapse bottom UI
@@ -142,8 +148,8 @@ class MainActivity : AppCompatActivity() {
      * @param requestCollapse: specifies if the player should be collapsed
      * @param duration: duration of the animation
      */
-    fun changePlayerCollapse(requestCollapse: Boolean, duration: Long = 1000) {
-        if (mPlayerCollapsed == requestCollapse) return
+    fun changePlayerCollapse(requestCollapse: Boolean, duration: Long = 1000) = mUIScope.launch {
+        if (mPlayerCollapsed == requestCollapse) return@launch
         if (!mPlayerCollapsed) {
             main_current_song.animate().setDuration(duration)
                 .translationYBy(main_current_song.height.toFloat())
@@ -161,20 +167,21 @@ class MainActivity : AppCompatActivity() {
      * @param requestCollapse: specifies if the navigation should be collapsed
      * @param duration: duration of the animation
      */
-    private fun changeBottomNavCollapse(requestCollapse: Boolean, duration: Long = 1000) {
-        if (mBottomNavCollapsed == requestCollapse) return
-        if (!mBottomNavCollapsed) {
-            main_bottom_navigation.animate().setDuration(duration)
-                .translationYBy(main_current_song.height.toFloat())
-                .withEndAction { main_bottom_navigation.visibility = View.GONE }.start()
+    private fun changeBottomNavCollapse(requestCollapse: Boolean, duration: Long = 1000) =
+        mUIScope.launch {
+            if (mBottomNavCollapsed == requestCollapse) return@launch
+            if (!mBottomNavCollapsed) {
+                main_bottom_navigation.animate().setDuration(duration)
+                    .translationYBy(main_current_song.height.toFloat())
+                    .withEndAction { main_bottom_navigation.visibility = View.GONE }.start()
 
-        } else {
-            main_bottom_navigation.animate().setDuration(duration)
-                .translationYBy(-main_current_song.height.toFloat())
-                .withStartAction { main_bottom_navigation.visibility = View.VISIBLE }.start()
+            } else {
+                main_bottom_navigation.animate().setDuration(duration)
+                    .translationYBy(-main_current_song.height.toFloat())
+                    .withStartAction { main_bottom_navigation.visibility = View.VISIBLE }.start()
+            }
+            mBottomNavCollapsed = requestCollapse
         }
-        mBottomNavCollapsed = requestCollapse
-    }
 
     override fun onDestroy() {
         // cancel all running coroutines

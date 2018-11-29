@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.iberger.enq.R
+import me.iberger.enq.gui.MainActivity
 import me.iberger.enq.gui.items.QueueItem
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.setupSwipeDragActions
@@ -27,11 +28,12 @@ import me.iberger.jmusicbot.KEY_QUEUE
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.QueueEntry
 import me.iberger.jmusicbot.exceptions.AuthException
+import me.iberger.jmusicbot.listener.ConnectionChangeListener
 import me.iberger.jmusicbot.listener.QueueUpdateListener
 import timber.log.Timber
 
-class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemSwipeCallback,
-    ItemTouchCallback {
+class QueueFragment : Fragment(), QueueUpdateListener, ConnectionChangeListener,
+    SimpleSwipeCallback.ItemSwipeCallback, ItemTouchCallback {
     companion object {
         fun newInstance() = QueueFragment()
     }
@@ -45,15 +47,13 @@ class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemS
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("Creating Queue Fragment")
         super.onCreate(savedInstanceState)
-        MusicBot.instance.startQueueUpdates(this)
+        MusicBot.instance?.startQueueUpdates(this)
+        MusicBot.instance?.connectionChangeListeners?.add(this)
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? =
-        inflater.inflate(R.layout.fragment_queue, container, false)
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? = inflater.inflate(R.layout.fragment_queue, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -80,13 +80,6 @@ class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemS
 
     override fun onUpdateError(e: Exception) {
         Timber.e(e)
-        mUIScope.launch {
-            Toast.makeText(
-                context,
-                "Something horrific just happened",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
     }
 
     override fun itemSwiped(position: Int, direction: Int) {
@@ -94,8 +87,9 @@ class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemS
             val entry = mFastItemAdapter.getAdapterItem(position)
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
+                    if (!MainActivity.connected) return@launch
                     try {
-                        MusicBot.instance.dequeue(entry.song).await()
+                        MusicBot.instance?.dequeue(entry.song)?.await()
                     } catch (e: AuthException) {
                         Timber.e("AuthException with reason ${e.reason}")
                         withContext(Dispatchers.Main) {
@@ -115,16 +109,18 @@ class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemS
     }
 
     override fun itemTouchOnMove(oldPosition: Int, newPosition: Int): Boolean {
+        if (!MainActivity.connected) return false
         DragDropUtil.onMove(mFastItemAdapter.itemAdapter, oldPosition, newPosition)
         return true
     }
 
     override fun itemTouchDropped(oldPosition: Int, newPosition: Int) {
+        if (!MainActivity.connected) return
         mBackgroundScope.launch {
             val entry = mFastItemAdapter.getAdapterItem(newPosition).queueEntry
             Timber.d("Moved $entry from $oldPosition to $newPosition")
             try {
-                MusicBot.instance.moveSong(entry, newPosition).await()
+                MusicBot.instance?.moveSong(entry, newPosition)?.await()
             } catch (e: java.lang.Exception) {
                 Timber.e(e)
                 mUIScope.launch {
@@ -135,12 +131,18 @@ class QueueFragment : Fragment(), QueueUpdateListener, SimpleSwipeCallback.ItemS
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(mFastItemAdapter.saveInstanceState(outState, KEY_QUEUE))
+    override fun onConnectionLost(e: Exception) {
+        MusicBot.instance?.stopQueueUpdates(this)
+    }
+
+
+    override fun onConnectionRecovered() {
+        MusicBot.instance?.startQueueUpdates(this)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        MusicBot.instance.stopQueueUpdates(this)
+        MusicBot.instance?.stopQueueUpdates(this)
+        MusicBot.instance?.connectionChangeListeners?.remove(this)
     }
 }

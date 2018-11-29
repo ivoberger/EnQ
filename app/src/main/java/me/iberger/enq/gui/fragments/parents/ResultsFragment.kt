@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.iberger.enq.R
+import me.iberger.enq.gui.MainActivity
 import me.iberger.enq.gui.items.SuggestionsItem
 import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.MusicBot
@@ -38,8 +39,9 @@ open class ResultsFragment : Fragment() {
         queue.adapter = mFastItemAdapter
 
         mFastItemAdapter.withOnClickListener { _, _, item, position ->
+            if (!MainActivity.connected) return@withOnClickListener false
             mBackgroundScope.launch {
-                MusicBot.instance.enqueue(item.song).await()
+                MusicBot.instance?.enqueue(item.song)?.await()
                 withContext(Dispatchers.Main) {
                     mFastItemAdapter.remove(position)
                     context!!.toastShort(
@@ -54,6 +56,6 @@ open class ResultsFragment : Fragment() {
         }
     }
 
-    fun displayResults(results: List<SuggestionsItem>) =
+    fun displayResults(results: List<SuggestionsItem>?) =
         mUIScope.launch { mFastItemAdapter.set(results) }
 }
