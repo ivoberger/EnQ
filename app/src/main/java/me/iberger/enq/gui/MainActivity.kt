@@ -2,7 +2,6 @@ package me.iberger.enq.gui
 
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
@@ -10,9 +9,7 @@ import androidx.core.view.forEachIndexed
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
-import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.IIcon
 import io.sentry.Sentry
 import io.sentry.android.AndroidSentryClientFactory
@@ -21,26 +18,19 @@ import kotlinx.coroutines.*
 import me.iberger.enq.R
 import me.iberger.enq.backend.Configuration
 import me.iberger.enq.gui.fragments.*
-import me.iberger.enq.utils.LoggingTree
-import me.iberger.enq.utils.loadFavorites
-import me.iberger.enq.utils.showLoginDialog
-import me.iberger.enq.utils.showServerDiscoveryDialog
+import me.iberger.enq.gui.listener.MainNavigationListener
+import me.iberger.enq.utils.*
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.Song
 import timber.log.Timber
 
-class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity() {
 
     companion object {
         var favorites: MutableList<Song> = mutableListOf()
         lateinit var config: Configuration
     }
 
-    private val mMenuIcons = listOf<IIcon>(
-        CommunityMaterial.Icon2.cmd_playlist_play,
-        CommunityMaterial.Icon.cmd_all_inclusive,
-        CommunityMaterial.Icon2.cmd_star_outline
-    )
     lateinit var optionsMenu: Menu
 
     private val mUIScope = CoroutineScope(Dispatchers.Main)
@@ -52,33 +42,42 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // general setup
         mBackgroundScope.launch {
+            // logging
             Timber.plant(LoggingTree())
+            // error reporting
             Sentry.init(AndroidSentryClientFactory(applicationContext))
+            // saved data
             favorites = loadFavorites(this@MainActivity)
             config = Configuration(this@MainActivity)
         }
+        // setup main bottom navigation
+        main_bottom_navigation.setOnNavigationItemSelectedListener(MainNavigationListener(this))
 
-        main_bottom_navigation.setOnNavigationItemSelectedListener(this)
+        // load bottom navigation icons async
+        val icons = listOf<IIcon>(
+            CommunityMaterial.Icon2.cmd_playlist_play,
+            CommunityMaterial.Icon.cmd_all_inclusive,
+            CommunityMaterial.Icon2.cmd_star_outline
+        ).map { mBackgroundScope.async { it.make(this@MainActivity) } }
         mUIScope.launch {
-            val icons =
-                mMenuIcons.map { mBackgroundScope.async { IconicsDrawable(this@MainActivity, it) } }
-            main_bottom_navigation.menu.forEachIndexed { index, item ->
-                item.icon = icons[index].await()
-            }
+            main_bottom_navigation.menu.forEachIndexed { idx, itm -> itm.icon = icons[idx].await() }
         }
-        showServerDiscoveryDialog(this@MainActivity, true)
+        showServerDiscoveryDialog(true)
     }
 
-    fun continueWithLogin() =
-        mBackgroundScope.launch {
-            showLoginDialog(
-                this@MainActivity,
-                MusicBot.hasAuthorization(this@MainActivity)
-            )
-        }
+    /**
+     * continueToLogin is called by showServerDiscoveryDialog after a server was found
+     */
+    fun continueToLogin() =
+        mBackgroundScope.launch { showLoginDialog(MusicBot.hasAuthorization(applicationContext)) }
 
 
+    /**
+     * continueWithBot is called by showLoginDialog after login is complete
+     */
     fun continueWithBot() = mBackgroundScope.launch {
         val currentSongFragment = CurrentSongFragment.newInstance()
         supportFragmentManager.commit {
@@ -94,31 +93,41 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.options_main, menu)
+        // save menu for use in SearchFragment
         optionsMenu = menu
-        val searchView = (menu.findItem(R.id.app_bar_search).actionView as SearchView)
+        val searchView = menu.findItem(R.id.app_bar_search).actionView as SearchView
 
         var playerCollapse = mPlayerCollapsed
+        // set listener to iconify the SearchView when back is pressed
         val backStackListener =
             FragmentManager.OnBackStackChangedListener { searchView.isIconified = true }
 
         searchView.setOnSearchClickListener {
+            // save player collapse state
             playerCollapse = mPlayerCollapsed
+            // collapse bottom UI
             changePlayerCollapse(true, 0)
             changeBottomNavCollapse(true, 0)
             supportFragmentManager.commit {
+                // hide current fragment (always at 1 as 0 ist the player)
                 hide(supportFragmentManager.fragments[1])
+                // add search fragment with transition
                 add(R.id.main_content, SearchFragment.newInstance())
                 setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 addToBackStack(null)
             }
+            // execute transactions and set listener afterwards
             supportFragmentManager.executePendingTransactions()
             supportFragmentManager.addOnBackStackChangedListener(backStackListener)
         }
         searchView.setOnCloseListener {
+            // un-collapse bottom UI
             changeBottomNavCollapse(false)
             changePlayerCollapse(playerCollapse)
+            // remove search fragment
             supportFragmentManager.popBackStack()
             supportFragmentManager.commit {
+                // show previous fragment again
                 show(supportFragmentManager.fragments[1])
                 setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             }
@@ -128,35 +137,12 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         return true
     }
 
-    override fun onNavigationItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.nav_queue -> {
-            changePlayerCollapse(false)
-            supportFragmentManager.commit {
-                replace(R.id.main_content, QueueFragment.newInstance())
-                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-            }
-            true
-        }
-        R.id.nav_suggestions -> {
-            changePlayerCollapse(true)
-            supportFragmentManager.commit {
-                replace(R.id.main_content, SuggestionsFragment.newInstance())
-                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-            }
-            true
-        }
-        R.id.nav_starred -> {
-            changePlayerCollapse(true)
-            supportFragmentManager.commit {
-                replace(R.id.main_content, FavoritesFragment.newInstance())
-                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-            }
-            true
-        }
-        else -> false
-    }
-
-    private fun changePlayerCollapse(requestCollapse: Boolean, duration: Long = 1000) {
+    /**
+     * collapsed or shows the FrameView containing the PlayerFragment
+     * @param requestCollapse: specifies if the player should be collapsed
+     * @param duration: duration of the animation
+     */
+    fun changePlayerCollapse(requestCollapse: Boolean, duration: Long = 1000) {
         if (mPlayerCollapsed == requestCollapse) return
         if (!mPlayerCollapsed) {
             main_current_song.animate().setDuration(duration)
@@ -170,6 +156,11 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         mPlayerCollapsed = requestCollapse
     }
 
+    /**
+     * collapsed or shows the BottomNavigation
+     * @param requestCollapse: specifies if the navigation should be collapsed
+     * @param duration: duration of the animation
+     */
     private fun changeBottomNavCollapse(requestCollapse: Boolean, duration: Long = 1000) {
         if (mBottomNavCollapsed == requestCollapse) return
         if (!mBottomNavCollapsed) {
@@ -186,6 +177,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
     override fun onDestroy() {
+        // cancel all running coroutines
         mUIScope.coroutineContext.cancel()
         mBackgroundScope.coroutineContext.cancel()
         super.onDestroy()

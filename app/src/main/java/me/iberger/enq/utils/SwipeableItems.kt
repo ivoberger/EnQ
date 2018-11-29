@@ -1,16 +1,15 @@
 package me.iberger.enq.utils
 
 import android.content.Context
-import android.graphics.Color
 import androidx.annotation.ColorRes
-import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getColor
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.mikepenz.fastadapter_extensions.drag.ItemTouchCallback
 import com.mikepenz.fastadapter_extensions.swipe.SimpleSwipeCallback
 import com.mikepenz.fastadapter_extensions.swipe.SimpleSwipeDragCallback
-import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.IIcon
+import me.iberger.enq.R
 
 fun setupSwipeActions(
     context: Context,
@@ -19,18 +18,13 @@ fun setupSwipeActions(
     iconLeft: IIcon, @ColorRes colorLeft: Int,
     iconRight: IIcon, @ColorRes colorRight: Int
 ) {
-    val leaveBehindDrawableRight =
-        IconicsDrawable(context, iconRight).color(Color.WHITE).sizeDp(24)
-    val leaveBehindDrawableLeft =
-        IconicsDrawable(context, iconLeft).color(Color.WHITE).sizeDp(24)
+    val drawableRight = iconRight.make(context, R.color.white, 24)
+    val drawableLeft = iconLeft.make(context, R.color.white, 24)
     val touchCallback = SimpleSwipeCallback(
-        itemSwipeCallback,
-        leaveBehindDrawableLeft,
-        ItemTouchHelper.LEFT,
-        ContextCompat.getColor(context, colorLeft)
+        itemSwipeCallback, drawableLeft, ItemTouchHelper.LEFT, getColor(context, colorLeft)
     )
-        .withBackgroundSwipeRight(ContextCompat.getColor(context, colorRight))
-        .withLeaveBehindSwipeRight(leaveBehindDrawableRight)
+        .withBackgroundSwipeRight(getColor(context, colorRight))
+        .withLeaveBehindSwipeRight(drawableRight)
     ItemTouchHelper(touchCallback).attachToRecyclerView(recyclerView)
 }
 
@@ -42,18 +36,13 @@ fun setupSwipeDragActions(
     iconLeft: IIcon, @ColorRes colorLeft: Int,
     iconRight: IIcon, @ColorRes colorRight: Int
 ) {
-    val leaveBehindDrawableRight =
-        IconicsDrawable(context, iconRight).color(Color.WHITE).sizeDp(24)
-    val leaveBehindDrawableLeft =
-        IconicsDrawable(context, iconLeft).color(Color.WHITE).sizeDp(24)
+    val drawableRight = iconRight.make(context, R.color.white, 24)
+    val drawableLeft = iconLeft.make(context, R.color.white, 24)
     val touchCallback = SimpleSwipeDragCallback(
-        itemTouchCallback,
-        itemSwipeCallback,
-        leaveBehindDrawableLeft,
-        ItemTouchHelper.LEFT,
-        ContextCompat.getColor(context, colorLeft)
+        itemTouchCallback, itemSwipeCallback,
+        drawableLeft, ItemTouchHelper.LEFT, getColor(context, colorLeft)
     )
-        .withBackgroundSwipeRight(ContextCompat.getColor(context, colorRight))
-        .withLeaveBehindSwipeRight(leaveBehindDrawableRight)
+        .withBackgroundSwipeRight(getColor(context, colorRight))
+        .withLeaveBehindSwipeRight(drawableRight)
     ItemTouchHelper(touchCallback).attachToRecyclerView(recyclerView)
 }
