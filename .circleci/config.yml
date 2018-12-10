@@ -29,6 +29,9 @@ jobs:
       - run:
           name: Lint & Test
           command: ./gradlew lint test
+      - run:
+          name: Dependency Updates check
+          command: ./gradlew dependencyUpdates
       - store_artifacts:
           path: app/build/reports
           destination: reports
