@@ -15,6 +15,7 @@ import io.sentry.Sentry
 import io.sentry.android.AndroidSentryClientFactory
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
+import me.iberger.enq.BuildConfig
 import me.iberger.enq.R
 import me.iberger.enq.backend.Configuration
 import me.iberger.enq.gui.fragments.*
@@ -24,6 +25,7 @@ import me.iberger.enq.utils.*
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.Song
 import me.iberger.jmusicbot.listener.ConnectionChangeListener
+import me.iberger.timbersentry.SentryTree
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
@@ -49,9 +51,7 @@ class MainActivity : AppCompatActivity() {
         // general setup
         mBackgroundScope.launch {
             // logging
-            Timber.plant(LoggingTree())
-            // error reporting
-            Sentry.init(AndroidSentryClientFactory(applicationContext))
+            Timber.plant(if (BuildConfig.DEBUG) Timber.DebugTree() else SentryTree(context = this@MainActivity))
             // saved data
             favorites = loadFavorites(this@MainActivity)
             config = Configuration(this@MainActivity)

@@ -3,7 +3,7 @@ plugins {
     id "kotlin-android"
     id "kotlin-android-extensions"
     id "kotlin-kapt"
-    id "com.github.triplet.play" version "2.0.0-rc2"
+    id "com.github.triplet.play" version "2.0.0"
     id 'io.sentry.android.gradle'
 }
 
@@ -70,14 +70,10 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$v_appcompat"
     implementation "androidx.constraintlayout:constraintlayout:$v_contraint_layout"
     implementation "com.google.android.material:material:$v_material"
+
 //    implementation project(":jmusicbot")
-
-
     implementation "com.github.IIIuminator:JMusicBotAndroid:$v_jmusicbot"
-
-    implementation "io.sentry:sentry-android:$v_sentry"
-    implementation "org.slf4j:slf4j-nop:$v_slf4j"
-    implementation "com.jakewharton.timber:timber:$v_timber"
+    implementation "com.github.IIIuminator:timberSentry:$v_timberSentry"
 
     implementation "com.squareup.picasso:picasso:$v_picasso"
     implementation "com.squareup.moshi:moshi:$v_moshi"
