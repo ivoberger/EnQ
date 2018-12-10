@@ -15,14 +15,14 @@ jobs:
           name: Signing Setup
           command: bash .circleci/signing_setup.sh
       - restore_cache:
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}-{{ checksum  "gradle.properties" }}-{{ checksum  "gradle/wrapper/gradle-wrapper.properties" }}
+          key: jars-{{ checksum "build.gradle.kts" }}-{{ checksum  "app/build.gradle.kts" }}-{{ checksum  "gradle.properties" }}-{{ checksum  "gradle/wrapper/gradle-wrapper.properties" }}
       - run:
           name: Download Dependencies
           command: ./gradlew androidDependencies
       - save_cache:
           paths:
             - /tmp/workspace/.gradle
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}-{{ checksum  "gradle.properties" }}-{{ checksum  "gradle/wrapper/gradle-wrapper.properties" }}
+          key: jars-{{ checksum "build.gradle.kts" }}-{{ checksum  "app/build.gradle.kts" }}-{{ checksum  "gradle.properties" }}-{{ checksum  "gradle/wrapper/gradle-wrapper.properties" }}
       - run:
           name: Disable Pre-Dexing
           command: cp .circleci/init.gradle $GRADLE_USER_HOME/init.gradle
