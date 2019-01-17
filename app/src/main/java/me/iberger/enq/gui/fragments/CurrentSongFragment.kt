@@ -199,9 +199,7 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener, ConnectionChangeLi
         MusicBot.instance?.startPlayerUpdates(this)
     }
 
-    override fun onUpdateError(e: Exception) {
-        Timber.e(e)
-    }
+    override fun onUpdateError(e: Exception) = Timber.w(e)
 
     override fun onDestroy() {
         super.onDestroy()

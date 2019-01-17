@@ -11,7 +11,7 @@ import timber.log.Timber
 
 class ConnectionListener(private val mainActivity: MainActivity) : ConnectionChangeListener {
     override fun onConnectionLost(e: Exception) {
-        Timber.e(e)
+        Timber.w(e)
         MainActivity.connected = false
         GlobalScope.launch(Dispatchers.Main) {
             mainActivity.main_bottom_navigation.setBackgroundResource(R.color.md_red_500)

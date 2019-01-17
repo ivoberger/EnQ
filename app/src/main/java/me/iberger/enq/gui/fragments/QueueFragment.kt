@@ -86,7 +86,7 @@ class QueueFragment : Fragment(), QueueUpdateListener, ConnectionChangeListener,
 
     }
 
-    override fun onUpdateError(e: Exception) = Timber.e(e)
+    override fun onUpdateError(e: Exception) = Timber.w(e)
 
     override fun itemSwiped(position: Int, direction: Int) {
         mBackgroundScope.launch {
@@ -127,7 +127,7 @@ class QueueFragment : Fragment(), QueueUpdateListener, ConnectionChangeListener,
             Timber.d("Moved $entry from $oldPosition to $newPosition")
             try {
                 MusicBot.instance?.moveSong(entry, newPosition)?.await()
-            } catch (e: java.lang.Exception) {
+            } catch (e: Exception) {
                 Timber.e(e)
                 mUIScope.launch {
                     context?.toastShort(R.string.msg_no_permission)
