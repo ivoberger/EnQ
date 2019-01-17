@@ -10,7 +10,7 @@ buildscript {
     }
     configurations.all {
         resolutionStrategy {
-            force("net.sf.proguard:proguard-gradle:6.1.0beta1")
+            force("net.sf.proguard:proguard-gradle:6.1.0beta2")
         }
     }
 }
