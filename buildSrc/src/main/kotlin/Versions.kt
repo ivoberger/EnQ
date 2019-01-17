@@ -23,6 +23,8 @@ object Versions {
 
     const val timbersentry: String = "0.2.0" 
 
+    const val glide: String = "4.8.0" 
+
     const val com_github_triplet_play_gradle_plugin: String = "2.1.0" 
 
     const val material: String = "1.1.0-alpha01" 
@@ -38,8 +40,6 @@ object Versions {
     const val iconics_core: String = "3.1.0" 
 
     const val moshi: String = "1.8.0" 
-
-    const val picasso: String = "2.71828" 
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.3.2" 
 

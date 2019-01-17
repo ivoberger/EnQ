@@ -1,18 +1,14 @@
 package me.iberger.enq.gui.fragments
 
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.IconicsDrawable
-import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_current_song.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,9 +16,7 @@ import kotlinx.coroutines.launch
 import me.iberger.enq.R
 import me.iberger.enq.gui.MainActivity
 import me.iberger.enq.gui.MainActivity.Companion.favorites
-import me.iberger.enq.utils.changeFavoriteStatus
-import me.iberger.enq.utils.make
-import me.iberger.enq.utils.toastShort
+import me.iberger.enq.utils.*
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.PlayerState
 import me.iberger.jmusicbot.data.PlayerStates
@@ -72,8 +66,7 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener, ConnectionChangeLi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        MusicBot.instance?.startPlayerUpdates(this@CurrentSongFragment)
-        MusicBot.instance?.connectionChangeListeners?.add(this@CurrentSongFragment)
+        startUpdates()
     }
 
     override fun onCreateView(
@@ -178,8 +171,9 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener, ConnectionChangeLi
             // fill in song metadata
             song_title.text = song.title
             song_description.text = song.description
-            if (song.albumArtUrl != null) Picasso.get().load(song.albumArtUrl).into(song_album_art)
-            else song_album_art.setImageDrawable(null)
+            if (song.albumArtUrl != null)
+                Glide.with(this@CurrentSongFragment).load(song.albumArtUrl).into(song_album_art)
+            else Glide.with(this@CurrentSongFragment).clear(song_album_art)
             song.duration?.also {
                 song_duration.text = String.format("%02d:%02d", it / 60, it % 60)
             }
@@ -202,13 +196,20 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener, ConnectionChangeLi
         MusicBot.instance?.startPlayerUpdates(this)
     }
 
-    override fun onUpdateError(e: Exception) {
-        Timber.e(e)
+    override fun onUpdateError(e: Exception) = Timber.w(e)
+
+    override fun onResume() {
+        super.onResume()
+        startUpdates()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopUpdates()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        MusicBot.instance?.stopPlayerUpdates(this)
-        MusicBot.instance?.connectionChangeListeners?.remove(this)
+        stopUpdates()
     }
 }

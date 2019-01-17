@@ -39,6 +39,10 @@ object Libs {
 
     const val timbersentry: String = "com.github.IIIuminator:timberSentry:" + Versions.timbersentry
 
+    /**
+     * https://github.com/bumptech/glide */
+    const val glide: String = "com.github.bumptech.glide:glide:" + Versions.glide
+
     const val com_github_triplet_play_gradle_plugin: String =
             "com.github.triplet.play:com.github.triplet.play.gradle.plugin:" +
             Versions.com_github_triplet_play_gradle_plugin
@@ -73,10 +77,6 @@ object Libs {
     /**
      * https://github.com/square/moshi */
     const val moshi: String = "com.squareup.moshi:moshi:" + Versions.moshi
-
-    /**
-     * https://github.com/square/picasso/ */
-    const val picasso: String = "com.squareup.picasso:picasso:" + Versions.picasso
 
     const val de_fayard_buildsrcversions_gradle_plugin: String =
             "de.fayard.buildSrcVersions:de.fayard.buildSrcVersions.gradle.plugin:" +

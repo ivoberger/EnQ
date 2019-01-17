@@ -55,7 +55,7 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
 
     override fun itemSwiped(position: Int, direction: Int) {
         mBackgroundScope.launch {
-            val entry = mFastItemAdapter.getAdapterItem(position)
+            val entry = fastItemAdapter.getAdapterItem(position)
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
                     try {
@@ -65,14 +65,14 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
                         Timber.e("AuthException with reason ${e.reason}")
                         withContext(Dispatchers.Main) {
                             context!!.toastShort(R.string.msg_no_permission)
-                            mFastItemAdapter.notifyAdapterItemChanged(position)
+                            fastItemAdapter.notifyAdapterItemChanged(position)
                         }
                     }
                 }
                 ItemTouchHelper.LEFT -> {
                     changeFavoriteStatus(context!!, entry.song)
                     withContext(Dispatchers.Main) {
-                        mFastItemAdapter.notifyAdapterItemChanged(position)
+                        fastItemAdapter.notifyAdapterItemChanged(position)
                     }
                 }
             }

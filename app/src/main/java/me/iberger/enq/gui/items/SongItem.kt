@@ -4,8 +4,8 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.mikepenz.fastadapter.items.AbstractItem
-import com.squareup.picasso.Picasso
 import me.iberger.enq.R
 import me.iberger.jmusicbot.data.Song
 
@@ -21,7 +21,8 @@ open class SongItem(val song: Song) : AbstractItem<SongItem, SongItem.ViewHolder
         holder.txtDescription.isSelected = true
         holder.txtTitle.text = song.title
         holder.txtDescription.text = song.description
-        song.albumArtUrl?.also { Picasso.get().load(it).into(holder.imgAlbumArt) }
+
+        song.albumArtUrl?.also { Glide.with(holder.itemView).load(it).into(holder.imgAlbumArt) }
         song.duration?.also {
             holder.txtDuration.text = String.format("%02d:%02d", it / 60, it % 60)
         }

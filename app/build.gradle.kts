@@ -29,6 +29,10 @@ android {
         }
     }
     buildTypes {
+        getByName("debug") {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = " (debug)"
+        }
         getByName("release") {
             isMinifyEnabled = false
             isShrinkResources = false
@@ -69,7 +73,7 @@ dependencies {
     implementation(Libs.jmusicbotandroid)
     implementation(Libs.timbersentry)
 
-    implementation(Libs.picasso)
+    implementation(Libs.glide)
     implementation(Libs.moshi)
 
     implementation(Libs.fastadapter)

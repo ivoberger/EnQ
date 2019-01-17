@@ -9,7 +9,6 @@ import me.iberger.jmusicbot.data.Song
 
 class SuggestionsItem(song: Song) : SongItem(song) {
 
-
     override fun bindView(holder: ViewHolder, payloads: MutableList<Any>) {
         super.bindView(holder, payloads)
         val context = holder.itemView.context
