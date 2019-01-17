@@ -5,11 +5,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.fastadapter.items.AbstractItem
 import com.mikepenz.fastadapter_extensions.drag.IDraggable
 import com.mikepenz.iconics.IconicsDrawable
-import com.squareup.picasso.Picasso
 import me.iberger.enq.R
 import me.iberger.enq.gui.MainActivity
 import me.iberger.jmusicbot.data.QueueEntry
@@ -32,7 +32,8 @@ class QueueItem(
         holder.txtDescription.isSelected = true
         holder.txtTitle.text = song.title
         holder.txtDescription.text = song.description
-        song.albumArtUrl?.also { Picasso.get().load(it).into(holder.imgAlbumArt) }
+
+        song.albumArtUrl?.also { Glide.with(holder.itemView).load(it).into(holder.imgAlbumArt) }
         song.duration?.also {
             holder.txtDuration.text = String.format("%02d:%02d", it / 60, it % 60)
         }

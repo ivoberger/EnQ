@@ -4,10 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.*
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter
 import com.mikepenz.fastadapter_extensions.drag.ItemTouchCallback
@@ -21,6 +19,7 @@ import kotlinx.coroutines.withContext
 import me.iberger.enq.R
 import me.iberger.enq.gui.MainActivity
 import me.iberger.enq.gui.items.QueueItem
+import me.iberger.enq.gui.listener.QueueUpdateCallback
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.setupSwipeDragActions
 import me.iberger.enq.utils.toastShort
@@ -39,11 +38,21 @@ class QueueFragment : Fragment(), QueueUpdateListener, ConnectionChangeListener,
     }
 
     private val mUIScope = CoroutineScope(Dispatchers.Main)
-
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
-    private var mQueue: List<QueueEntry> = listOf()
 
-    private lateinit var mFastItemAdapter: FastItemAdapter<QueueItem>
+    private val diffCallback = object : DiffUtil.ItemCallback<QueueEntry>() {
+        override fun areItemsTheSame(oldItem: QueueEntry, newItem: QueueEntry): Boolean =
+            oldItem.song.id == newItem.song.id && oldItem.userName == newItem.userName
+
+        override fun areContentsTheSame(oldItem: QueueEntry, newItem: QueueEntry): Boolean = oldItem == newItem
+
+    }
+
+    private var mAsyncDiffer: AsyncListDiffer<QueueEntry>? = null
+    private var mQueueUpdateCallback: QueueUpdateCallback? = null
+
+    private val mFastItemAdapter: FastItemAdapter<QueueItem> by lazy { FastItemAdapter<QueueItem>() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("Creating Queue Fragment")
         super.onCreate(savedInstanceState)
@@ -57,7 +66,9 @@ class QueueFragment : Fragment(), QueueUpdateListener, ConnectionChangeListener,
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mFastItemAdapter = FastItemAdapter()
+        mQueueUpdateCallback = QueueUpdateCallback(mFastItemAdapter)
+        mAsyncDiffer = AsyncListDiffer(mQueueUpdateCallback!!, AsyncDifferConfig.Builder(diffCallback).build())
+
         queue.layoutManager = LinearLayoutManager(context).apply { reverseLayout = true }
         queue.adapter = mFastItemAdapter
         savedInstanceState?.also { mFastItemAdapter.withSavedInstanceState(it, KEY_QUEUE) }
@@ -70,17 +81,12 @@ class QueueFragment : Fragment(), QueueUpdateListener, ConnectionChangeListener,
     }
 
     override fun onQueueChanged(newQueue: List<QueueEntry>) {
-        if (mQueue == newQueue) return
-        mQueue = newQueue
-        val itemQueue = mQueue.map { QueueItem((it)) }
-        mUIScope.launch {
-            mFastItemAdapter.set(itemQueue)
-        }
+        mQueueUpdateCallback?.currentList = newQueue
+        mAsyncDiffer?.submitList(newQueue)
+
     }
 
-    override fun onUpdateError(e: Exception) {
-        Timber.e(e)
-    }
+    override fun onUpdateError(e: Exception) = Timber.e(e)
 
     override fun itemSwiped(position: Int, direction: Int) {
         mBackgroundScope.launch {
