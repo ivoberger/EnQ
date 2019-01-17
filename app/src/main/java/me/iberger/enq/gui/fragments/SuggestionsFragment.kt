@@ -1,7 +1,6 @@
 package me.iberger.enq.gui.fragments
 
 import android.os.Bundle
-import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import kotlinx.android.synthetic.main.fragment_search.*
@@ -13,30 +12,31 @@ import me.iberger.jmusicbot.data.MusicBotPlugin
 
 class SuggestionsFragment : TabbedSongListFragment() {
     companion object {
+
         fun newInstance() = SuggestionsFragment()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mProviderPlugins = mBackgroundScope.async { MusicBot.instance.suggesters }
+        mProviderPlugins = mBackgroundScope.async { MusicBot.instance!!.suggesters }
         mBackgroundScope.launch {
+            mProviderPlugins.await() ?: return@launch
             mConfig.lastSuggester?.also {
-                if (mProviderPlugins.await().contains(it)) mSelectedPlugin = it
+                if (mProviderPlugins.await()!!.contains(it)) mSelectedPlugin = it
             }
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun initializeTabs() {
         mBackgroundScope.launch {
+            mProviderPlugins = async { MusicBot.instance?.suggesters }
+            val provider = mProviderPlugins.await()
+            provider ?: return@launch
             mFragmentPagerAdapter =
                     async {
-                        SuggestionsFragmentPager(
-                            childFragmentManager,
-                            mProviderPlugins.await()
-                        )
+                        SuggestionsFragmentPager(childFragmentManager, provider)
                     }
-            mUIScope.launch { search_view_pager.adapter = mFragmentPagerAdapter.await() }
+            mUIScope.launch { view_pager.adapter = mFragmentPagerAdapter.await() }
         }
     }
 

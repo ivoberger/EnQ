@@ -49,30 +49,30 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
     }
 
     private fun getSuggestions() = mBackgroundScope.launch {
-        val results = MusicBot.instance.getSuggestions(mSuggesterId).await()
-        super.displayResults(results.map { SuggestionsItem(it) })
+        val results = MusicBot.instance?.getSuggestions(mSuggesterId)?.await()
+        super.displayResults(results?.map { SuggestionsItem(it) })
     }
 
     override fun itemSwiped(position: Int, direction: Int) {
         mBackgroundScope.launch {
-            val entry = mFastItemAdapter.getAdapterItem(position)
+            val entry = fastItemAdapter.getAdapterItem(position)
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
                     try {
-                        MusicBot.instance.deleteSuggestion(mSuggesterId, entry.song).await()
+                        MusicBot.instance?.deleteSuggestion(mSuggesterId, entry.song)?.await()
                         getSuggestions()
                     } catch (e: AuthException) {
                         Timber.e("AuthException with reason ${e.reason}")
                         withContext(Dispatchers.Main) {
                             context!!.toastShort(R.string.msg_no_permission)
-                            mFastItemAdapter.notifyAdapterItemChanged(position)
+                            fastItemAdapter.notifyAdapterItemChanged(position)
                         }
                     }
                 }
                 ItemTouchHelper.LEFT -> {
                     changeFavoriteStatus(context!!, entry.song)
                     withContext(Dispatchers.Main) {
-                        mFastItemAdapter.notifyAdapterItemChanged(position)
+                        fastItemAdapter.notifyAdapterItemChanged(position)
                     }
                 }
             }

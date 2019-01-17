@@ -16,27 +16,32 @@ import me.iberger.enq.gui.MainActivity
 import me.iberger.enq.gui.fragments.parents.TabbedSongListFragment
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.MusicBotPlugin
+import me.iberger.jmusicbot.listener.ConnectionChangeListener
 import timber.log.Timber
 
-class SearchFragment : TabbedSongListFragment() {
+class SearchFragment : TabbedSongListFragment(), ConnectionChangeListener {
 
     companion object {
         fun newInstance() = SearchFragment()
     }
 
+    private lateinit var mSearchView: SearchView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mProviderPlugins = mBackgroundScope.async { MusicBot.instance.provider }
+        mProviderPlugins = mBackgroundScope.async { MusicBot.instance!!.provider }
+        MusicBot.instance?.connectionChangeListeners?.add(this@SearchFragment)
         mBackgroundScope.launch {
+            mProviderPlugins.await() ?: return@launch
             mConfig.lastProvider?.also {
-                if (mProviderPlugins.await().contains(it)) mSelectedPlugin = it
+                if (mProviderPlugins.await()!!.contains(it)) mSelectedPlugin = it
             }
         }
 
-        val searchView =
-            ((activity as MainActivity).optionsMenu.findItem(R.id.app_bar_search).actionView as SearchView)
+        mSearchView =
+                (activity as MainActivity).optionsMenu.findItem(R.id.app_bar_search).actionView as SearchView
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        mSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             private var oldText = ""
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.also {
@@ -66,28 +71,33 @@ class SearchFragment : TabbedSongListFragment() {
     ): View? =
         inflater.inflate(R.layout.fragment_search, container, false)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun initializeTabs() {
         mBackgroundScope.launch {
+            mProviderPlugins.await() ?: return@launch
             mFragmentPagerAdapter =
                     async {
-                        SearchFragmentPager(childFragmentManager, mProviderPlugins.await())
+                        SearchFragmentPager(childFragmentManager, mProviderPlugins.await()!!)
                     }
-            mUIScope.launch { search_view_pager.adapter = mFragmentPagerAdapter.await() }
+            mUIScope.launch { view_pager.adapter = mFragmentPagerAdapter.await() }
         }
     }
 
     fun search(query: String) {
         mBackgroundScope.launch {
-            (mFragmentPagerAdapter.await() as SearchFragmentPager).search(
-                query
-            )
+            (mFragmentPagerAdapter.await() as SearchFragmentPager).search(query)
         }
     }
+
+    override fun onConnectionLost(e: Exception) {
+        activity?.supportFragmentManager?.popBackStack()
+    }
+
+    override fun onConnectionRecovered() {}
 
     override fun onDestroy() {
         super.onDestroy()
         mConfig.lastProvider = mSelectedPlugin
+        MusicBot.instance?.connectionChangeListeners?.remove(this)
     }
 
     inner class SearchFragmentPager(fm: FragmentManager, provider: List<MusicBotPlugin>) :

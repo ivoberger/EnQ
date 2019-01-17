@@ -28,9 +28,9 @@ class SearchResultsFragment : ResultsFragment() {
     fun search(query: String) {
         Timber.d("Searching for $query on provider $mProviderID")
         mBackgroundScope.launch {
-            val results = MusicBot.instance.search(mProviderID, query).await()
-            Timber.d("Got ${results.size} results on provider $mProviderID")
-            super.displayResults(results.map { SuggestionsItem(it) })
+            val results = MusicBot.instance?.search(mProviderID, query)?.await()
+            Timber.d("Got ${results?.size} results on provider $mProviderID")
+            super.displayResults(results?.map { SuggestionsItem(it) })
         }
     }
 }

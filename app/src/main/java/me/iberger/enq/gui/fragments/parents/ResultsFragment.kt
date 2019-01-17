@@ -13,6 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.iberger.enq.R
+import me.iberger.enq.gui.MainActivity
+import me.iberger.enq.gui.items.SongItem
 import me.iberger.enq.gui.items.SuggestionsItem
 import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.MusicBot
@@ -22,26 +24,23 @@ open class ResultsFragment : Fragment() {
     val mUIScope = CoroutineScope(Dispatchers.Main)
     val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
-    lateinit var mFastItemAdapter: FastItemAdapter<SuggestionsItem>
+    val fastItemAdapter: FastItemAdapter<SongItem> by lazy { FastItemAdapter<SongItem>() }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? =
-        inflater.inflate(R.layout.fragment_queue, container, false)
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? = inflater.inflate(R.layout.fragment_queue, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mFastItemAdapter = FastItemAdapter()
         queue.layoutManager = LinearLayoutManager(context)
-        queue.adapter = mFastItemAdapter
+        queue.adapter = fastItemAdapter
 
-        mFastItemAdapter.withOnClickListener { _, _, item, position ->
+        fastItemAdapter.withOnClickListener { _, _, item, position ->
+            if (!MainActivity.connected) return@withOnClickListener false
             mBackgroundScope.launch {
-                MusicBot.instance.enqueue(item.song).await()
+                MusicBot.instance?.enqueue(item.song)?.await()
                 withContext(Dispatchers.Main) {
-                    mFastItemAdapter.remove(position)
+                    fastItemAdapter.remove(position)
                     context!!.toastShort(
                         context!!.getString(
                             R.string.msg_enqueued,
@@ -54,6 +53,6 @@ open class ResultsFragment : Fragment() {
         }
     }
 
-    fun displayResults(results: List<SuggestionsItem>) =
-        mUIScope.launch { mFastItemAdapter.set(results) }
+    fun displayResults(results: List<SuggestionsItem>?) =
+        mUIScope.launch { fastItemAdapter.set(results) }
 }
