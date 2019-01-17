@@ -20,9 +20,7 @@ import me.iberger.enq.R
 import me.iberger.enq.gui.MainActivity
 import me.iberger.enq.gui.items.QueueItem
 import me.iberger.enq.gui.listener.QueueUpdateCallback
-import me.iberger.enq.utils.changeFavoriteStatus
-import me.iberger.enq.utils.setupSwipeDragActions
-import me.iberger.enq.utils.toastShort
+import me.iberger.enq.utils.*
 import me.iberger.jmusicbot.KEY_QUEUE
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.QueueEntry
@@ -56,8 +54,7 @@ class QueueFragment : Fragment(), QueueUpdateListener, ConnectionChangeListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("Creating Queue Fragment")
         super.onCreate(savedInstanceState)
-        MusicBot.instance?.startQueueUpdates(this)
-        MusicBot.instance?.connectionChangeListeners?.add(this)
+        startUpdates()
     }
 
     override fun onCreateView(
@@ -146,9 +143,18 @@ class QueueFragment : Fragment(), QueueUpdateListener, ConnectionChangeListener,
         MusicBot.instance?.startQueueUpdates(this)
     }
 
+    override fun onResume() {
+        super.onResume()
+        startUpdates()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopUpdates()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        MusicBot.instance?.stopQueueUpdates(this)
-        MusicBot.instance?.connectionChangeListeners?.remove(this)
+        stopUpdates()
     }
 }

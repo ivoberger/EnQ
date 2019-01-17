@@ -16,9 +16,7 @@ import kotlinx.coroutines.launch
 import me.iberger.enq.R
 import me.iberger.enq.gui.MainActivity
 import me.iberger.enq.gui.MainActivity.Companion.favorites
-import me.iberger.enq.utils.changeFavoriteStatus
-import me.iberger.enq.utils.make
-import me.iberger.enq.utils.toastShort
+import me.iberger.enq.utils.*
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.PlayerState
 import me.iberger.jmusicbot.data.PlayerStates
@@ -68,8 +66,7 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener, ConnectionChangeLi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        MusicBot.instance?.startPlayerUpdates(this@CurrentSongFragment)
-        MusicBot.instance?.connectionChangeListeners?.add(this@CurrentSongFragment)
+        startUpdates()
     }
 
     override fun onCreateView(
@@ -201,9 +198,18 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener, ConnectionChangeLi
 
     override fun onUpdateError(e: Exception) = Timber.w(e)
 
+    override fun onResume() {
+        super.onResume()
+        startUpdates()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopUpdates()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        MusicBot.instance?.stopPlayerUpdates(this)
-        MusicBot.instance?.connectionChangeListeners?.remove(this)
+        stopUpdates()
     }
 }
