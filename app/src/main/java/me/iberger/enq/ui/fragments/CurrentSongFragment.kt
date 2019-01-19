@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.IconicsDrawable
@@ -16,16 +18,17 @@ import kotlinx.coroutines.launch
 import me.iberger.enq.R
 import me.iberger.enq.ui.MainActivity
 import me.iberger.enq.ui.MainActivity.Companion.favorites
-import me.iberger.enq.utils.*
+import me.iberger.enq.ui.viewmodel.PlayerViewModel
+import me.iberger.enq.utils.changeFavoriteStatus
+import me.iberger.enq.utils.make
+import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.PlayerState
 import me.iberger.jmusicbot.data.PlayerStates
 import me.iberger.jmusicbot.data.Song
-import me.iberger.jmusicbot.listener.ConnectionChangeListener
-import me.iberger.jmusicbot.listener.PlayerUpdateListener
 import timber.log.Timber
 
-class CurrentSongFragment : Fragment(), PlayerUpdateListener, ConnectionChangeListener {
+class CurrentSongFragment : Fragment() {
 
     companion object {
 
@@ -34,6 +37,7 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener, ConnectionChangeLi
 
     private val mUIScope = CoroutineScope(Dispatchers.Main)
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
+    private val mViewModel by lazy { ViewModelProviders.of(this).get(PlayerViewModel::class.java) }
 
     private var mPlayerState: PlayerState = PlayerState(PlayerStates.STOP, null)
     private var mShowSkip = false
@@ -66,7 +70,7 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener, ConnectionChangeLi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        startUpdates()
+        mViewModel.playerState.observe(this, Observer { onPlayerStateChanged(it) })
     }
 
     override fun onCreateView(
@@ -140,7 +144,7 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener, ConnectionChangeLi
     }
 
 
-    override fun onPlayerStateChanged(newState: PlayerState) {
+    fun onPlayerStateChanged(newState: PlayerState) {
         if (newState == mPlayerState || view == null) return
         mUIScope.launch {
             mPlayerState = newState
@@ -185,31 +189,5 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener, ConnectionChangeLi
                 else mFavoritesAddDrawable
             )
         }
-    }
-
-    override fun onConnectionLost(e: Exception) {
-        MusicBot.instance?.stopPlayerUpdates(this)
-        onPlayerStateChanged(PlayerState(PlayerStates.ERROR, null))
-    }
-
-    override fun onConnectionRecovered() {
-        MusicBot.instance?.startPlayerUpdates(this)
-    }
-
-    override fun onUpdateError(e: Exception) = Timber.w(e)
-
-    override fun onResume() {
-        super.onResume()
-        startUpdates()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        stopUpdates()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        stopUpdates()
     }
 }

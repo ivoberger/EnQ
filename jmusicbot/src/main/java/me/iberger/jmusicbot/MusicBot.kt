@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.net.wifi.WifiManager
 import androidx.core.content.edit
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.*
@@ -13,8 +15,6 @@ import me.iberger.jmusicbot.exceptions.InvalidParametersException
 import me.iberger.jmusicbot.exceptions.NotFoundException
 import me.iberger.jmusicbot.exceptions.UsernameTakenException
 import me.iberger.jmusicbot.listener.ConnectionChangeListener
-import me.iberger.jmusicbot.listener.PlayerUpdateListener
-import me.iberger.jmusicbot.listener.QueueUpdateListener
 import me.iberger.jmusicbot.network.MusicBotAPI
 import me.iberger.jmusicbot.network.TokenAuthenticator
 import me.iberger.jmusicbot.network.process
@@ -45,7 +45,9 @@ class MusicBot(
             )
         }
     }.authenticator(TokenAuthenticator()).cache(null).build()
+
     private var apiClient: MusicBotAPI
+
     var user: User = user
         set(newUser) {
             newUser.save(mPreferences)
@@ -78,11 +80,12 @@ class MusicBot(
     val suggesters: Deferred<List<MusicBotPlugin>?>
         get() = apiClient.getSuggesters().process()
 
+    private val mQueue: MutableLiveData<List<QueueEntry>> = MutableLiveData()
+    private val mPlayerState: MutableLiveData<PlayerState> = MutableLiveData()
+
     private var mQueueUpdateTimer: Timer? = null
     private var mPlayerUpdateTimer: Timer? = null
 
-    private val mQueueUpdateListeners: MutableList<QueueUpdateListener> = mutableListOf()
-    private val mPlayerUpdateListeners: MutableList<PlayerUpdateListener> = mutableListOf()
     val connectionChangeListeners: MutableList<ConnectionChangeListener> = mutableListOf()
 
     fun deleteUser(): Deferred<Unit?> = apiClient.deleteUser().process()
@@ -127,51 +130,54 @@ class MusicBot(
     suspend fun play(): Unit = updatePlayer(apiClient.play().process().await())
     suspend fun skip(): Unit = updatePlayer(apiClient.skip().process().await())
 
-    fun startQueueUpdates(listener: QueueUpdateListener, period: Long = 500) {
-        mQueueUpdateListeners.add(listener)
-        mQueueUpdateTimer = fixedRateTimer(period = period) { updateQueue() }
+    fun getQueue(period: Long = 500): LiveData<List<QueueEntry>> {
+        if (mQueueUpdateTimer == null) mQueueUpdateTimer = fixedRateTimer(period = period) { updateQueue() }
+        return mQueue
     }
 
-    fun stopQueueUpdates(listener: QueueUpdateListener) {
-        mQueueUpdateListeners.remove(listener)
-        if (mQueueUpdateListeners.isEmpty()) {
+    fun stopQueueUpdates() {
+        if (!mQueue.hasObservers()) {
             mQueueUpdateTimer?.cancel()
             mQueueUpdateTimer = null
         }
     }
 
-    fun startPlayerUpdates(listener: PlayerUpdateListener, period: Long = 500) {
-        mPlayerUpdateListeners.add(listener)
-        mPlayerUpdateTimer = fixedRateTimer(period = period) { updatePlayer() }
+    fun getPlayerState(period: Long = 500): LiveData<PlayerState> {
+        if (mPlayerUpdateTimer == null) mPlayerUpdateTimer = fixedRateTimer(period = period) { updatePlayer() }
+        return mPlayerState
     }
 
-    fun stopPlayerUpdates(listener: PlayerUpdateListener) {
-        mPlayerUpdateListeners.remove(listener)
-        if (mPlayerUpdateListeners.isEmpty()) {
+    fun stopPlayerUpdates() {
+        if (!mPlayerState.hasObservers()) {
             mPlayerUpdateTimer?.cancel()
             mPlayerUpdateTimer = null
         }
     }
 
-    private fun updateQueue(queue: List<QueueEntry>? = null) = runBlocking {
+    private fun updateQueue(newQueue: List<QueueEntry>? = null) = runBlocking {
         try {
-            val newQueue = queue ?: apiClient.getQueue().process().await()!!
-            mQueueUpdateListeners.forEach { it.onQueueChanged(newQueue) }
+            val queue = newQueue ?: apiClient.getQueue().process().await()!!
+            withContext(Dispatchers.Main) { mQueue.value = queue }
         } catch (e: Exception) {
-            mQueueUpdateListeners.forEach { it.onUpdateError(e) }
+            Timber.w(e)
+            // TODO: propagate error
         }
     }
 
     private fun updatePlayer(playerState: PlayerState? = null) = runBlocking {
         try {
-            val newState = playerState ?: apiClient.getPlayerState().process().await()!!
-            mPlayerUpdateListeners.forEach { it.onPlayerStateChanged(newState) }
+            val state = playerState ?: apiClient.getPlayerState().process().await()!!
+            withContext(Dispatchers.Main) {
+                mPlayerState.value = state
+            }
         } catch (e: Exception) {
-            mPlayerUpdateListeners.forEach { it.onUpdateError(e) }
+            // TODO: propagate error
         }
     }
 
     fun onConnectionLost(e: Exception) {
+        stopQueueUpdates()
+        stopPlayerUpdates()
         baseUrl = null
         connectionChangeListeners.forEach { it.onConnectionLost(e) }
         runBlocking {
@@ -272,6 +278,7 @@ class MusicBot(
                 apiClient = Retrofit.Builder()
                     .addConverterFactory(MoshiConverterFactory.create(mMoshi).asLenient())
                     .baseUrl(it)
+                    .addCallAdapterFactory(CoroutineCallAdapterFactory())
                     .build()
                     .create(MusicBotAPI::class.java)
                 return true

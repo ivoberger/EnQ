@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.*
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter
@@ -20,21 +22,22 @@ import me.iberger.enq.R
 import me.iberger.enq.ui.MainActivity
 import me.iberger.enq.ui.items.QueueItem
 import me.iberger.enq.ui.listener.QueueUpdateCallback
-import me.iberger.enq.utils.*
+import me.iberger.enq.ui.viewmodel.QueueViewModel
+import me.iberger.enq.utils.changeFavoriteStatus
+import me.iberger.enq.utils.setupSwipeDragActions
+import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.KEY_QUEUE
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.QueueEntry
 import me.iberger.jmusicbot.exceptions.AuthException
-import me.iberger.jmusicbot.listener.ConnectionChangeListener
-import me.iberger.jmusicbot.listener.QueueUpdateListener
 import timber.log.Timber
 
-class QueueFragment : Fragment(), QueueUpdateListener, ConnectionChangeListener,
-    SimpleSwipeCallback.ItemSwipeCallback, ItemTouchCallback {
+class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTouchCallback {
     companion object {
         fun newInstance() = QueueFragment()
     }
 
+    private val mViewModel by lazy { ViewModelProviders.of(this).get(QueueViewModel::class.java) }
     private val mUIScope = CoroutineScope(Dispatchers.Main)
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
@@ -54,7 +57,10 @@ class QueueFragment : Fragment(), QueueUpdateListener, ConnectionChangeListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("Creating Queue Fragment")
         super.onCreate(savedInstanceState)
-        startUpdates()
+        mViewModel.queue.observe(this, Observer {
+            mQueueUpdateCallback?.currentList = it
+            mAsyncDiffer?.submitList(it)
+        })
     }
 
     override fun onCreateView(
@@ -76,14 +82,6 @@ class QueueFragment : Fragment(), QueueUpdateListener, ConnectionChangeListener,
             CommunityMaterial.Icon.cmd_delete, R.color.delete
         )
     }
-
-    override fun onQueueChanged(newQueue: List<QueueEntry>) {
-        mQueueUpdateCallback?.currentList = newQueue
-        mAsyncDiffer?.submitList(newQueue)
-
-    }
-
-    override fun onUpdateError(e: Exception) = Timber.w(e)
 
     override fun itemSwiped(position: Int, direction: Int) {
         mBackgroundScope.launch {
@@ -132,29 +130,5 @@ class QueueFragment : Fragment(), QueueUpdateListener, ConnectionChangeListener,
                 }
             }
         }
-    }
-
-    override fun onConnectionLost(e: Exception) {
-        MusicBot.instance?.stopQueueUpdates(this)
-    }
-
-
-    override fun onConnectionRecovered() {
-        MusicBot.instance?.startQueueUpdates(this)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        startUpdates()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        stopUpdates()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        stopUpdates()
     }
 }
