@@ -9,11 +9,9 @@ import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.exceptions.InvalidParametersException
 import me.iberger.jmusicbot.exceptions.NotFoundException
 import me.iberger.jmusicbot.exceptions.ServerErrorException
-import retrofit2.Call
 import retrofit2.Response
 import timber.log.Timber
 import java.io.IOException
-import java.lang.Exception
 import java.net.DatagramPacket
 import java.net.InetAddress
 import java.net.MulticastSocket
@@ -27,7 +25,7 @@ internal fun verifyHostAddress(wifiManager: WifiManager, address: String? = null
     Timber.d("New host address: ${MusicBot.baseUrl}")
 }
 
-private fun discoverHost(wifiManager: WifiManager): String? {
+internal fun discoverHost(wifiManager: WifiManager): String? {
     val lock = wifiManager.createMulticastLock(LOCK_TAG)
     lock.acquire()
     return try {
@@ -49,6 +47,8 @@ private fun discoverHost(wifiManager: WifiManager): String? {
     }
 }
 
+
+@Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class, ServerErrorException::class)
 internal fun <T> Deferred<Response<T>>.process(
     successCodes: List<Int> = listOf(200, 201, 204),
     errorCodes: Map<Int, Exception> = mapOf(),

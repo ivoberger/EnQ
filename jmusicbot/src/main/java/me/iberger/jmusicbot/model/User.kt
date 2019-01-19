@@ -31,8 +31,8 @@ data class User(
         }
     }
 
-    fun save(sharedPreferences: SharedPreferences) {
-        val userAdapter = Moshi.Builder().build().adapter<User>(this::class.java)
+    fun save(sharedPreferences: SharedPreferences, moshi: Moshi = Moshi.Builder().build()) {
+        val userAdapter = moshi.adapter<User>(this::class.java)
         sharedPreferences.edit {
             putString(KEY_USER, userAdapter.toJson(this@User))
         }

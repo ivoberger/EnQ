@@ -17,8 +17,8 @@ sealed class Credentials {
     @JsonClass(generateAdapter = true)
     class Login(
         @Json(name = "name") val name: String,
-        @Json(name = "uuid") val uuid: String = UUID.randomUUID().toString(),
-        @Json(name = "password") val password: String
+        @Json(name = "password") val password: String,
+        @Json(name = "uuid") val uuid: String = UUID.randomUUID().toString()
     ) : Credentials() {
         constructor(user: User) : this(
             user.name,
