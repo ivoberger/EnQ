@@ -71,7 +71,6 @@ dependencies {
     implementation(Libs.material)
 
     implementation(project(":jmusicbot"))
-//    implementation(Libs.jmusicbotandroid)
     implementation(Libs.timbersentry)
 
     implementation(Libs.glide)

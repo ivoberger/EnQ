@@ -37,11 +37,6 @@ object Libs {
      * https://developer.android.com/studio */
     const val lint_gradle: String = "com.android.tools.lint:lint-gradle:" + Versions.lint_gradle
 
-    /**
-     * https://github.com/IIIuminator/JMusicBotAndroid */
-    const val jmusicbotandroid: String = "com.github.IIIuminator:JMusicBotAndroid:" +
-            Versions.jmusicbotandroid
-
     const val timbersentry: String = "com.github.IIIuminator:timberSentry:" + Versions.timbersentry
 
     /**

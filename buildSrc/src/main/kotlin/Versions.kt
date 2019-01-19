@@ -21,8 +21,6 @@ object Versions {
 
     const val lint_gradle: String = "26.5.0-alpha01" 
 
-    const val jmusicbotandroid: String = "5aba4fe454" 
-
     const val timbersentry: String = "0.2.0" 
 
     const val glide: String = "4.8.0" 
