@@ -15,6 +15,8 @@ object Versions {
 
     const val fragment_ktx: String = "1.1.0-alpha02" 
 
+    const val lifecycle_extensions: String = "2.0.0" 
+
     const val com_android_tools_build_gradle: String = "3.5.0-alpha01" 
 
     const val lint_gradle: String = "26.5.0-alpha01" 
@@ -29,6 +31,10 @@ object Versions {
 
     const val material: String = "1.1.0-alpha01" 
 
+    const val retrofit2_kotlin_coroutines_adapter: String = "0.9.2" 
+
+    const val timber: String = "4.7.1" 
+
     const val community_material_typeface: String = "3.1.0-rc02" 
 
     const val fastadapter_commons: String = "3.3.1" 
@@ -39,7 +45,11 @@ object Versions {
 
     const val iconics_core: String = "3.1.0" 
 
-    const val moshi: String = "1.8.0" 
+    const val com_squareup_moshi: String = "1.8.0" 
+
+    const val okhttp: String = "3.12.1" 
+
+    const val com_squareup_retrofit2: String = "2.5.0" 
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.3.2" 
 
@@ -61,7 +71,7 @@ object Versions {
 
         const val currentVersion: String = "5.1.1"
 
-        const val nightlyVersion: String = "5.2-20190117003518+0000"
+        const val nightlyVersion: String = "5.3-20190119000045+0000"
 
         const val releaseCandidate: String = ""
     }

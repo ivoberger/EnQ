@@ -1,4 +1,4 @@
-package me.iberger.enq.gui.listener
+package me.iberger.enq.ui.listener
 
 import android.view.MenuItem
 import androidx.fragment.app.FragmentManager
@@ -6,10 +6,10 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import me.iberger.enq.R
-import me.iberger.enq.gui.MainActivity
-import me.iberger.enq.gui.fragments.FavoritesFragment
-import me.iberger.enq.gui.fragments.QueueFragment
-import me.iberger.enq.gui.fragments.SuggestionsFragment
+import me.iberger.enq.ui.MainActivity
+import me.iberger.enq.ui.fragments.FavoritesFragment
+import me.iberger.enq.ui.fragments.QueueFragment
+import me.iberger.enq.ui.fragments.SuggestionsFragment
 
 class MainNavigationListener(
     private val mainActivity: MainActivity,

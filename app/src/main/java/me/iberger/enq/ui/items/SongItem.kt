@@ -1,4 +1,4 @@
-package me.iberger.enq.gui.items
+package me.iberger.enq.ui.items
 
 import android.view.View
 import android.widget.ImageView

@@ -1,11 +1,11 @@
-package me.iberger.enq.gui.listener
+package me.iberger.enq.ui.listener
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import me.iberger.enq.R
-import me.iberger.enq.gui.MainActivity
+import me.iberger.enq.ui.MainActivity
 import me.iberger.jmusicbot.listener.ConnectionChangeListener
 import timber.log.Timber
 

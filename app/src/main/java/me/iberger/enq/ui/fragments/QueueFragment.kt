@@ -1,4 +1,4 @@
-package me.iberger.enq.gui.fragments
+package me.iberger.enq.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,9 +17,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.iberger.enq.R
-import me.iberger.enq.gui.MainActivity
-import me.iberger.enq.gui.items.QueueItem
-import me.iberger.enq.gui.listener.QueueUpdateCallback
+import me.iberger.enq.ui.MainActivity
+import me.iberger.enq.ui.items.QueueItem
+import me.iberger.enq.ui.listener.QueueUpdateCallback
 import me.iberger.enq.utils.*
 import me.iberger.jmusicbot.KEY_QUEUE
 import me.iberger.jmusicbot.MusicBot
@@ -92,7 +92,7 @@ class QueueFragment : Fragment(), QueueUpdateListener, ConnectionChangeListener,
                 ItemTouchHelper.RIGHT -> {
                     if (!MainActivity.connected) return@launch
                     try {
-                        MusicBot.instance?.dequeue(entry.song)?.await()
+                        MusicBot.instance?.dequeue(entry.song)
                     } catch (e: AuthException) {
                         Timber.e("AuthException with reason ${e.reason}")
                         withContext(Dispatchers.Main) {
@@ -123,7 +123,7 @@ class QueueFragment : Fragment(), QueueUpdateListener, ConnectionChangeListener,
             val entry = mFastItemAdapter.getAdapterItem(newPosition).queueEntry
             Timber.d("Moved $entry from $oldPosition to $newPosition")
             try {
-                MusicBot.instance?.moveSong(entry, newPosition)?.await()
+                MusicBot.instance?.moveSong(entry, newPosition)
             } catch (e: Exception) {
                 Timber.e(e)
                 mUIScope.launch {

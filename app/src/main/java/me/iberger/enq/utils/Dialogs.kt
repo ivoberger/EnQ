@@ -8,7 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat.getColor
 import kotlinx.coroutines.*
 import me.iberger.enq.R
-import me.iberger.enq.gui.MainActivity
+import me.iberger.enq.ui.MainActivity
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.exceptions.UsernameTakenException

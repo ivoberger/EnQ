@@ -1,4 +1,4 @@
-package me.iberger.enq.gui.fragments
+package me.iberger.enq.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,7 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.iberger.enq.R
-import me.iberger.enq.gui.items.FavoritesItem
+import me.iberger.enq.ui.items.FavoritesItem
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.loadFavorites
 import me.iberger.enq.utils.setupSwipeActions
@@ -60,7 +60,7 @@ class FavoritesFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback {
             val item = mFastItemAdapter.getAdapterItem(position)
             when (direction) {
                 ItemTouchHelper.LEFT -> {
-                    MusicBot.instance?.enqueue(item.song)?.await()
+                    MusicBot.instance?.enqueue(item.song)
                     withContext(Dispatchers.Main) {
                         context!!.toastShort(
                             context!!.getString(

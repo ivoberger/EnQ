@@ -1,4 +1,4 @@
-package me.iberger.enq.gui.fragments.parents
+package me.iberger.enq.ui.fragments.parents
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,9 +13,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.iberger.enq.R
-import me.iberger.enq.gui.MainActivity
-import me.iberger.enq.gui.items.SongItem
-import me.iberger.enq.gui.items.SuggestionsItem
+import me.iberger.enq.ui.MainActivity
+import me.iberger.enq.ui.items.SongItem
+import me.iberger.enq.ui.items.SuggestionsItem
 import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.MusicBot
 
@@ -38,7 +38,7 @@ open class ResultsFragment : Fragment() {
         fastItemAdapter.withOnClickListener { _, _, item, position ->
             if (!MainActivity.connected) return@withOnClickListener false
             mBackgroundScope.launch {
-                MusicBot.instance?.enqueue(item.song)?.await()
+                MusicBot.instance?.enqueue(item.song)
                 withContext(Dispatchers.Main) {
                     fastItemAdapter.remove(position)
                     context!!.toastShort(

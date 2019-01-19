@@ -1,4 +1,4 @@
-package me.iberger.enq.gui.fragments
+package me.iberger.enq.ui.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -6,7 +6,7 @@ import androidx.fragment.app.FragmentManager
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import me.iberger.enq.gui.fragments.parents.TabbedSongListFragment
+import me.iberger.enq.ui.fragments.parents.TabbedSongListFragment
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.MusicBotPlugin
 
@@ -18,7 +18,7 @@ class SuggestionsFragment : TabbedSongListFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mProviderPlugins = mBackgroundScope.async { MusicBot.instance!!.suggesters }
+        mProviderPlugins = MusicBot.instance!!.suggesters
         mBackgroundScope.launch {
             mProviderPlugins.await() ?: return@launch
             mConfig.lastSuggester?.also {
@@ -29,7 +29,7 @@ class SuggestionsFragment : TabbedSongListFragment() {
 
     override fun initializeTabs() {
         mBackgroundScope.launch {
-            mProviderPlugins = async { MusicBot.instance?.suggesters }
+            mProviderPlugins = MusicBot.instance!!.suggesters
             val provider = mProviderPlugins.await()
             provider ?: return@launch
             mFragmentPagerAdapter =

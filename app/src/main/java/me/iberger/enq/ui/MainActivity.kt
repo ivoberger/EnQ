@@ -1,4 +1,4 @@
-package me.iberger.enq.gui
+package me.iberger.enq.ui
 
 import android.os.Bundle
 import android.view.Menu
@@ -11,20 +11,17 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.typeface.IIcon
-import io.sentry.Sentry
-import io.sentry.android.AndroidSentryClientFactory
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import me.iberger.enq.BuildConfig
 import me.iberger.enq.R
 import me.iberger.enq.backend.Configuration
-import me.iberger.enq.gui.fragments.*
-import me.iberger.enq.gui.listener.ConnectionListener
-import me.iberger.enq.gui.listener.MainNavigationListener
+import me.iberger.enq.ui.fragments.*
+import me.iberger.enq.ui.listener.ConnectionListener
+import me.iberger.enq.ui.listener.MainNavigationListener
 import me.iberger.enq.utils.*
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.Song
-import me.iberger.jmusicbot.listener.ConnectionChangeListener
 import me.iberger.timbersentry.SentryTree
 import timber.log.Timber
 

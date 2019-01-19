@@ -1,4 +1,4 @@
-package me.iberger.enq.gui.fragments.parents
+package me.iberger.enq.ui.fragments.parents
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.coroutines.*
 import me.iberger.enq.R
 import me.iberger.enq.backend.Configuration
-import me.iberger.enq.gui.MainActivity
+import me.iberger.enq.ui.MainActivity
 import me.iberger.jmusicbot.data.MusicBotPlugin
 import me.iberger.jmusicbot.listener.ConnectionChangeListener
 import timber.log.Timber

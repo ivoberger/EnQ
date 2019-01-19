@@ -1,4 +1,4 @@
-package me.iberger.enq.gui.fragments
+package me.iberger.enq.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,8 +12,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.iberger.enq.R
-import me.iberger.enq.gui.MainActivity
-import me.iberger.enq.gui.fragments.parents.TabbedSongListFragment
+import me.iberger.enq.ui.MainActivity
+import me.iberger.enq.ui.fragments.parents.TabbedSongListFragment
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.MusicBotPlugin
 import me.iberger.jmusicbot.listener.ConnectionChangeListener
@@ -29,7 +29,7 @@ class SearchFragment : TabbedSongListFragment(), ConnectionChangeListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mProviderPlugins = mBackgroundScope.async { MusicBot.instance!!.provider }
+        mProviderPlugins = MusicBot.instance!!.provider
         MusicBot.instance?.connectionChangeListeners?.add(this@SearchFragment)
         mBackgroundScope.launch {
             mProviderPlugins.await() ?: return@launch

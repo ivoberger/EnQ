@@ -1,4 +1,4 @@
-package me.iberger.enq.gui.fragments
+package me.iberger.enq.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
@@ -14,8 +14,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.iberger.enq.R
-import me.iberger.enq.gui.MainActivity
-import me.iberger.enq.gui.MainActivity.Companion.favorites
+import me.iberger.enq.ui.MainActivity
+import me.iberger.enq.ui.MainActivity.Companion.favorites
 import me.iberger.enq.utils.*
 import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.data.PlayerState
@@ -101,7 +101,7 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener, ConnectionChangeLi
         if (!MainActivity.connected) return@launch
         if (mShowSkip) {
             try {
-                MusicBot.instance?.skip()?.await()
+                MusicBot.instance?.skip()
             } catch (e: Exception) {
                 Timber.e(e)
                 mUIScope.launch { context?.toastShort(R.string.msg_no_permission) }
@@ -110,10 +110,10 @@ class CurrentSongFragment : Fragment(), PlayerUpdateListener, ConnectionChangeLi
             }
         }
         when (mPlayerState.state) {
-            PlayerStates.STOP -> MusicBot.instance?.play()?.await()
-            PlayerStates.PLAY -> MusicBot.instance?.pause()?.await()
-            PlayerStates.PAUSE -> MusicBot.instance?.play()?.await()
-            PlayerStates.ERROR -> MusicBot.instance?.play()?.await()
+            PlayerStates.STOP -> MusicBot.instance?.play()
+            PlayerStates.PLAY -> MusicBot.instance?.pause()
+            PlayerStates.PAUSE -> MusicBot.instance?.play()
+            PlayerStates.ERROR -> MusicBot.instance?.play()
         }
     }
 

@@ -1,11 +1,11 @@
-package me.iberger.enq.gui.listener
+package me.iberger.enq.ui.listener
 
 import androidx.recyclerview.widget.ListUpdateCallback
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import me.iberger.enq.gui.items.QueueItem
+import me.iberger.enq.ui.items.QueueItem
 import me.iberger.jmusicbot.data.QueueEntry
 
 class QueueUpdateCallback(private val mFastItemAdapter: FastItemAdapter<QueueItem>) : ListUpdateCallback {

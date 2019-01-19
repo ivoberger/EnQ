@@ -1,4 +1,4 @@
-package me.iberger.enq.gui.items
+package me.iberger.enq.ui.items
 
 import android.view.View
 import android.widget.ImageView
@@ -11,7 +11,7 @@ import com.mikepenz.fastadapter.items.AbstractItem
 import com.mikepenz.fastadapter_extensions.drag.IDraggable
 import com.mikepenz.iconics.IconicsDrawable
 import me.iberger.enq.R
-import me.iberger.enq.gui.MainActivity
+import me.iberger.enq.ui.MainActivity
 import me.iberger.jmusicbot.data.QueueEntry
 import me.iberger.jmusicbot.data.Song
 
