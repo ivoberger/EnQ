@@ -23,9 +23,9 @@ import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.make
 import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.MusicBot
-import me.iberger.jmusicbot.data.PlayerState
-import me.iberger.jmusicbot.data.PlayerStates
-import me.iberger.jmusicbot.data.Song
+import me.iberger.jmusicbot.model.PlayerState
+import me.iberger.jmusicbot.model.PlayerStates
+import me.iberger.jmusicbot.model.Song
 import timber.log.Timber
 
 class CurrentSongFragment : Fragment() {

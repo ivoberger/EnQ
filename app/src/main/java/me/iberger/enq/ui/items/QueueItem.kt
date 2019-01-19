@@ -12,8 +12,8 @@ import com.mikepenz.fastadapter_extensions.drag.IDraggable
 import com.mikepenz.iconics.IconicsDrawable
 import me.iberger.enq.R
 import me.iberger.enq.ui.MainActivity
-import me.iberger.jmusicbot.data.QueueEntry
-import me.iberger.jmusicbot.data.Song
+import me.iberger.jmusicbot.model.QueueEntry
+import me.iberger.jmusicbot.model.Song
 
 class QueueItem(
     val queueEntry: QueueEntry,

@@ -2,7 +2,7 @@ package me.iberger.jmusicbot.network
 
 import kotlinx.coroutines.Deferred
 import me.iberger.jmusicbot.*
-import me.iberger.jmusicbot.data.*
+import me.iberger.jmusicbot.model.*
 import retrofit2.Response
 import retrofit2.http.*
 

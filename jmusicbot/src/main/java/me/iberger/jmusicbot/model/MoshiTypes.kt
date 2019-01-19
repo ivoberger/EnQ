@@ -1,4 +1,4 @@
-package me.iberger.jmusicbot.data
+package me.iberger.jmusicbot.model
 
 import com.squareup.moshi.Types
 import java.lang.reflect.Type

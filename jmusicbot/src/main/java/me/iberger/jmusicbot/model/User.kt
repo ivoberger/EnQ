@@ -1,4 +1,4 @@
-package me.iberger.jmusicbot.data
+package me.iberger.jmusicbot.model
 
 import android.content.SharedPreferences
 import androidx.core.content.edit

@@ -15,7 +15,7 @@ import me.iberger.enq.R
 import me.iberger.enq.ui.MainActivity
 import me.iberger.enq.ui.fragments.parents.TabbedSongListFragment
 import me.iberger.jmusicbot.MusicBot
-import me.iberger.jmusicbot.data.MusicBotPlugin
+import me.iberger.jmusicbot.model.MusicBotPlugin
 import me.iberger.jmusicbot.listener.ConnectionChangeListener
 import timber.log.Timber
 

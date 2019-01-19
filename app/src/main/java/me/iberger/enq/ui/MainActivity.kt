@@ -21,7 +21,7 @@ import me.iberger.enq.ui.listener.ConnectionListener
 import me.iberger.enq.ui.listener.MainNavigationListener
 import me.iberger.enq.utils.*
 import me.iberger.jmusicbot.MusicBot
-import me.iberger.jmusicbot.data.Song
+import me.iberger.jmusicbot.model.Song
 import me.iberger.timbersentry.SentryTree
 import timber.log.Timber
 

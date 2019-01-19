@@ -28,7 +28,7 @@ import me.iberger.enq.utils.setupSwipeDragActions
 import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.KEY_QUEUE
 import me.iberger.jmusicbot.MusicBot
-import me.iberger.jmusicbot.data.QueueEntry
+import me.iberger.jmusicbot.model.QueueEntry
 import me.iberger.jmusicbot.exceptions.AuthException
 import timber.log.Timber
 

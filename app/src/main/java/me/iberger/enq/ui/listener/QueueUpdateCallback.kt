@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import me.iberger.enq.ui.items.QueueItem
-import me.iberger.jmusicbot.data.QueueEntry
+import me.iberger.jmusicbot.model.QueueEntry
 
 class QueueUpdateCallback(private val mFastItemAdapter: FastItemAdapter<QueueItem>) : ListUpdateCallback {
 

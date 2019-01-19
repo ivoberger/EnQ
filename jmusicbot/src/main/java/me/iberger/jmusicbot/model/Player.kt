@@ -1,4 +1,4 @@
-package me.iberger.jmusicbot.data
+package me.iberger.jmusicbot.model
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass

@@ -13,7 +13,7 @@ import kotlinx.coroutines.*
 import me.iberger.enq.R
 import me.iberger.enq.backend.Configuration
 import me.iberger.enq.ui.MainActivity
-import me.iberger.jmusicbot.data.MusicBotPlugin
+import me.iberger.jmusicbot.model.MusicBotPlugin
 import me.iberger.jmusicbot.listener.ConnectionChangeListener
 import timber.log.Timber
 

@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.mikepenz.fastadapter.items.AbstractItem
 import me.iberger.enq.R
-import me.iberger.jmusicbot.data.Song
+import me.iberger.jmusicbot.model.Song
 
 open class SongItem(val song: Song) : AbstractItem<SongItem, SongItem.ViewHolder>() {
 

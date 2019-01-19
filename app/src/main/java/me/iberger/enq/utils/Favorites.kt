@@ -11,8 +11,8 @@ import kotlinx.coroutines.withContext
 import me.iberger.enq.KEY_FAVORITES
 import me.iberger.enq.R
 import me.iberger.enq.ui.MainActivity
-import me.iberger.jmusicbot.data.MoshiTypes
-import me.iberger.jmusicbot.data.Song
+import me.iberger.jmusicbot.model.MoshiTypes
+import me.iberger.jmusicbot.model.Song
 import timber.log.Timber
 
 fun changeFavoriteStatus(context: Context, song: Song) = GlobalScope.launch {

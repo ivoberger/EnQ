@@ -5,7 +5,7 @@ import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import me.iberger.enq.R
 import me.iberger.enq.ui.MainActivity
-import me.iberger.jmusicbot.data.Song
+import me.iberger.jmusicbot.model.Song
 
 class SuggestionsItem(song: Song) : SongItem(song) {
 
