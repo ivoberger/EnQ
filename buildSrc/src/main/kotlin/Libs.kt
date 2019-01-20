@@ -67,6 +67,10 @@ object Libs {
             "com.louiscad.splitties:splitties-systemservices:" + Versions.splitties_systemservices
 
     /**
+     * https://github.com/mikepenz/AboutLibraries */
+    const val aboutlibraries: String = "com.mikepenz:aboutlibraries:" + Versions.aboutlibraries
+
+    /**
      * https://github.com/mikepenz/Android-Iconics */
     const val community_material_typeface: String = "com.mikepenz:community-material-typeface:" +
             Versions.community_material_typeface

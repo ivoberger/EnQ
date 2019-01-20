@@ -2,6 +2,7 @@ package me.iberger.enq.ui
 
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +10,8 @@ import androidx.core.view.forEachIndexed
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
+import com.mikepenz.aboutlibraries.Libs
+import com.mikepenz.aboutlibraries.LibsBuilder
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.typeface.IIcon
 import kotlinx.android.synthetic.main.activity_main.*
@@ -105,8 +108,7 @@ class MainActivity : AppCompatActivity() {
 
         var playerCollapse = mPlayerCollapsed
         // set listener to iconify the SearchView when back is pressed
-        val backStackListener =
-            FragmentManager.OnBackStackChangedListener { searchView.isIconified = true }
+        val backStackListener = FragmentManager.OnBackStackChangedListener { searchView.isIconified = true }
 
         searchView.setOnSearchClickListener {
             if (!connected) return@setOnSearchClickListener
@@ -144,13 +146,34 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        item ?: return false
+        return when (item.itemId) {
+            R.id.app_bar_about -> {
+                LibsBuilder().apply {
+                    activityStyle = Libs.ActivityStyle.DARK
+                    aboutAppName = getString(R.string.app_name)
+                    aboutShowIcon = true
+                    showVersion = true
+                    aboutShowVersionName = true
+                    aboutShowVersionCode = false
+                    aboutDescription = "Collaborative DJ-ing"
+                    activityTitle = getString(R.string.nav_about)
+                    showLicense = true
+                }.start(this)
+                true
+            }
+            else -> false
+        }
+    }
+
     /**
      * collapsed or shows the FrameView containing the PlayerFragment
-     * @param requestCollapse: specifies if the player should be collapsed
+     * @param collapse: specifies if the player should be collapsed
      * @param duration: duration of the animation
      */
-    fun changePlayerCollapse(requestCollapse: Boolean, duration: Long = 1000) = mUIScope.launch {
-        if (mPlayerCollapsed == requestCollapse) return@launch
+    fun changePlayerCollapse(collapse: Boolean, duration: Long = 1000) = mUIScope.launch {
+        if (mPlayerCollapsed == collapse) return@launch
         if (!mPlayerCollapsed) {
             main_current_song.animate().setDuration(duration)
                 .translationYBy(main_current_song.height.toFloat())
@@ -160,17 +183,17 @@ class MainActivity : AppCompatActivity() {
                 .translationYBy(-main_current_song.height.toFloat())
                 .withStartAction { main_current_song.visibility = View.VISIBLE }.start()
         }
-        mPlayerCollapsed = requestCollapse
+        mPlayerCollapsed = collapse
     }
 
     /**
      * collapsed or shows the BottomNavigation
-     * @param requestCollapse: specifies if the navigation should be collapsed
+     * @param collapse: specifies if the navigation should be collapsed
      * @param duration: duration of the animation
      */
-    private fun changeBottomNavCollapse(requestCollapse: Boolean, duration: Long = 1000) =
+    private fun changeBottomNavCollapse(collapse: Boolean, duration: Long = 1000) =
         mUIScope.launch {
-            if (mBottomNavCollapsed == requestCollapse) return@launch
+            if (mBottomNavCollapsed == collapse) return@launch
             if (!mBottomNavCollapsed) {
                 main_bottom_navigation.animate().setDuration(duration)
                     .translationYBy(main_current_song.height.toFloat())
@@ -181,7 +204,7 @@ class MainActivity : AppCompatActivity() {
                     .translationYBy(-main_current_song.height.toFloat())
                     .withStartAction { main_bottom_navigation.visibility = View.VISIBLE }.start()
             }
-            mBottomNavCollapsed = requestCollapse
+            mBottomNavCollapsed = collapse
         }
 
     override fun onDestroy() {

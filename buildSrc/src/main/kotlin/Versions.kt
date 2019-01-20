@@ -35,6 +35,8 @@ object Versions {
 
     const val splitties_systemservices: String = "3.0.0-alpha02" 
 
+    const val aboutlibraries: String = "6.2.1" 
+
     const val community_material_typeface: String = "3.1.0-rc02" 
 
     const val fastadapter_commons: String = "3.3.1" 

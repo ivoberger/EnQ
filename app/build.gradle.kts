@@ -79,6 +79,7 @@ dependencies {
     implementation(Libs.fastadapter)
     implementation(Libs.fastadapter_commons)
     implementation(Libs.fastadapter_extensions)
+    implementation(Libs.aboutlibraries)
 
     implementation(Libs.iconics_core)
     implementation(Libs.community_material_typeface)
