@@ -28,6 +28,7 @@ fun MainActivity.showServerDiscoveryDialog(searching: Boolean = false): Job = Gl
     if (!searching) serverDialogBuilder
         .setTitle(R.string.tlt_no_server)
         .setPositiveButton(R.string.btn_retry) { dialog, _ ->
+            JMusicBot.discoverHost()
             showServerDiscoveryDialog(true)
             dialog.dismiss()
         }

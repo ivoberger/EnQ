@@ -45,8 +45,7 @@ object JMusicBot {
             value?.let { mRetrofit = mRetrofit.newBuilder().baseUrl(it).build() }
         }
 
-    private var mOkHttpClient: OkHttpClient =
-        OkHttpClient.Builder().authenticator(TokenAuthenticator()).cache(null).build()
+    private var mOkHttpClient: OkHttpClient = OkHttpClient.Builder().cache(null).build()
         set(value) {
             field = value
             mRetrofit = mRetrofit.newBuilder().client(value).build()
@@ -85,7 +84,8 @@ object JMusicBot {
                 Timber.d("Setting new token")
                 mOkHttpClient = mOkHttpClient.newBuilder().addInterceptor { chain ->
                     chain.proceed(chain.request().newBuilder().addHeader(KEY_AUTHORIZATION, it).build())
-                }.build()
+                }
+                    .authenticator(TokenAuthenticator()).build()
             }
         }
 
@@ -104,18 +104,20 @@ object JMusicBot {
         Timber.d("MusicBot successfully initialized")
     }
 
-    private fun discoverHost() = GlobalScope.launch {
+    fun discoverHost() = GlobalScope.launch {
         Timber.d("Discovering host")
         state = MusicBotState.CONNECTING
-        state.job = async { mWifiManager.discoverHost() }
-        baseUrl = state.job?.await() as? String?
-        state = if (baseUrl != null) {
-            Timber.d("Found host: $baseUrl")
-            MusicBotState.NEEDS_AUTH
-        } else {
-            Timber.d("No host found")
-            MusicBotState.DISCONNECTED
+        state.job = launch {
+            baseUrl = mWifiManager.discoverHost()
+            state = if (baseUrl != null) {
+                Timber.d("Found host: $baseUrl")
+                MusicBotState.NEEDS_AUTH
+            } else {
+                Timber.d("No host found")
+                MusicBotState.DISCONNECTED
+            }
         }
+
     }
 
     suspend fun authorize(userName: String? = null, password: String? = null): Boolean {
@@ -146,7 +148,7 @@ object JMusicBot {
                 Timber.d("Valid Token")
                 state = MusicBotState.CONNECTED
                 return true
-            } else Timber.w(e)
+            } else Timber.w(e.localizedMessage)
         }
         Timber.d("Invalid Token")
         return false
@@ -162,7 +164,7 @@ object JMusicBot {
     )
     suspend fun register(userName: String? = null) {
         Timber.d("Registering user")
-        state.connectionCheck()
+        state.serverCheck()
         val credentials = when {
             (userName != null) -> {
                 user = User(userName)
@@ -185,7 +187,7 @@ object JMusicBot {
     )
     suspend fun login(userName: String? = null, password: String? = null) {
         Timber.d("Logging in user")
-        state.connectionCheck()
+        state.serverCheck()
         val credentials = when {
             (userName != null && password != null) -> {
                 user = User(userName, password)

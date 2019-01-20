@@ -1,6 +1,6 @@
 package me.iberger.jmusicbot.model
 
-import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Job
 
 /**
  * Possible states for the music bot client to be in
@@ -13,16 +13,20 @@ import kotlinx.coroutines.Deferred
 enum class MusicBotState {
     NEEDS_INIT, NEEDS_AUTH, CONNECTED, DISCONNECTED, CONNECTING;
 
-    var job: Deferred<Any?>? = null
+    var job: Job? = null
 
     fun isInitialized() = this != NEEDS_INIT
     fun hasServer() = isInitialized() && this != DISCONNECTED && this != CONNECTING
     fun isConnected() = hasServer() && this != NEEDS_AUTH
 
-    @Throws(IllegalStateException::class)
-    fun connectionCheck() {
+    fun serverCheck() {
         check(isInitialized()) { "Client not initialized" }
         check(hasServer()) { "Client has no server" }
+    }
+
+    @Throws(IllegalStateException::class)
+    fun connectionCheck() {
+        serverCheck()
         check(isConnected()) { "Client needs authorization" }
     }
 }
