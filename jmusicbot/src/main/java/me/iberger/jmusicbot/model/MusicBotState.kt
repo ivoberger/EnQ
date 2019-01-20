@@ -19,9 +19,8 @@ enum class MusicBotState {
     fun isConnected() = this != NEEDS_INIT && this != DISCONNECTED && this != CONNECTING
 
     @Throws(IllegalStateException::class)
-    fun connectionCheck() = when {
-        !isInitialized() -> throw IllegalStateException("Client not initialized")
-        !isConnected() -> throw IllegalStateException("Client has no server")
-        else -> Unit
+    fun connectionCheck() {
+        check(isInitialized()) { "Client not initialized" }
+        check(isConnected()) { "Client has no server" }
     }
 }

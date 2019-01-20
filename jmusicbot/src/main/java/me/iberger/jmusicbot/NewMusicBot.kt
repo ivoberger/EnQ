@@ -13,6 +13,7 @@ import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.exceptions.InvalidParametersException
 import me.iberger.jmusicbot.exceptions.NotFoundException
 import me.iberger.jmusicbot.exceptions.ServerErrorException
+import me.iberger.jmusicbot.listener.ConnectionChangeListener
 import me.iberger.jmusicbot.model.*
 import me.iberger.jmusicbot.network.MusicBotAPI
 import me.iberger.jmusicbot.network.TokenAuthenticator
@@ -59,6 +60,7 @@ object NewMusicBot {
         }
 
     private var mApiClient: MusicBotAPI = mRetrofit.create(MusicBotAPI::class.java)
+    val connectionChangeListeners: MutableList<ConnectionChangeListener> = mutableListOf()
 
     var user: User? = null
         get() = if (state.isInitialized() && mPreferences.contains(KEY_USER)) User.load(mPreferences, mMoshi)
@@ -182,9 +184,56 @@ object NewMusicBot {
         updateQueue(mApiClient.enqueue(song.id, song.provider.id).process().await())
     }
 
-    suspend fun pause(): Unit = updatePlayer(mApiClient.pause().process().await())
-    suspend fun play(): Unit = updatePlayer(mApiClient.play().process().await())
-    suspend fun skip(): Unit = updatePlayer(mApiClient.skip().process().await())
+    @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
+    suspend fun dequeue(song: Song) {
+        state.connectionCheck()
+        updateQueue(mApiClient.dequeue(song.id, song.provider.id).process().await())
+    }
+
+    suspend fun moveSong(entry: QueueEntry, newPosition: Int) {
+        state.connectionCheck()
+        updateQueue(mApiClient.moveSong(entry, newPosition).process().await())
+    }
+
+    suspend fun search(providerId: String, query: String): List<Song> {
+        state.connectionCheck()
+        return mApiClient.searchForSong(providerId, query).process().await()
+    }
+
+    suspend fun suggestions(suggesterId: String): List<Song> {
+        state.connectionCheck()
+        return mApiClient.getSuggestions(suggesterId).process().await()
+    }
+
+    suspend fun deleteSuggestion(suggesterId: String, song: Song) {
+        state.connectionCheck()
+        return mApiClient.deleteSuggestion(suggesterId, song.id, song.provider.id).process().await() ?: Unit
+    }
+
+    suspend fun pause() {
+        state.connectionCheck()
+        updatePlayer(mApiClient.pause().process().await())
+    }
+
+    suspend fun play() {
+        state.connectionCheck()
+        updatePlayer(mApiClient.play().process().await())
+    }
+
+    suspend fun skip() {
+        state.connectionCheck()
+        updatePlayer(mApiClient.skip().process().await())
+    }
+
+    suspend fun getProvider(): List<MusicBotPlugin> {
+        state.connectionCheck()
+        return mApiClient.getProvider().process().await()
+    }
+
+    suspend fun getSuggesters(): List<MusicBotPlugin> {
+        state.connectionCheck()
+        return mApiClient.getSuggesters().process().await()
+    }
 
     fun getQueue(period: Long = 500): LiveData<List<QueueEntry>> {
         if (mQueueUpdateTimer == null) mQueueUpdateTimer = fixedRateTimer(period = period) { updateQueue() }
@@ -212,6 +261,7 @@ object NewMusicBot {
 
     private fun updateQueue(newQueue: List<QueueEntry>? = null) = runBlocking {
         try {
+            state.connectionCheck()
             val queue = newQueue ?: mApiClient.getQueue().process().await() ?: listOf()
             withContext(Dispatchers.Main) { mQueue.value = queue }
         } catch (e: Exception) {
@@ -222,6 +272,7 @@ object NewMusicBot {
 
     private fun updatePlayer(playerState: PlayerState? = null) = runBlocking {
         try {
+            state.connectionCheck()
             val state = playerState ?: mApiClient.getPlayerState().process().await() ?: PlayerState(PlayerStates.ERROR)
             withContext(Dispatchers.Main) {
                 mPlayerState.value = state
@@ -229,5 +280,24 @@ object NewMusicBot {
         } catch (e: Exception) {
             // TODO: propagate error
         }
+    }
+
+    fun onConnectionLost(e: Exception) {
+        stopQueueUpdates()
+        stopPlayerUpdates()
+        MusicBot.baseUrl = null
+        connectionChangeListeners.forEach { it.onConnectionLost(e) }
+        runBlocking {
+            while (true) {
+                try {
+                    discoverHost()
+                    if (MusicBot.baseUrl != null) return@runBlocking
+                    delay(500L)
+                } catch (e: Exception) {
+                    Timber.e(e)
+                }
+            }
+        }
+        connectionChangeListeners.forEach { it.onConnectionRecovered() }
     }
 }

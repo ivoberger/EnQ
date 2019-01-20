@@ -5,6 +5,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import me.iberger.jmusicbot.MusicBot
+import me.iberger.jmusicbot.NewMusicBot
 import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.exceptions.InvalidParametersException
 import me.iberger.jmusicbot.exceptions.NotFoundException
@@ -54,16 +55,16 @@ internal fun <T> Deferred<Response<T>>.process(
     errorCodes: Map<Int, Exception> = mapOf(),
     notFoundType: NotFoundException.Type = NotFoundException.Type.SONG,
     invalidParamsType: InvalidParametersException.Type = InvalidParametersException.Type.MISSING
-): Deferred<T?> = GlobalScope.async {
+): Deferred<T> = GlobalScope.async {
     val response: Response<T>
     try {
         response = await()
     } catch (e: Exception) {
-        MusicBot.instance?.onConnectionLost(e)
-        return@async null
+        NewMusicBot.onConnectionLost(e)
+        throw e
     }
     return@async when (response.code()) {
-        in successCodes -> response.body()
+        in successCodes -> response.body()!!
         in errorCodes -> throw errorCodes[response.code()]!!
         400 -> throw InvalidParametersException(
             invalidParamsType,

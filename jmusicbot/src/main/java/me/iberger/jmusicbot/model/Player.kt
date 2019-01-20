@@ -7,7 +7,9 @@ import com.squareup.moshi.JsonClass
 data class PlayerState(
     @Json(name = "state") val state: PlayerStates,
     @Json(name = "songEntry") val songEntry: SongEntry?
-)
+) {
+    constructor(state: PlayerStates) : this(state, null)
+}
 
 @JsonClass(generateAdapter = true)
 data class PlayerStateChange(
