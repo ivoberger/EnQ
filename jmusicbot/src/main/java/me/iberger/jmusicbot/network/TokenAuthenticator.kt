@@ -12,7 +12,7 @@ import timber.log.Timber
 class TokenAuthenticator : Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? = runBlocking {
         Timber.d("Retrieving new token NP")
-        JMusicBot.refreshToken()
+        JMusicBot.authorize()
         return@runBlocking response.request().newBuilder().header(KEY_AUTHORIZATION, JMusicBot.authToken ?: "")
             .build()
     }

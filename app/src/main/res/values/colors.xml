@@ -11,4 +11,6 @@
     <color name="favorites">#43A047</color>
     <color name="enqueue">#7CB342</color>
     <color name="delete">#BF360C</color>
+
+    <color name="ic_launcher_background">#7CB342</color>
 </resources>

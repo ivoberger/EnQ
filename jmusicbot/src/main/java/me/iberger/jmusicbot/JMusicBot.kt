@@ -25,7 +25,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import splitties.systemservices.wifiManager
 import timber.log.Timber
 import java.util.*
-import kotlin.concurrent.fixedRateTimer
+import kotlin.concurrent.timer
 
 
 object JMusicBot {
@@ -121,6 +121,7 @@ object JMusicBot {
     }
 
     suspend fun authorize(userName: String? = null, password: String? = null): Boolean {
+        state.serverCheck()
         Timber.d("Starting authorization")
         if (tokenValid()) return true
         try {
@@ -222,19 +223,6 @@ object JMusicBot {
         mApiClient.deleteUser().process()
     }
 
-    @Throws(
-        InvalidParametersException::class,
-        AuthException::class,
-        NotFoundException::class,
-        ServerErrorException::class,
-        IllegalStateException::class
-    )
-    suspend fun refreshToken() {
-        state.connectionCheck()
-        user?.let { authToken = mApiClient.login(Credentials.Login(it)).process() }
-        throw java.lang.IllegalStateException("User is null")
-    }
-
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     suspend fun enqueue(song: Song) {
         state.connectionCheck()
@@ -293,7 +281,7 @@ object JMusicBot {
     }
 
     fun getQueue(period: Long = 500): LiveData<List<QueueEntry>> {
-        if (mQueueUpdateTimer == null) mQueueUpdateTimer = fixedRateTimer(period = period) { updateQueue() }
+        if (mQueueUpdateTimer == null) mQueueUpdateTimer = timer(period = period) { updateQueue() }
         return mQueue
     }
 
@@ -305,7 +293,7 @@ object JMusicBot {
     }
 
     fun getPlayerState(period: Long = 500): LiveData<PlayerState> {
-        if (mPlayerUpdateTimer == null) mPlayerUpdateTimer = fixedRateTimer(period = period) { updatePlayer() }
+        if (mPlayerUpdateTimer == null) mPlayerUpdateTimer = timer(period = period) { updatePlayer() }
         return mPlayerState
     }
 
@@ -316,7 +304,7 @@ object JMusicBot {
         }
     }
 
-    private fun updateQueue(newQueue: List<QueueEntry>? = null) = runBlocking {
+    private fun updateQueue(newQueue: List<QueueEntry>? = null) = GlobalScope.launch {
         try {
             state.connectionCheck()
             val queue = newQueue ?: mApiClient.getQueue().process() ?: listOf()
@@ -327,7 +315,7 @@ object JMusicBot {
         }
     }
 
-    private fun updatePlayer(playerState: PlayerState? = null) = runBlocking {
+    private fun updatePlayer(playerState: PlayerState? = null) = GlobalScope.launch {
         try {
             state.connectionCheck()
             val state = playerState ?: mApiClient.getPlayerState().process() ?: PlayerState(PlayerStates.ERROR)
@@ -348,7 +336,11 @@ object JMusicBot {
             while (true) {
                 try {
                     discoverHost().join()
-                    if (baseUrl != null) return@runBlocking
+                    state.job?.join()
+                    if (baseUrl != null) {
+                        authorize()
+                        return@runBlocking
+                    }
                     delay(500L)
                 } catch (e: Exception) {
                     Timber.e(e)
