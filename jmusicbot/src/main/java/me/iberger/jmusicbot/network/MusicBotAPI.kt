@@ -29,8 +29,12 @@ internal interface MusicBotAPI {
     @PUT("token")
     fun login(@Body loginCredentials: Credentials.Login): Deferred<Response<String>>
 
-    @GET(URL_PLAYER)
-    fun testToken(@Header(KEY_AUTHORIZATION) authToken: String): Deferred<Response<PlayerState>>
+    @PUT("$URL_PLAYER/$URL_QUEUE")
+    fun testToken(
+        @Header(KEY_AUTHORIZATION) authToken: String,
+        @Query(KEY_SONG_ID) songId: String = "",
+        @Query(KEY_PROVIDER_ID) providerId: String = ""
+    ): Deferred<Response<List<QueueEntry>>>
 
     // Song operations
 

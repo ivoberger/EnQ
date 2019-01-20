@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat.getColor
 import kotlinx.coroutines.*
 import me.iberger.enq.R
 import me.iberger.enq.ui.MainActivity
-import me.iberger.jmusicbot.MusicBot
+import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.exceptions.UsernameTakenException
 import timber.log.Timber
@@ -39,7 +39,7 @@ fun MainActivity.showServerDiscoveryDialog(searching: Boolean = false): Job = Gl
         )
         serverDialog.show()
         if (!searching) return@withContext
-        if (async(Dispatchers.IO) { MusicBot.hasServer(applicationContext.applicationContext) }.await()) {
+        if (withContext(Dispatchers.IO) { JMusicBot.state.job?.join(); JMusicBot.state.hasServer() }) {
             this@showServerDiscoveryDialog.continueToLogin()
             serverDialog.dismiss()
         } else {
@@ -51,7 +51,7 @@ fun MainActivity.showServerDiscoveryDialog(searching: Boolean = false): Job = Gl
 
 
 fun MainActivity.showLoginDialog(
-    loggingIn: Boolean,
+    loggingIn: Boolean = true,
     userName: String? = null,
     password: String? = null
 ): Job = GlobalScope.launch {
@@ -61,9 +61,7 @@ fun MainActivity.showLoginDialog(
         .setTitle(R.string.tlt_logging_in)
     if (!loggingIn) {
         val dialogView =
-            async(Dispatchers.Main) {
-                this@showLoginDialog.layoutInflater.inflate(R.layout.dialog_login, null)
-            }.await()
+            withContext(Dispatchers.Main) { this@showLoginDialog.layoutInflater.inflate(R.layout.dialog_login, null) }
         loginDialogBuilder
             .setView(dialogView)
             .setTitle(R.string.tlt_login)
@@ -83,13 +81,9 @@ fun MainActivity.showLoginDialog(
         loginDialog.show()
         if (!loggingIn) return@withContext
         try {
-            val musicBot = MusicBot.init(applicationContext, userName, password).await()
+            JMusicBot.authorize(userName, password)
             continueWithBot()
-            Toast.makeText(
-                this@showLoginDialog,
-                getString(R.string.msg_logged_in, musicBot.user.name),
-                Toast.LENGTH_SHORT
-            ).show()
+            this@showLoginDialog.toastShort(getString(R.string.msg_logged_in, JMusicBot.user!!.name))
             loginDialog.dismiss()
         } catch (e: UsernameTakenException) {
             Timber.w(e)
@@ -103,9 +97,7 @@ fun MainActivity.showLoginDialog(
         } catch (e: AuthException) {
             Timber.w("Authentication error with reason ${e.reason}")
             Timber.w(e)
-            Toast.makeText(
-                this@showLoginDialog, R.string.msg_password_wrong, Toast.LENGTH_LONG
-            ).show()
+            this@showLoginDialog.toastLong(R.string.msg_password_wrong)
             showLoginDialog(false)
             loginDialog.cancel()
         }

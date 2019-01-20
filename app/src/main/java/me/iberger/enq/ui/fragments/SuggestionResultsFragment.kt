@@ -16,8 +16,8 @@ import me.iberger.enq.ui.items.SuggestionsItem
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.setupSwipeActions
 import me.iberger.enq.utils.toastShort
+import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.KEY_SUGGESTER_ID
-import me.iberger.jmusicbot.MusicBot
 import me.iberger.jmusicbot.exceptions.AuthException
 import timber.log.Timber
 
@@ -49,8 +49,8 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
     }
 
     private fun getSuggestions() = mBackgroundScope.launch {
-        val results = MusicBot.instance?.getSuggestions(mSuggesterId)?.await()
-        super.displayResults(results?.map { SuggestionsItem(it) })
+        val results = JMusicBot.suggestions(mSuggesterId)
+        super.displayResults(results.map { SuggestionsItem(it) })
     }
 
     override fun itemSwiped(position: Int, direction: Int) {
@@ -59,7 +59,7 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
                     try {
-                        MusicBot.instance?.deleteSuggestion(mSuggesterId, entry.song)?.await()
+                        JMusicBot.deleteSuggestion(mSuggesterId, entry.song)
                         getSuggestions()
                     } catch (e: AuthException) {
                         Timber.e("AuthException with reason ${e.reason}")

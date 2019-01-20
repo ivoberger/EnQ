@@ -2,10 +2,7 @@ package me.iberger.jmusicbot.network
 
 import android.net.wifi.WifiManager
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import me.iberger.jmusicbot.MusicBot
-import me.iberger.jmusicbot.NewMusicBot
+import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.exceptions.InvalidParametersException
 import me.iberger.jmusicbot.exceptions.NotFoundException
@@ -21,13 +18,8 @@ private const val GROUP_ADDRESS = "224.0.0.142"
 private const val PORT = 42945
 private const val LOCK_TAG = "enq_broadcast"
 
-internal fun verifyHostAddress(wifiManager: WifiManager, address: String? = null) {
-    MusicBot.baseUrl = address ?: MusicBot.baseUrl ?: discoverHost(wifiManager)
-    Timber.d("New host address: ${MusicBot.baseUrl}")
-}
-
-internal fun discoverHost(wifiManager: WifiManager): String? {
-    val lock = wifiManager.createMulticastLock(LOCK_TAG)
+internal fun WifiManager.discoverHost(): String? {
+    val lock = createMulticastLock(LOCK_TAG)
     lock.acquire()
     return try {
         MulticastSocket(PORT).use { socket ->
@@ -50,20 +42,20 @@ internal fun discoverHost(wifiManager: WifiManager): String? {
 
 
 @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class, ServerErrorException::class)
-internal fun <T> Deferred<Response<T>>.process(
+internal suspend fun <T> Deferred<Response<T>>.process(
     successCodes: List<Int> = listOf(200, 201, 204),
     errorCodes: Map<Int, Exception> = mapOf(),
     notFoundType: NotFoundException.Type = NotFoundException.Type.SONG,
     invalidParamsType: InvalidParametersException.Type = InvalidParametersException.Type.MISSING
-): Deferred<T> = GlobalScope.async {
+): T {
     val response: Response<T>
     try {
         response = await()
     } catch (e: Exception) {
-        NewMusicBot.onConnectionLost(e)
+        JMusicBot.onConnectionLost(e)
         throw e
     }
-    return@async when (response.code()) {
+    return when (response.code()) {
         in successCodes -> response.body()!!
         in errorCodes -> throw errorCodes[response.code()]!!
         400 -> throw InvalidParametersException(

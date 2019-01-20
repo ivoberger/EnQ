@@ -16,11 +16,16 @@ import kotlinx.coroutines.*
 import me.iberger.enq.BuildConfig
 import me.iberger.enq.R
 import me.iberger.enq.backend.Configuration
-import me.iberger.enq.ui.fragments.*
+import me.iberger.enq.ui.fragments.CurrentSongFragment
+import me.iberger.enq.ui.fragments.QueueFragment
+import me.iberger.enq.ui.fragments.SearchFragment
 import me.iberger.enq.ui.listener.ConnectionListener
 import me.iberger.enq.ui.listener.MainNavigationListener
-import me.iberger.enq.utils.*
-import me.iberger.jmusicbot.MusicBot
+import me.iberger.enq.utils.loadFavorites
+import me.iberger.enq.utils.make
+import me.iberger.enq.utils.showLoginDialog
+import me.iberger.enq.utils.showServerDiscoveryDialog
+import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.model.Song
 import me.iberger.timbersentry.SentryTree
 import timber.log.Timber
@@ -65,22 +70,21 @@ class MainActivity : AppCompatActivity() {
         mUIScope.launch {
             main_bottom_navigation.menu.forEachIndexed { idx, itm -> itm.icon = icons[idx].await() }
         }
+        mBackgroundScope.launch { JMusicBot.init(this@MainActivity) }
         showServerDiscoveryDialog(true)
     }
 
     /**
      * continueToLogin is called by showServerDiscoveryDialog after a server was found
      */
-    fun continueToLogin() =
-        mBackgroundScope.launch { showLoginDialog(MusicBot.hasAuthorization(applicationContext)) }
-
+    fun continueToLogin() = mBackgroundScope.launch { showLoginDialog() }
 
     /**
      * continueWithBot is called by showLoginDialog after login is complete
      */
     fun continueWithBot() = mBackgroundScope.launch {
         connected = true
-        MusicBot.instance?.connectionChangeListeners?.add((ConnectionListener(this@MainActivity)))
+        JMusicBot.connectionChangeListeners.add((ConnectionListener(this@MainActivity)))
         val currentSongFragment = CurrentSongFragment.newInstance()
         supportFragmentManager.commit {
             replace(R.id.main_current_song, currentSongFragment, null)

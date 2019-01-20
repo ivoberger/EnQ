@@ -14,9 +14,9 @@ import kotlinx.coroutines.launch
 import me.iberger.enq.R
 import me.iberger.enq.ui.MainActivity
 import me.iberger.enq.ui.fragments.parents.TabbedSongListFragment
-import me.iberger.jmusicbot.MusicBot
-import me.iberger.jmusicbot.model.MusicBotPlugin
+import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.listener.ConnectionChangeListener
+import me.iberger.jmusicbot.model.MusicBotPlugin
 import timber.log.Timber
 
 class SearchFragment : TabbedSongListFragment(), ConnectionChangeListener {
@@ -29,8 +29,8 @@ class SearchFragment : TabbedSongListFragment(), ConnectionChangeListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mProviderPlugins = MusicBot.instance!!.provider
-        MusicBot.instance?.connectionChangeListeners?.add(this@SearchFragment)
+        mProviderPlugins = mBackgroundScope.async { JMusicBot.getProvider() }
+        JMusicBot.connectionChangeListeners.add(this@SearchFragment)
         mBackgroundScope.launch {
             mProviderPlugins.await() ?: return@launch
             mConfig.lastProvider?.also {
@@ -97,7 +97,7 @@ class SearchFragment : TabbedSongListFragment(), ConnectionChangeListener {
     override fun onDestroy() {
         super.onDestroy()
         mConfig.lastProvider = mSelectedPlugin
-        MusicBot.instance?.connectionChangeListeners?.remove(this)
+        JMusicBot.connectionChangeListeners.remove(this)
     }
 
     inner class SearchFragmentPager(fm: FragmentManager, provider: List<MusicBotPlugin>) :

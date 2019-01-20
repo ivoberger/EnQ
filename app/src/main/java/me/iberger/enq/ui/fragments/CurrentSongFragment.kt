@@ -22,7 +22,7 @@ import me.iberger.enq.ui.viewmodel.PlayerViewModel
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.make
 import me.iberger.enq.utils.toastShort
-import me.iberger.jmusicbot.MusicBot
+import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.model.PlayerState
 import me.iberger.jmusicbot.model.PlayerStates
 import me.iberger.jmusicbot.model.Song
@@ -105,7 +105,7 @@ class CurrentSongFragment : Fragment() {
         if (!MainActivity.connected) return@launch
         if (mShowSkip) {
             try {
-                MusicBot.instance?.skip()
+                JMusicBot.skip()
             } catch (e: Exception) {
                 Timber.e(e)
                 mUIScope.launch { context?.toastShort(R.string.msg_no_permission) }
@@ -114,10 +114,10 @@ class CurrentSongFragment : Fragment() {
             }
         }
         when (mPlayerState.state) {
-            PlayerStates.STOP -> MusicBot.instance?.play()
-            PlayerStates.PLAY -> MusicBot.instance?.pause()
-            PlayerStates.PAUSE -> MusicBot.instance?.play()
-            PlayerStates.ERROR -> MusicBot.instance?.play()
+            PlayerStates.STOP -> JMusicBot.play()
+            PlayerStates.PLAY -> JMusicBot.pause()
+            PlayerStates.PAUSE -> JMusicBot.play()
+            PlayerStates.ERROR -> JMusicBot.play()
         }
     }
 

@@ -26,10 +26,10 @@ import me.iberger.enq.ui.viewmodel.QueueViewModel
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.setupSwipeDragActions
 import me.iberger.enq.utils.toastShort
+import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.KEY_QUEUE
-import me.iberger.jmusicbot.MusicBot
-import me.iberger.jmusicbot.model.QueueEntry
 import me.iberger.jmusicbot.exceptions.AuthException
+import me.iberger.jmusicbot.model.QueueEntry
 import timber.log.Timber
 
 class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTouchCallback {
@@ -90,7 +90,7 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
                 ItemTouchHelper.RIGHT -> {
                     if (!MainActivity.connected) return@launch
                     try {
-                        MusicBot.instance?.dequeue(entry.song)
+                        JMusicBot.dequeue(entry.song)
                     } catch (e: AuthException) {
                         Timber.e("AuthException with reason ${e.reason}")
                         withContext(Dispatchers.Main) {
@@ -121,7 +121,7 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
             val entry = mFastItemAdapter.getAdapterItem(newPosition).queueEntry
             Timber.d("Moved $entry from $oldPosition to $newPosition")
             try {
-                MusicBot.instance?.moveSong(entry, newPosition)
+                JMusicBot.moveSong(entry, newPosition)
             } catch (e: Exception) {
                 Timber.e(e)
                 mUIScope.launch {

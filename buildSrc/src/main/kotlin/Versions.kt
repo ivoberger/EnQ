@@ -33,6 +33,8 @@ object Versions {
 
     const val timber: String = "4.7.1" 
 
+    const val splitties_systemservices: String = "3.0.0-alpha02" 
+
     const val community_material_typeface: String = "3.1.0-rc02" 
 
     const val fastadapter_commons: String = "3.3.1" 
@@ -51,7 +53,7 @@ object Versions {
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.3.2" 
 
-    const val sentry_android_gradle_plugin: String = "1.7.16" 
+    const val sentry_android_gradle_plugin: String = "1.7.17" 
 
     const val org_jetbrains_kotlin: String = "1.3.11" 
 
@@ -69,7 +71,7 @@ object Versions {
 
         const val currentVersion: String = "5.1.1"
 
-        const val nightlyVersion: String = "5.3-20190119000045+0000"
+        const val nightlyVersion: String = "5.3-20190120000040+0000"
 
         const val releaseCandidate: String = ""
     }

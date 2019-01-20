@@ -17,7 +17,7 @@ import me.iberger.enq.ui.MainActivity
 import me.iberger.enq.ui.items.SongItem
 import me.iberger.enq.ui.items.SuggestionsItem
 import me.iberger.enq.utils.toastShort
-import me.iberger.jmusicbot.MusicBot
+import me.iberger.jmusicbot.JMusicBot
 
 open class ResultsFragment : Fragment() {
 
@@ -38,7 +38,7 @@ open class ResultsFragment : Fragment() {
         fastItemAdapter.withOnClickListener { _, _, item, position ->
             if (!MainActivity.connected) return@withOnClickListener false
             mBackgroundScope.launch {
-                MusicBot.instance?.enqueue(item.song)
+                JMusicBot.enqueue(item.song)
                 withContext(Dispatchers.Main) {
                     fastItemAdapter.remove(position)
                     context!!.toastShort(

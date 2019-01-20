@@ -30,6 +30,8 @@ dependencies {
 
     implementation(Libs.timber)
 
+    implementation("com.louiscad.splitties:splitties-systemservices:3.0.0-alpha02")
+
     implementation(Libs.okhttp)
     implementation(Libs.retrofit)
     implementation(Libs.retrofit2_kotlin_coroutines_adapter)

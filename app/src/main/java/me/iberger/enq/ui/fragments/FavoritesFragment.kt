@@ -21,7 +21,7 @@ import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.loadFavorites
 import me.iberger.enq.utils.setupSwipeActions
 import me.iberger.enq.utils.toastShort
-import me.iberger.jmusicbot.MusicBot
+import me.iberger.jmusicbot.JMusicBot
 
 class FavoritesFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback {
 
@@ -60,7 +60,7 @@ class FavoritesFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback {
             val item = mFastItemAdapter.getAdapterItem(position)
             when (direction) {
                 ItemTouchHelper.LEFT -> {
-                    MusicBot.instance?.enqueue(item.song)
+                    JMusicBot.enqueue(item.song)
                     withContext(Dispatchers.Main) {
                         context!!.toastShort(
                             context!!.getString(

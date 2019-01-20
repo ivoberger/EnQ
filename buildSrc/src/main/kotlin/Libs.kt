@@ -62,6 +62,11 @@ object Libs {
     const val timber: String = "com.jakewharton.timber:timber:" + Versions.timber
 
     /**
+     * https://github.com/LouisCAD/Splitties */
+    const val splitties_systemservices: String =
+            "com.louiscad.splitties:splitties-systemservices:" + Versions.splitties_systemservices
+
+    /**
      * https://github.com/mikepenz/Android-Iconics */
     const val community_material_typeface: String = "com.mikepenz:community-material-typeface:" +
             Versions.community_material_typeface

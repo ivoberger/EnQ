@@ -22,19 +22,24 @@ import me.iberger.jmusicbot.network.process
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import splitties.systemservices.wifiManager
 import timber.log.Timber
 import java.util.*
 import kotlin.concurrent.fixedRateTimer
 
 
-object NewMusicBot {
+object JMusicBot {
     var state: MusicBotState = MusicBotState.NEEDS_INIT
+        set(newState) {
+            Timber.d("State changed from $field to $newState")
+            field = newState
+        }
 
     private lateinit var mPreferences: SharedPreferences
-    private lateinit var mWifiManager: WifiManager
+    private val mWifiManager: WifiManager by lazy { wifiManager }
     private val mMoshi: Moshi by lazy { Moshi.Builder().build() }
 
-    var baseUrl: String? = null
+    private var baseUrl: String? = null
         set(value) {
             field = value
             value?.let { mRetrofit = mRetrofit.newBuilder().baseUrl(it).build() }
@@ -49,7 +54,7 @@ object NewMusicBot {
 
     private var mRetrofit: Retrofit = Retrofit.Builder()
         .addConverterFactory(MoshiConverterFactory.create(mMoshi).asLenient())
-        .baseUrl(baseUrl ?: "localhost")
+        .baseUrl(baseUrl ?: "http://localhost")
         .client(mOkHttpClient)
         .addCallAdapterFactory(CoroutineCallAdapterFactory())
         .build()
@@ -77,6 +82,7 @@ object NewMusicBot {
             field = newToken
             // rebuild networking client if new token is not null
             newToken?.let {
+                Timber.d("Setting new token")
                 mOkHttpClient = mOkHttpClient.newBuilder().addInterceptor { chain ->
                     chain.proceed(chain.request().newBuilder().addHeader(KEY_AUTHORIZATION, it).build())
                 }.build()
@@ -90,21 +96,61 @@ object NewMusicBot {
     private var mPlayerUpdateTimer: Timer? = null
 
     fun init(context: Context, startAutoDiscover: Boolean = true) {
-        Timber.d("Initiating MusicBot")
+        Timber.d("Initializing MusicBot")
         mPreferences = context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE)
-        mWifiManager =
-                context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+//        mPreferences.edit().remove(KEY_AUTHORIZATION).apply()
         state = MusicBotState.DISCONNECTED
         if (startAutoDiscover) discoverHost()
+        Timber.d("MusicBot successfully initialized")
     }
 
-    fun discoverHost() = GlobalScope.launch {
+    private fun discoverHost() = GlobalScope.launch {
+        Timber.d("Discovering host")
         state = MusicBotState.CONNECTING
-        state.job = async { discoverHost(mWifiManager) }
-        baseUrl = (state.job as? Deferred<String?>)?.await()
-        state = if (baseUrl != null) MusicBotState.NEEDS_AUTH else MusicBotState.DISCONNECTED
+        state.job = async { mWifiManager.discoverHost() }
+        baseUrl = state.job?.await() as? String?
+        state = if (baseUrl != null) {
+            Timber.d("Found host: $baseUrl")
+            MusicBotState.NEEDS_AUTH
+        } else {
+            Timber.d("No host found")
+            MusicBotState.DISCONNECTED
+        }
     }
 
+    suspend fun authorize(userName: String? = null, password: String? = null): Boolean {
+        Timber.d("Starting authorization")
+        if (tokenValid()) return true
+        try {
+            register(userName)
+            password?.let { changePassword(it) }
+            if (tokenValid()) return true
+        } catch (e: Exception) {
+            Timber.w(e)
+        }
+        try {
+            login(userName, password)
+            if (tokenValid()) return true
+        } catch (e: Exception) {
+            Timber.w(e)
+        }
+        Timber.d("Authorization failed")
+        return false
+    }
+
+    private suspend fun tokenValid(): Boolean {
+        try {
+            authToken?.let { mApiClient.testToken(it).process() }
+        } catch (e: Exception) {
+            if (e !is AuthException) {
+                Timber.d("Valid Token")
+                state = MusicBotState.CONNECTED
+                return true
+            } else Timber.w(e)
+        }
+        Timber.d("Invalid Token")
+        return false
+    }
 
     @Throws(
         InvalidParametersException::class,
@@ -115,13 +161,18 @@ object NewMusicBot {
         IllegalArgumentException::class
     )
     suspend fun register(userName: String? = null) {
+        Timber.d("Registering user")
         state.connectionCheck()
         val credentials = when {
-            (userName != null) -> Credentials.Register(userName)
+            (userName != null) -> {
+                user = User(userName)
+                Credentials.Register(userName)
+            }
             user != null -> Credentials.Register(user!!)
             else -> throw IllegalArgumentException("No username stored or supplied")
         }
-        authToken = mApiClient.registerUser(credentials).process().await()
+        authToken = mApiClient.registerUser(credentials).process()
+        Timber.d("Registered user")
     }
 
     @Throws(
@@ -133,32 +184,23 @@ object NewMusicBot {
         IllegalArgumentException::class
     )
     suspend fun login(userName: String? = null, password: String? = null) {
+        Timber.d("Logging in user")
         state.connectionCheck()
         val credentials = when {
-            (userName != null && password != null) -> Credentials.Login(userName, password)
+            (userName != null && password != null) -> {
+                user = User(userName, password)
+                Credentials.Login(userName, password)
+            }
             user != null -> Credentials.Login(user!!)
             else -> throw IllegalArgumentException("No user stored or supplied")
         }
-        authToken = mApiClient.login(credentials).process().await()
-    }
-
-    @Throws(
-        InvalidParametersException::class,
-        AuthException::class,
-        NotFoundException::class,
-        ServerErrorException::class,
-        IllegalStateException::class
-    )
-    suspend fun deleteUser() {
-        state.connectionCheck()
-        authToken ?: throw IllegalStateException("Auth token is null")
-        mApiClient.deleteUser().process().await()
+        authToken = mApiClient.login(credentials).process()
     }
 
     @Throws(InvalidParametersException::class, AuthException::class)
     suspend fun changePassword(newPassword: String) {
         state.connectionCheck()
-        authToken = mApiClient.changePassword(Credentials.PasswordChange((newPassword))).process().await()
+        authToken = mApiClient.changePassword(Credentials.PasswordChange((newPassword))).process()
         authToken?.also {
             user?.password = newPassword
             user?.save(mPreferences)
@@ -172,67 +214,80 @@ object NewMusicBot {
         ServerErrorException::class,
         IllegalStateException::class
     )
+    suspend fun deleteUser() {
+        state.connectionCheck()
+        authToken ?: throw IllegalStateException("Auth token is null")
+        mApiClient.deleteUser().process()
+    }
+
+    @Throws(
+        InvalidParametersException::class,
+        AuthException::class,
+        NotFoundException::class,
+        ServerErrorException::class,
+        IllegalStateException::class
+    )
     suspend fun refreshToken() {
         state.connectionCheck()
-        user?.let { authToken = mApiClient.login(Credentials.Login(it)).process().await() }
+        user?.let { authToken = mApiClient.login(Credentials.Login(it)).process() }
         throw java.lang.IllegalStateException("User is null")
     }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     suspend fun enqueue(song: Song) {
         state.connectionCheck()
-        updateQueue(mApiClient.enqueue(song.id, song.provider.id).process().await())
+        updateQueue(mApiClient.enqueue(song.id, song.provider.id).process())
     }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     suspend fun dequeue(song: Song) {
         state.connectionCheck()
-        updateQueue(mApiClient.dequeue(song.id, song.provider.id).process().await())
+        updateQueue(mApiClient.dequeue(song.id, song.provider.id).process())
     }
 
     suspend fun moveSong(entry: QueueEntry, newPosition: Int) {
         state.connectionCheck()
-        updateQueue(mApiClient.moveSong(entry, newPosition).process().await())
+        updateQueue(mApiClient.moveSong(entry, newPosition).process())
     }
 
     suspend fun search(providerId: String, query: String): List<Song> {
         state.connectionCheck()
-        return mApiClient.searchForSong(providerId, query).process().await()
+        return mApiClient.searchForSong(providerId, query).process()
     }
 
     suspend fun suggestions(suggesterId: String): List<Song> {
         state.connectionCheck()
-        return mApiClient.getSuggestions(suggesterId).process().await()
+        return mApiClient.getSuggestions(suggesterId).process()
     }
 
     suspend fun deleteSuggestion(suggesterId: String, song: Song) {
         state.connectionCheck()
-        return mApiClient.deleteSuggestion(suggesterId, song.id, song.provider.id).process().await() ?: Unit
+        return mApiClient.deleteSuggestion(suggesterId, song.id, song.provider.id).process()
     }
 
     suspend fun pause() {
         state.connectionCheck()
-        updatePlayer(mApiClient.pause().process().await())
+        updatePlayer(mApiClient.pause().process())
     }
 
     suspend fun play() {
         state.connectionCheck()
-        updatePlayer(mApiClient.play().process().await())
+        updatePlayer(mApiClient.play().process())
     }
 
     suspend fun skip() {
         state.connectionCheck()
-        updatePlayer(mApiClient.skip().process().await())
+        updatePlayer(mApiClient.skip().process())
     }
 
     suspend fun getProvider(): List<MusicBotPlugin> {
         state.connectionCheck()
-        return mApiClient.getProvider().process().await()
+        return mApiClient.getProvider().process()
     }
 
     suspend fun getSuggesters(): List<MusicBotPlugin> {
         state.connectionCheck()
-        return mApiClient.getSuggesters().process().await()
+        return mApiClient.getSuggesters().process()
     }
 
     fun getQueue(period: Long = 500): LiveData<List<QueueEntry>> {
@@ -262,7 +317,7 @@ object NewMusicBot {
     private fun updateQueue(newQueue: List<QueueEntry>? = null) = runBlocking {
         try {
             state.connectionCheck()
-            val queue = newQueue ?: mApiClient.getQueue().process().await() ?: listOf()
+            val queue = newQueue ?: mApiClient.getQueue().process() ?: listOf()
             withContext(Dispatchers.Main) { mQueue.value = queue }
         } catch (e: Exception) {
             Timber.w(e)
@@ -273,7 +328,7 @@ object NewMusicBot {
     private fun updatePlayer(playerState: PlayerState? = null) = runBlocking {
         try {
             state.connectionCheck()
-            val state = playerState ?: mApiClient.getPlayerState().process().await() ?: PlayerState(PlayerStates.ERROR)
+            val state = playerState ?: mApiClient.getPlayerState().process() ?: PlayerState(PlayerStates.ERROR)
             withContext(Dispatchers.Main) {
                 mPlayerState.value = state
             }
@@ -285,13 +340,13 @@ object NewMusicBot {
     fun onConnectionLost(e: Exception) {
         stopQueueUpdates()
         stopPlayerUpdates()
-        MusicBot.baseUrl = null
+        baseUrl = null
         connectionChangeListeners.forEach { it.onConnectionLost(e) }
         runBlocking {
             while (true) {
                 try {
-                    discoverHost()
-                    if (MusicBot.baseUrl != null) return@runBlocking
+                    discoverHost().join()
+                    if (baseUrl != null) return@runBlocking
                     delay(500L)
                 } catch (e: Exception) {
                     Timber.e(e)

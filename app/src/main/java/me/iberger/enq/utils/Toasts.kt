@@ -14,3 +14,13 @@ fun Context.toastShort(@StringRes text: Int) {
 fun Context.toastShort(@StringRes text: String) {
     Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
 }
+
+@UiThread
+fun Context.toastLong(@StringRes text: Int) {
+    Toast.makeText(this, text, Toast.LENGTH_LONG).show()
+}
+
+@UiThread
+fun Context.toastLong(@StringRes text: String) {
+    Toast.makeText(this, text, Toast.LENGTH_LONG).show()
+}
