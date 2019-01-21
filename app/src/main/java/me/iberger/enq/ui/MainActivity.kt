@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         mUIScope.launch {
             main_bottom_navigation.menu.forEachIndexed { idx, itm -> itm.icon = icons[idx].await() }
         }
-        mBackgroundScope.launch { JMusicBot.init(this@MainActivity) }
+        JMusicBot.discoverHost()
         showServerDiscoveryDialog(true)
     }
 

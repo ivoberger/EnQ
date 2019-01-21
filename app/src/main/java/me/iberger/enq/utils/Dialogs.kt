@@ -65,6 +65,7 @@ fun MainActivity.showLoginDialog(
     if (!loggingIn) {
         val dialogView =
             withContext(Dispatchers.Main) { this@showLoginDialog.layoutInflater.inflate(R.layout.dialog_login, null) }
+        withContext(Dispatchers.Main) { dialogView.findViewById<EditText>(R.id.login_username)?.setText(userName) }
         loginDialogBuilder
             .setView(dialogView)
             .setTitle(R.string.tlt_login)
@@ -95,32 +96,32 @@ fun MainActivity.showLoginDialog(
                 R.string.msg_username_taken,
                 Toast.LENGTH_LONG
             ).show()
-            showLoginDialog(false)
+            showLoginDialog(false, userName, password)
             loginDialog.cancel()
         } catch (e: AuthException) {
             Timber.w("Authentication error with reason ${e.reason}")
             Timber.w(e)
             this@showLoginDialog.toastLong(R.string.msg_password_wrong)
-            showLoginDialog(false)
+            showLoginDialog(false, userName, password)
             loginDialog.cancel()
         } catch (e: IllegalStateException) {
             Timber.w(e)
-            showLoginDialog(false)
+            showLoginDialog(false, userName, password)
             loginDialog.cancel()
         } catch (e: InvalidParametersException) {
             Timber.w(e)
             this@showLoginDialog.toastLong(R.string.msg_server_error)
-            showLoginDialog(false)
+            showLoginDialog(false, userName, password)
             loginDialog.cancel()
         } catch (e: ServerErrorException) {
             Timber.e(e)
             this@showLoginDialog.toastLong(R.string.msg_server_error)
-            showLoginDialog(false)
+            showLoginDialog(false, userName, password)
             loginDialog.cancel()
         } catch (e: Exception) {
             Timber.e(e)
             this@showLoginDialog.toastLong(R.string.msg_unknown_error)
-            showLoginDialog(false)
+            showLoginDialog(false, userName, password)
             loginDialog.cancel()
         }
     }

@@ -35,7 +35,7 @@ object Versions {
 
     const val timber: String = "4.7.1" 
 
-    const val splitties_systemservices: String = "3.0.0-alpha02" 
+    const val com_louiscad_splitties: String = "3.0.0-alpha02" 
 
     const val aboutlibraries: String = "6.2.1" 
 

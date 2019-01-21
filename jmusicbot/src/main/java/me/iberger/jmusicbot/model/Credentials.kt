@@ -22,11 +22,11 @@ sealed class Credentials {
     ) : Credentials() {
         constructor(user: User) : this(
             user.name,
-            user.uuid,
             user.password ?: throw InvalidParametersException(
                 InvalidParametersException.Type.INVALID_PASSWORD,
                 "Password can't be null"
-            )
+            ),
+            user.uuid
         )
     }
 

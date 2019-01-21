@@ -30,8 +30,9 @@ dependencies {
 
     implementation(Libs.timber)
 
-    implementation("com.louiscad.splitties:splitties-systemservices:3.0.0-alpha02")
-    implementation("com.auth0.android:jwtdecode:1.2.0")
+    implementation(Libs.splitties_systemservices)
+    implementation(Libs.splitties_preferences)
+    implementation(Libs.jwtdecode)
 
     implementation(Libs.okhttp)
     implementation(Libs.retrofit)

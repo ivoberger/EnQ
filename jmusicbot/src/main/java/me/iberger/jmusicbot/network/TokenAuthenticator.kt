@@ -3,6 +3,7 @@ package me.iberger.jmusicbot.network
 import kotlinx.coroutines.runBlocking
 import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.KEY_AUTHORIZATION
+import me.iberger.jmusicbot.model.BotPreferences
 import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response
@@ -14,7 +15,7 @@ class TokenAuthenticator : Authenticator {
         Timber.d("Retrieving new token NP")
         JMusicBot.authorize()
         return@runBlocking response.request().newBuilder()
-            .header(KEY_AUTHORIZATION, JMusicBot.authToken?.toString() ?: "")
+            .header(KEY_AUTHORIZATION, BotPreferences.authToken?.toString() ?: "")
             .build()
     }
 }

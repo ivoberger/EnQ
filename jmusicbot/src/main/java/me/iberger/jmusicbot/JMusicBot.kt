@@ -1,9 +1,6 @@
 package me.iberger.jmusicbot
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.net.wifi.WifiManager
-import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.auth0.android.jwt.JWT
@@ -14,7 +11,6 @@ import me.iberger.jmusicbot.exceptions.*
 import me.iberger.jmusicbot.listener.ConnectionChangeListener
 import me.iberger.jmusicbot.model.*
 import me.iberger.jmusicbot.network.MusicBotAPI
-import me.iberger.jmusicbot.network.TokenAuthenticator
 import me.iberger.jmusicbot.network.discoverHost
 import me.iberger.jmusicbot.network.process
 import okhttp3.OkHttpClient
@@ -27,15 +23,13 @@ import kotlin.concurrent.timer
 
 
 object JMusicBot {
-    var state: MusicBotState = MusicBotState.NEEDS_INIT
+    var state: MusicBotState = MusicBotState.DISCONNECTED
         set(newState) {
             Timber.d("State changed from $field to $newState")
             field = newState
         }
-
-    private lateinit var mPreferences: SharedPreferences
     private val mWifiManager: WifiManager by lazy { wifiManager }
-    private val mMoshi: Moshi by lazy { Moshi.Builder().build() }
+    internal val mMoshi: Moshi by lazy { Moshi.Builder().build() }
 
     private var baseUrl: String? = null
         set(value) {
@@ -43,9 +37,10 @@ object JMusicBot {
             value?.let { mRetrofit = mRetrofit.newBuilder().baseUrl(it).build() }
         }
 
-    private var mOkHttpClient: OkHttpClient = OkHttpClient.Builder().cache(null).build()
+    internal var mOkHttpClient: OkHttpClient = OkHttpClient.Builder().cache(null).build()
         set(value) {
             field = value
+            // rebuild retrofit with new okHttpClient
             mRetrofit = mRetrofit.newBuilder().client(value).build()
         }
 
@@ -62,49 +57,21 @@ object JMusicBot {
         }
 
     private var mApiClient: MusicBotAPI = mRetrofit.create(MusicBotAPI::class.java)
+
     val connectionChangeListeners: MutableList<ConnectionChangeListener> = mutableListOf()
 
-    var user: User? = null
-        get() = if (state.isInitialized() && mPreferences.contains(KEY_USER)) User.load(mPreferences, mMoshi)
-        else field
-        set(newUser) {
-            if (state.isInitialized()) newUser?.save(mPreferences, mMoshi)
-            field = newUser
-        }
-
-    var authToken: JWT? = null
-        get() = if (state.isInitialized()) mPreferences.getString(KEY_AUTHORIZATION, null)?.let { JWT(it) } else field
-        set(newToken) {
-            if (!state.isInitialized()) return
-            field = newToken
-            // rebuild networking client if new token is not null
-            newToken?.let {
-                mPreferences.edit { putString(KEY_AUTHORIZATION, it.toString()) }
-                Timber.d("Setting new token, Claims: ${it.claims.size}")
-                it.claims.forEach { claim -> Timber.d("Claim ${claim.key}: ${claim.value.asString()}") }
-                mOkHttpClient = mOkHttpClient.newBuilder().addInterceptor { chain ->
-                    chain.proceed(chain.request().newBuilder().addHeader(KEY_AUTHORIZATION, it.toString()).build())
-                }
-                    .authenticator(TokenAuthenticator()).build()
-                return
-            }
-            mPreferences.edit { remove(KEY_AUTHORIZATION) }
-        }
-
     private val mQueue: MutableLiveData<List<QueueEntry>> = MutableLiveData()
-    private val mPlayerState: MutableLiveData<PlayerState> = MutableLiveData()
 
+    private val mPlayerState: MutableLiveData<PlayerState> = MutableLiveData()
     private var mQueueUpdateTimer: Timer? = null
     private var mPlayerUpdateTimer: Timer? = null
 
-    fun init(context: Context, startAutoDiscover: Boolean = true) {
-        Timber.d("Initializing MusicBot")
-        mPreferences = context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE)
-//        mPreferences.edit().remove(KEY_AUTHORIZATION).apply()
-        state = MusicBotState.DISCONNECTED
-        if (startAutoDiscover) discoverHost()
-        Timber.d("MusicBot successfully initialized")
-    }
+    var user: User?
+        get() = BotPreferences.user
+        set(value) {
+            BotPreferences.user = value
+        }
+    val userPermissions: MutableList<Permissions> = mutableListOf()
 
     fun discoverHost() = GlobalScope.launch {
         Timber.d("Discovering host")
@@ -138,8 +105,8 @@ object JMusicBot {
             if (tokenValid()) return
         } catch (e: UsernameTakenException) {
             Timber.w(e)
-            if (password == null && user?.password == null) {
-                Timber.d("No passwords found, throwing exception, $password, $user")
+            if (password == null && BotPreferences.user?.password == null) {
+                Timber.d("No passwords found, throwing exception, $password, ${BotPreferences.user}")
                 throw e
             }
         }
@@ -154,10 +121,10 @@ object JMusicBot {
         state = MusicBotState.CONNECTED
     }
 
-    private suspend fun tokenValid(): Boolean {
+    private fun tokenValid(): Boolean {
         return false
 //        try {
-//            authToken?.let {
+//            BotPreferences.authToken?.let {
 //                if (it.isExpired(60)) return false
 //                mApiClient.testToken(it.toString()).process()
 //            }
@@ -180,18 +147,18 @@ object JMusicBot {
         IllegalStateException::class
     )
     suspend fun register(userName: String? = null) {
-        Timber.d("Registering user")
+        Timber.d("Registering BotPreferences.user")
         state.serverCheck()
         val credentials = when {
             (userName != null) -> {
-                user = User(userName)
+                BotPreferences.user = User(userName)
                 Credentials.Register(userName)
             }
-            user != null -> Credentials.Register(user!!)
+            BotPreferences.user != null -> Credentials.Register(BotPreferences.user!!)
             else -> throw IllegalStateException("No username stored or supplied")
         }
-        authToken = JWT(mApiClient.registerUser(credentials).process())
-        Timber.d("Registered user")
+        BotPreferences.authToken = JWT(mApiClient.registerUser(credentials).process())
+        Timber.d("Registered BotPreferences.user")
     }
 
     @Throws(
@@ -202,27 +169,25 @@ object JMusicBot {
         IllegalStateException::class
     )
     suspend fun login(userName: String? = null, password: String? = null) {
-        Timber.d("Logging in user")
+        Timber.d("Logging in ${BotPreferences.user}")
         state.serverCheck()
         val credentials = when {
             (userName != null && password != null) -> {
-                user = User(userName, password)
+                BotPreferences.user = User(userName, password)
                 Credentials.Login(userName, password)
             }
-            user != null -> Credentials.Login(user!!)
+            BotPreferences.user != null -> Credentials.Login(BotPreferences.user!!)
             else -> throw IllegalStateException("No user stored or supplied")
         }
-        authToken = JWT(mApiClient.login(credentials).process())
+        BotPreferences.authToken = JWT(mApiClient.login(credentials).process())
     }
 
     @Throws(InvalidParametersException::class, AuthException::class)
     suspend fun changePassword(newPassword: String) {
         state.connectionCheck()
-        authToken = JWT(mApiClient.changePassword(Credentials.PasswordChange((newPassword))).process())
-        authToken?.also {
-            user?.password = newPassword
-            user?.save(mPreferences)
-        }
+        BotPreferences.authToken =
+                JWT(mApiClient.changePassword(Credentials.PasswordChange((newPassword))).process())
+        BotPreferences.authToken?.also { BotPreferences.user?.password = newPassword }
     }
 
     @Throws(
@@ -234,7 +199,7 @@ object JMusicBot {
     )
     suspend fun deleteUser() {
         state.connectionCheck()
-        authToken ?: throw IllegalStateException("Auth token is null")
+        BotPreferences.authToken ?: throw IllegalStateException("Auth token is null")
         mApiClient.deleteUser().process()
     }
 
