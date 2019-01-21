@@ -21,6 +21,7 @@ class QueueUpdateCallback(private val mFastItemAdapter: FastItemAdapter<QueueIte
     }
 
     override fun onInserted(position: Int, count: Int) {
+        if (position + count > currentList.size) return
         val addList = currentList.subList(position, position + count).map { QueueItem(it) }
         GlobalScope.launch(Dispatchers.Main) { mFastItemAdapter.add(position, addList) }
     }

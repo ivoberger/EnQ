@@ -21,6 +21,8 @@ object Versions {
 
     const val lint_gradle: String = "26.5.0-alpha01" 
 
+    const val jwtdecode: String = "1.2.0" 
+
     const val timbersentry: String = "0.2.0" 
 
     const val glide: String = "4.8.0" 
@@ -73,7 +75,7 @@ object Versions {
 
         const val currentVersion: String = "5.1.1"
 
-        const val nightlyVersion: String = "5.3-20190120000040+0000"
+        const val nightlyVersion: String = "5.3-20190121000045+0000"
 
         const val releaseCandidate: String = ""
     }

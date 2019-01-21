@@ -61,16 +61,20 @@ sentry {
 }
 
 dependencies {
+    // Kotlin (extensions)
     implementation(Libs.kotlin_stdlib_jdk8)
     implementation(Libs.kotlinx_coroutines_android)
     implementation(Libs.core_ktx)
     implementation(Libs.fragment_ktx)
+    // appcompat, arch components etc.
     implementation(Libs.appcompat)
     implementation(Libs.lifecycle_extensions)
     implementation(Libs.constraintlayout)
     implementation(Libs.material)
 
     implementation(project(":jmusicbot"))
+
+    // utils
     implementation(Libs.timbersentry)
 
     implementation(Libs.glide)

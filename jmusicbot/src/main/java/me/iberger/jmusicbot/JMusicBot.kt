@@ -6,13 +6,11 @@ import android.net.wifi.WifiManager
 import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.auth0.android.jwt.JWT
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.*
-import me.iberger.jmusicbot.exceptions.AuthException
-import me.iberger.jmusicbot.exceptions.InvalidParametersException
-import me.iberger.jmusicbot.exceptions.NotFoundException
-import me.iberger.jmusicbot.exceptions.ServerErrorException
+import me.iberger.jmusicbot.exceptions.*
 import me.iberger.jmusicbot.listener.ConnectionChangeListener
 import me.iberger.jmusicbot.model.*
 import me.iberger.jmusicbot.network.MusicBotAPI
@@ -74,19 +72,23 @@ object JMusicBot {
             field = newUser
         }
 
-    var authToken: String? = null
-        get() = if (state.isInitialized()) mPreferences.getString(KEY_AUTHORIZATION, field) else field
+    var authToken: JWT? = null
+        get() = if (state.isInitialized()) mPreferences.getString(KEY_AUTHORIZATION, null)?.let { JWT(it) } else field
         set(newToken) {
-            if (state.isInitialized()) mPreferences.edit { putString(KEY_AUTHORIZATION, newToken) }
+            if (!state.isInitialized()) return
             field = newToken
             // rebuild networking client if new token is not null
             newToken?.let {
-                Timber.d("Setting new token")
+                mPreferences.edit { putString(KEY_AUTHORIZATION, it.toString()) }
+                Timber.d("Setting new token, Claims: ${it.claims.size}")
+                it.claims.forEach { claim -> Timber.d("Claim ${claim.key}: ${claim.value.asString()}") }
                 mOkHttpClient = mOkHttpClient.newBuilder().addInterceptor { chain ->
-                    chain.proceed(chain.request().newBuilder().addHeader(KEY_AUTHORIZATION, it).build())
+                    chain.proceed(chain.request().newBuilder().addHeader(KEY_AUTHORIZATION, it.toString()).build())
                 }
                     .authenticator(TokenAuthenticator()).build()
+                return
             }
+            mPreferences.edit { remove(KEY_AUTHORIZATION) }
         }
 
     private val mQueue: MutableLiveData<List<QueueEntry>> = MutableLiveData()
@@ -120,39 +122,54 @@ object JMusicBot {
 
     }
 
-    suspend fun authorize(userName: String? = null, password: String? = null): Boolean {
+    @Throws(
+        InvalidParametersException::class,
+        NotFoundException::class,
+        ServerErrorException::class,
+        IllegalStateException::class
+    )
+    suspend fun authorize(userName: String? = null, password: String? = null) {
         state.serverCheck()
         Timber.d("Starting authorization")
-        if (tokenValid()) return true
+        if (tokenValid()) return
         try {
             register(userName)
             password?.let { changePassword(it) }
-            if (tokenValid()) return true
-        } catch (e: Exception) {
+            if (tokenValid()) return
+        } catch (e: UsernameTakenException) {
             Timber.w(e)
+            if (password == null && user?.password == null) {
+                Timber.d("No passwords found, throwing exception, $password, $user")
+                throw e
+            }
         }
         try {
             login(userName, password)
-            if (tokenValid()) return true
+            if (tokenValid()) return
         } catch (e: Exception) {
             Timber.w(e)
+            Timber.d("Authorization failed")
+            throw e
         }
-        Timber.d("Authorization failed")
-        return false
+        state = MusicBotState.CONNECTED
     }
 
     private suspend fun tokenValid(): Boolean {
-        try {
-            authToken?.let { mApiClient.testToken(it).process() }
-        } catch (e: Exception) {
-            if (e !is AuthException) {
-                Timber.d("Valid Token")
-                state = MusicBotState.CONNECTED
-                return true
-            } else Timber.w(e.localizedMessage)
-        }
-        Timber.d("Invalid Token")
         return false
+//        try {
+//            authToken?.let {
+//                if (it.isExpired(60)) return false
+//                mApiClient.testToken(it.toString()).process()
+//            }
+//        } catch (e: Exception) {
+//            if (e !is AuthException && e !is ServerErrorException) {
+//                Timber.d("Valid Token")
+//                state = MusicBotState.CONNECTED
+//                return true
+//            } else Timber.w(e.localizedMessage)
+//        }
+//        Timber.d("Invalid Token")
+//        return false
     }
 
     @Throws(
@@ -160,8 +177,7 @@ object JMusicBot {
         AuthException::class,
         NotFoundException::class,
         ServerErrorException::class,
-        IllegalStateException::class,
-        IllegalArgumentException::class
+        IllegalStateException::class
     )
     suspend fun register(userName: String? = null) {
         Timber.d("Registering user")
@@ -172,9 +188,9 @@ object JMusicBot {
                 Credentials.Register(userName)
             }
             user != null -> Credentials.Register(user!!)
-            else -> throw IllegalArgumentException("No username stored or supplied")
+            else -> throw IllegalStateException("No username stored or supplied")
         }
-        authToken = mApiClient.registerUser(credentials).process()
+        authToken = JWT(mApiClient.registerUser(credentials).process())
         Timber.d("Registered user")
     }
 
@@ -183,8 +199,7 @@ object JMusicBot {
         AuthException::class,
         NotFoundException::class,
         ServerErrorException::class,
-        IllegalStateException::class,
-        IllegalArgumentException::class
+        IllegalStateException::class
     )
     suspend fun login(userName: String? = null, password: String? = null) {
         Timber.d("Logging in user")
@@ -195,15 +210,15 @@ object JMusicBot {
                 Credentials.Login(userName, password)
             }
             user != null -> Credentials.Login(user!!)
-            else -> throw IllegalArgumentException("No user stored or supplied")
+            else -> throw IllegalStateException("No user stored or supplied")
         }
-        authToken = mApiClient.login(credentials).process()
+        authToken = JWT(mApiClient.login(credentials).process())
     }
 
     @Throws(InvalidParametersException::class, AuthException::class)
     suspend fun changePassword(newPassword: String) {
         state.connectionCheck()
-        authToken = mApiClient.changePassword(Credentials.PasswordChange((newPassword))).process()
+        authToken = JWT(mApiClient.changePassword(Credentials.PasswordChange((newPassword))).process())
         authToken?.also {
             user?.password = newPassword
             user?.save(mPreferences)

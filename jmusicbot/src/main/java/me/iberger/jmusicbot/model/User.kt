@@ -13,8 +13,9 @@ import java.util.*
 @JsonClass(generateAdapter = true)
 data class User(
     @Json(name = "name") val name: String,
+    @Json(name = "password") var password: String? = null,
     @Json(name = "uuid") val uuid: String = UUID.randomUUID().toString(),
-    @Json(name = "password") var password: String? = null
+    @Json(name = "permissions") var permissions: MutableList<Permissions> = mutableListOf()
 ) {
     init {
         Timber.d("Creating User $this")

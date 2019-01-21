@@ -37,6 +37,10 @@ object Libs {
      * https://developer.android.com/studio */
     const val lint_gradle: String = "com.android.tools.lint:lint-gradle:" + Versions.lint_gradle
 
+    /**
+     * https://github.com/auth0/jwtdecode.android */
+    const val jwtdecode: String = "com.auth0.android:jwtdecode:" + Versions.jwtdecode
+
     const val timbersentry: String = "com.github.IIIuminator:timberSentry:" + Versions.timbersentry
 
     /**

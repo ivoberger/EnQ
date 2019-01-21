@@ -27,4 +27,6 @@
     <string name="hint_search">Suche nach einem Song</string>
     <string name="lbl_search">Suche</string>
     <string name="nav_about">Info</string>
+    <string name="msg_unknown_error">Ein unbekannter Fehler ist aufgetreten</string>
+    <string name="msg_server_error">Unbekannter Server Fehler</string>
 </resources>
