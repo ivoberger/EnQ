@@ -8,7 +8,10 @@
         android:title="@string/nav_search"
         app:actionViewClass="android.widget.SearchView"
         app:showAsAction="always" />
+    <!--<item-->
+        <!--android:id="@+id/app_bar_settings"-->
+        <!--android:title="@string/nav_settings" />-->
     <item
-        android:id="@+id/app_bar_settings"
-        android:title="@string/nav_settings" />
+        android:id="@+id/app_bar_about"
+        android:title="@string/nav_about" />
 </menu>

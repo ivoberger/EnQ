@@ -66,11 +66,11 @@ dependencies {
     implementation(Libs.core_ktx)
     implementation(Libs.fragment_ktx)
     implementation(Libs.appcompat)
+    implementation(Libs.lifecycle_extensions)
     implementation(Libs.constraintlayout)
     implementation(Libs.material)
 
-//    implementation project(":jmusicbot")
-    implementation(Libs.jmusicbotandroid)
+    implementation(project(":jmusicbot"))
     implementation(Libs.timbersentry)
 
     implementation(Libs.glide)
@@ -79,6 +79,7 @@ dependencies {
     implementation(Libs.fastadapter)
     implementation(Libs.fastadapter_commons)
     implementation(Libs.fastadapter_extensions)
+    implementation(Libs.aboutlibraries)
 
     implementation(Libs.iconics_core)
     implementation(Libs.community_material_typeface)

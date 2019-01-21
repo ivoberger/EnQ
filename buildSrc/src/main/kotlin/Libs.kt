@@ -24,6 +24,11 @@ object Libs {
     const val fragment_ktx: String = "androidx.fragment:fragment-ktx:" + Versions.fragment_ktx
 
     /**
+     * https://developer.android.com/topic/libraries/architecture/index.html */
+    const val lifecycle_extensions: String = "androidx.lifecycle:lifecycle-extensions:" +
+            Versions.lifecycle_extensions
+
+    /**
      * https://developer.android.com/studio */
     const val com_android_tools_build_gradle: String = "com.android.tools.build:gradle:" +
             Versions.com_android_tools_build_gradle
@@ -31,11 +36,6 @@ object Libs {
     /**
      * https://developer.android.com/studio */
     const val lint_gradle: String = "com.android.tools.lint:lint-gradle:" + Versions.lint_gradle
-
-    /**
-     * https://github.com/IIIuminator/JMusicBotAndroid */
-    const val jmusicbotandroid: String = "com.github.IIIuminator:JMusicBotAndroid:" +
-            Versions.jmusicbotandroid
 
     const val timbersentry: String = "com.github.IIIuminator:timberSentry:" + Versions.timbersentry
 
@@ -50,6 +50,25 @@ object Libs {
     /**
      * http://developer.android.com/tools/extras/support-library.html */
     const val material: String = "com.google.android.material:material:" + Versions.material
+
+    /**
+     * https://github.com/JakeWharton/retrofit2-kotlin-coroutines-adapter/ */
+    const val retrofit2_kotlin_coroutines_adapter: String =
+            "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:" +
+            Versions.retrofit2_kotlin_coroutines_adapter
+
+    /**
+     * https://github.com/JakeWharton/timber */
+    const val timber: String = "com.jakewharton.timber:timber:" + Versions.timber
+
+    /**
+     * https://github.com/LouisCAD/Splitties */
+    const val splitties_systemservices: String =
+            "com.louiscad.splitties:splitties-systemservices:" + Versions.splitties_systemservices
+
+    /**
+     * https://github.com/mikepenz/AboutLibraries */
+    const val aboutlibraries: String = "com.mikepenz:aboutlibraries:" + Versions.aboutlibraries
 
     /**
      * https://github.com/mikepenz/Android-Iconics */
@@ -76,7 +95,26 @@ object Libs {
 
     /**
      * https://github.com/square/moshi */
-    const val moshi: String = "com.squareup.moshi:moshi:" + Versions.moshi
+    const val moshi_kotlin_codegen: String = "com.squareup.moshi:moshi-kotlin-codegen:" +
+            Versions.com_squareup_moshi
+
+    /**
+     * https://github.com/square/moshi */
+    const val moshi: String = "com.squareup.moshi:moshi:" + Versions.com_squareup_moshi
+
+    /**
+     * https://github.com/square/okhttp */
+    const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.okhttp
+
+    /**
+     * https://github.com/square/retrofit/ */
+    const val converter_moshi: String = "com.squareup.retrofit2:converter-moshi:" +
+            Versions.com_squareup_retrofit2
+
+    /**
+     * https://github.com/square/retrofit/ */
+    const val retrofit: String = "com.squareup.retrofit2:retrofit:" +
+            Versions.com_squareup_retrofit2
 
     const val de_fayard_buildsrcversions_gradle_plugin: String =
             "de.fayard.buildSrcVersions:de.fayard.buildSrcVersions.gradle.plugin:" +

@@ -5,8 +5,8 @@ import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import androidx.core.content.edit
 import com.squareup.moshi.Moshi
-import me.iberger.jmusicbot.data.MusicBotPlugin
-import me.iberger.jmusicbot.data.MusicBotPluginJsonAdapter
+import me.iberger.jmusicbot.model.MusicBotPlugin
+import me.iberger.jmusicbot.model.MusicBotPluginJsonAdapter
 import timber.log.Timber
 
 class Configuration(private val preferences: SharedPreferences) {
