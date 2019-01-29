@@ -17,9 +17,9 @@ object Versions {
 
     const val lifecycle_extensions: String = "2.0.0" 
 
-    const val com_android_tools_build_gradle: String = "3.5.0-alpha01" 
+    const val com_android_tools_build_gradle: String = "3.5.0-alpha02" 
 
-    const val lint_gradle: String = "26.5.0-alpha01" 
+    const val lint_gradle: String = "26.5.0-alpha02" 
 
     const val jwtdecode: String = "1.2.0" 
 
@@ -59,9 +59,9 @@ object Versions {
 
     const val sentry_android_gradle_plugin: String = "1.7.17" 
 
-    const val org_jetbrains_kotlin: String = "1.3.11" 
+    const val org_jetbrains_kotlin: String = "1.3.11" // available: "1.3.20"
 
-    const val kotlinx_coroutines_android: String = "1.1.0" 
+    const val kotlinx_coroutines_android: String = "1.1.1" 
 
     const val core_kt: String = "1.0.3" 
 
@@ -75,8 +75,8 @@ object Versions {
 
         const val currentVersion: String = "5.1.1"
 
-        const val nightlyVersion: String = "5.3-20190121000045+0000"
+        const val nightlyVersion: String = "5.3-20190129000401+0000"
 
-        const val releaseCandidate: String = ""
+        const val releaseCandidate: String = "5.2-rc-1"
     }
 }
