@@ -41,7 +41,7 @@ android {
         }
     }
     sourceSets {
-        getByName("main").res.srcDirs("src/main/resources", " src/main/res")
+        getByName("main").res.srcDirs("src/main/resources", "src/main/res")
     }
     lintOptions {
         isAbortOnError = false

@@ -101,11 +101,12 @@ object JMusicBot {
         if (tokenValid()) return
         try {
             register(userName)
-            password?.let { changePassword(it) }
-            if (tokenValid()) return
+            if (!password.isNullOrBlank()) changePassword(password)
+            state = MusicBotState.CONNECTED
+            return
         } catch (e: UsernameTakenException) {
             Timber.w(e)
-            if (password == null && BotPreferences.user?.password == null) {
+            if (password.isNullOrBlank() && BotPreferences.user?.password == null) {
                 Timber.d("No passwords found, throwing exception, $password, ${BotPreferences.user}")
                 throw e
             }
@@ -122,6 +123,10 @@ object JMusicBot {
     }
 
     private fun tokenValid(): Boolean {
+        if (BotPreferences.authToken != null) {
+            state = MusicBotState.CONNECTED
+            return true
+        }
         return false
 //        try {
 //            BotPreferences.authToken?.let {
@@ -147,10 +152,10 @@ object JMusicBot {
         IllegalStateException::class
     )
     suspend fun register(userName: String? = null) {
-        Timber.d("Registering BotPreferences.user")
+        Timber.d("Registering ${BotPreferences.user}")
         state.serverCheck()
         val credentials = when {
-            (userName != null) -> {
+            (!userName.isNullOrBlank()) -> {
                 BotPreferences.user = User(userName)
                 Credentials.Register(userName)
             }
@@ -158,7 +163,7 @@ object JMusicBot {
             else -> throw IllegalStateException("No username stored or supplied")
         }
         BotPreferences.authToken = JWT(mApiClient.registerUser(credentials).process())
-        Timber.d("Registered BotPreferences.user")
+        Timber.d("Registered ${BotPreferences.user}")
     }
 
     @Throws(
@@ -172,7 +177,7 @@ object JMusicBot {
         Timber.d("Logging in ${BotPreferences.user}")
         state.serverCheck()
         val credentials = when {
-            (userName != null && password != null) -> {
+            (!(userName.isNullOrBlank() || password.isNullOrBlank())) -> {
                 BotPreferences.user = User(userName, password)
                 Credentials.Login(userName, password)
             }
@@ -206,7 +211,13 @@ object JMusicBot {
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     suspend fun enqueue(song: Song) {
         state.connectionCheck()
-        updateQueue(mApiClient.enqueue(song.id, song.provider.id).process())
+        try {
+            val res = mApiClient.enqueue(song.id, song.provider.id).process()
+            updateQueue(res)
+        } catch (e: ServerErrorException) {
+            onConnectionLost(e)
+        }
+
     }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
@@ -265,6 +276,11 @@ object JMusicBot {
         return mQueue
     }
 
+    fun startQueueUpdates() {
+        if (mQueue.hasObservers())
+            mQueueUpdateTimer = timer(period = 500) { updateQueue() }
+    }
+
     fun stopQueueUpdates() {
         if (!mQueue.hasObservers()) {
             mQueueUpdateTimer?.cancel()
@@ -275,6 +291,10 @@ object JMusicBot {
     fun getPlayerState(period: Long = 500): LiveData<PlayerState> {
         if (mPlayerUpdateTimer == null) mPlayerUpdateTimer = timer(period = period) { updatePlayer() }
         return mPlayerState
+    }
+
+    fun startPlayerUpdates() {
+        if (mPlayerState.hasObservers()) mPlayerUpdateTimer = timer(period = 500) { updatePlayer() }
     }
 
     fun stopPlayerUpdates() {
@@ -328,5 +348,7 @@ object JMusicBot {
             }
         }
         connectionChangeListeners.forEach { it.onConnectionRecovered() }
+        startQueueUpdates()
+        startPlayerUpdates()
     }
 }

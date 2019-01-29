@@ -110,7 +110,7 @@ fun MainActivity.showLoginDialog(
             loginDialog.cancel()
         } catch (e: InvalidParametersException) {
             Timber.w(e)
-            this@showLoginDialog.toastLong(R.string.msg_server_error)
+            this@showLoginDialog.toastLong(R.string.msg_password_wrong)
             showLoginDialog(false, userName, password)
             loginDialog.cancel()
         } catch (e: ServerErrorException) {
