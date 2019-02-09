@@ -80,9 +80,14 @@ dependencies {
     implementation(Libs.glide)
     implementation(Libs.moshi)
 
+    implementation("com.louiscad.splitties:splitties-material-colors:${Versions.com_louiscad_splitties}")
+
     implementation(Libs.fastadapter)
-    implementation(Libs.fastadapter_commons)
-    implementation(Libs.fastadapter_extensions)
+    implementation(Libs.fastadapter_extensions_utils)
+    implementation(Libs.fastadapter_extensions_ui)
+    implementation(Libs.fastadapter_extensions_drag)
+    implementation(Libs.fastadapter_extensions_swipe)
+    implementation(Libs.fastadapter_extensions_diff)
     implementation(Libs.aboutlibraries)
 
     implementation(Libs.iconics_core)

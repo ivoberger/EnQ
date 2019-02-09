@@ -28,7 +28,7 @@ object JMusicBot {
             Timber.d("State changed from $field to $newState")
             field = newState
         }
-    private val mWifiManager: WifiManager by lazy { wifiManager }
+    private val mWifiManager: WifiManager? by lazy { wifiManager }
     internal val mMoshi: Moshi by lazy { Moshi.Builder().build() }
 
     private var baseUrl: String? = null
@@ -77,7 +77,7 @@ object JMusicBot {
         Timber.d("Discovering host")
         state = MusicBotState.CONNECTING
         state.job = launch {
-            baseUrl = mWifiManager.discoverHost()
+            baseUrl = mWifiManager?.discoverHost()
             state = if (baseUrl != null) {
                 Timber.d("Found host: $baseUrl")
                 MusicBotState.NEEDS_AUTH
@@ -123,10 +123,10 @@ object JMusicBot {
     }
 
     private fun tokenValid(): Boolean {
-        if (BotPreferences.authToken != null) {
-            state = MusicBotState.CONNECTED
-            return true
-        }
+//        if (BotPreferences.authToken != null) {
+//            state = MusicBotState.CONNECTED
+//            return true
+//        }
         return false
 //        try {
 //            BotPreferences.authToken?.let {

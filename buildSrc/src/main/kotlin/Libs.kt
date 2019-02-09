@@ -67,6 +67,11 @@ object Libs {
 
     /**
      * https://github.com/LouisCAD/Splitties */
+    const val splitties_material_colors: String =
+            "com.louiscad.splitties:splitties-material-colors:" + Versions.com_louiscad_splitties
+
+    /**
+     * https://github.com/LouisCAD/Splitties */
     const val splitties_preferences: String = "com.louiscad.splitties:splitties-preferences:" +
             Versions.com_louiscad_splitties
 
@@ -84,15 +89,20 @@ object Libs {
     const val community_material_typeface: String = "com.mikepenz:community-material-typeface:" +
             Versions.community_material_typeface
 
-    /**
-     * https://github.com/mikepenz/FastAdapter */
-    const val fastadapter_commons: String = "com.mikepenz:fastadapter-commons:" +
-            Versions.fastadapter_commons
+    const val fastadapter_extensions_diff: String = "com.mikepenz:fastadapter-extensions-diff:" +
+            Versions.fastadapter_extensions_diff
 
-    /**
-     * https://github.com/mikepenz/FastAdapter */
-    const val fastadapter_extensions: String = "com.mikepenz:fastadapter-extensions:" +
-            Versions.fastadapter_extensions
+    const val fastadapter_extensions_drag: String = "com.mikepenz:fastadapter-extensions-drag:" +
+            Versions.fastadapter_extensions_drag
+
+    const val fastadapter_extensions_swipe: String = "com.mikepenz:fastadapter-extensions-swipe:" +
+            Versions.fastadapter_extensions_swipe
+
+    const val fastadapter_extensions_ui: String = "com.mikepenz:fastadapter-extensions-ui:" +
+            Versions.fastadapter_extensions_ui
+
+    const val fastadapter_extensions_utils: String = "com.mikepenz:fastadapter-extensions-utils:" +
+            Versions.fastadapter_extensions_utils
 
     /**
      * https://github.com/mikepenz/FastAdapter */

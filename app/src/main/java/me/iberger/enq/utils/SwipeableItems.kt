@@ -5,9 +5,9 @@ import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat.getColor
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.mikepenz.fastadapter_extensions.drag.ItemTouchCallback
-import com.mikepenz.fastadapter_extensions.swipe.SimpleSwipeCallback
-import com.mikepenz.fastadapter_extensions.swipe.SimpleSwipeDragCallback
+import com.mikepenz.fastadapter.drag.ItemTouchCallback
+import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
+import com.mikepenz.fastadapter.swipe_drag.SimpleSwipeDragCallback
 import com.mikepenz.iconics.typeface.IIcon
 import me.iberger.enq.R
 

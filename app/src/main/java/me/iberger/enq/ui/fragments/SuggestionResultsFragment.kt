@@ -5,7 +5,7 @@ import android.view.View
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
-import com.mikepenz.fastadapter_extensions.swipe.SimpleSwipeCallback
+import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
 import kotlinx.android.synthetic.main.fragment_queue.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,7 +55,7 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
 
     override fun itemSwiped(position: Int, direction: Int) {
         mBackgroundScope.launch {
-            val entry = fastItemAdapter.getAdapterItem(position)
+            val entry = resultsAdapter.getAdapterItem(position)
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
                     try {
@@ -65,14 +65,14 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
                         Timber.e("AuthException with reason ${e.reason}")
                         withContext(Dispatchers.Main) {
                             context!!.toastShort(R.string.msg_no_permission)
-                            fastItemAdapter.notifyAdapterItemChanged(position)
+                            fastAdapter.notifyAdapterItemChanged(position)
                         }
                     }
                 }
                 ItemTouchHelper.LEFT -> {
                     changeFavoriteStatus(context!!, entry.song)
                     withContext(Dispatchers.Main) {
-                        fastItemAdapter.notifyAdapterItemChanged(position)
+                        fastAdapter.notifyAdapterItemChanged(position)
                     }
                 }
             }

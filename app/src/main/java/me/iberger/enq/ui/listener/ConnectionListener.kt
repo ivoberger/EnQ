@@ -14,7 +14,7 @@ class ConnectionListener(private val mainActivity: MainActivity) : ConnectionCha
         Timber.w(e)
         MainActivity.connected = false
         GlobalScope.launch(Dispatchers.Main) {
-            mainActivity.main_bottom_navigation.setBackgroundResource(R.color.md_red_500)
+            mainActivity.main_bottom_navigation.setBackgroundResource(R.color.red_500)
         }
     }
 

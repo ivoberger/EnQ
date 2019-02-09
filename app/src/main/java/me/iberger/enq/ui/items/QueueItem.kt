@@ -7,8 +7,9 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
+import com.mikepenz.fastadapter.diff.DiffCallback
+import com.mikepenz.fastadapter.drag.IDraggable
 import com.mikepenz.fastadapter.items.AbstractItem
-import com.mikepenz.fastadapter_extensions.drag.IDraggable
 import com.mikepenz.iconics.IconicsDrawable
 import me.iberger.enq.R
 import me.iberger.enq.ui.MainActivity
@@ -19,11 +20,12 @@ class QueueItem(
     val queueEntry: QueueEntry,
     val song: Song = queueEntry.song
 ) :
-    AbstractItem<QueueItem, QueueItem.ViewHolder>(), IDraggable<QueueItem, QueueItem> {
-    override fun getType(): Int = R.id.queue_entry
+    AbstractItem<QueueItem.ViewHolder>(), IDraggable<QueueItem, QueueItem> {
 
-    override fun getLayoutRes(): Int = R.layout.adapter_queue_entry
+    override val type: Int = R.id.queue_entry
+    override val layoutRes: Int = R.layout.adapter_queue_entry
     override fun getViewHolder(v: View) = ViewHolder(v)
+
     override fun bindView(holder: ViewHolder, payloads: MutableList<Any>) {
         super.bindView(holder, payloads)
         val context = holder.itemView.context
@@ -59,4 +61,25 @@ class QueueItem(
         var txtChosenBy: TextView = view.findViewById(R.id.song_chosen_by)
         var txtDuration: TextView = view.findViewById(R.id.song_duration)
     }
+
+    class QueueDiffCallback : DiffCallback<QueueItem> {
+        override fun areItemsTheSame(oldItem: QueueItem?, newItem: QueueItem?): Boolean {
+            val oldEntry = oldItem?.queueEntry
+            val newEntry = newItem?.queueEntry
+
+            return oldEntry?.song?.id == newEntry?.song?.id && oldEntry?.userName == newEntry?.userName
+        }
+
+        override fun getChangePayload(
+            oldItem: QueueItem?,
+            oldItemPosition: Int,
+            newItem: QueueItem?,
+            newItemPosition: Int
+        ): Any? = null
+
+        override fun areContentsTheSame(oldItem: QueueItem?, newItem: QueueItem?): Boolean =
+            oldItem?.queueEntry == newItem?.queueEntry
+
+    }
+
 }

@@ -66,10 +66,9 @@ class SearchFragment : TabbedSongListFragment(), ConnectionChangeListener {
     override fun initializeTabs() {
         mBackgroundScope.launch {
             mProviderPlugins.await() ?: return@launch
-            mFragmentPagerAdapter =
-                    async {
-                        SearchFragmentPager(childFragmentManager, mProviderPlugins.await()!!)
-                    }
+            mFragmentPagerAdapter = async {
+                SearchFragmentPager(childFragmentManager, mProviderPlugins.await()!!)
+            }
             mUIScope.launch { view_pager.adapter = mFragmentPagerAdapter.await() }
         }
     }

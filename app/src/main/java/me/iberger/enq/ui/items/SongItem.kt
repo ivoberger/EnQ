@@ -9,12 +9,12 @@ import com.mikepenz.fastadapter.items.AbstractItem
 import me.iberger.enq.R
 import me.iberger.jmusicbot.model.Song
 
-open class SongItem(val song: Song) : AbstractItem<SongItem, SongItem.ViewHolder>() {
+open class SongItem(val song: Song) : AbstractItem<SongItem.ViewHolder>() {
 
-    override fun getType(): Int = R.id.queue_entry
-
-    override fun getLayoutRes(): Int = R.layout.adapter_queue_entry
+    override val type: Int = R.id.queue_entry
+    override val layoutRes: Int = R.layout.adapter_queue_entry
     override fun getViewHolder(v: View) = ViewHolder(v)
+
     override fun bindView(holder: ViewHolder, payloads: MutableList<Any>) {
         super.bindView(holder, payloads)
         holder.txtTitle.isSelected = true

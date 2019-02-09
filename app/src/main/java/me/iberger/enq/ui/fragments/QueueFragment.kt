@@ -6,21 +6,21 @@ import androidx.annotation.ContentView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.*
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
-import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter
-import com.mikepenz.fastadapter_extensions.drag.ItemTouchCallback
-import com.mikepenz.fastadapter_extensions.swipe.SimpleSwipeCallback
-import com.mikepenz.fastadapter_extensions.utilities.DragDropUtil
+import com.mikepenz.fastadapter.IAdapter
+import com.mikepenz.fastadapter.adapters.FastItemAdapter
+import com.mikepenz.fastadapter.diff.FastAdapterDiffUtil
+import com.mikepenz.fastadapter.drag.ItemTouchCallback
+import com.mikepenz.fastadapter.listeners.OnLongClickListener
+import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
+import com.mikepenz.fastadapter.utils.DragDropUtil
 import kotlinx.android.synthetic.main.fragment_queue.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import me.iberger.enq.R
 import me.iberger.enq.ui.MainActivity
 import me.iberger.enq.ui.items.QueueItem
-import me.iberger.enq.ui.listener.QueueUpdateCallback
 import me.iberger.enq.ui.viewmodel.QueueViewModel
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.setupSwipeDragActions
@@ -28,7 +28,6 @@ import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.KEY_QUEUE
 import me.iberger.jmusicbot.exceptions.AuthException
-import me.iberger.jmusicbot.model.QueueEntry
 import timber.log.Timber
 
 @ContentView(R.layout.fragment_queue)
@@ -41,32 +40,38 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
     private val mUIScope = CoroutineScope(Dispatchers.Main)
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
-    private val diffCallback = object : DiffUtil.ItemCallback<QueueEntry>() {
-        override fun areItemsTheSame(oldItem: QueueEntry, newItem: QueueEntry): Boolean =
-            oldItem.song.id == newItem.song.id && oldItem.userName == newItem.userName
-
-        override fun areContentsTheSame(oldItem: QueueEntry, newItem: QueueEntry): Boolean = oldItem == newItem
-
-    }
-
-    private var mAsyncDiffer: AsyncListDiffer<QueueEntry>? = null
-    private var mQueueUpdateCallback: QueueUpdateCallback? = null
-
     private val mFastItemAdapter: FastItemAdapter<QueueItem> by lazy { FastItemAdapter<QueueItem>() }
+
+    private var moving = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("Creating Queue Fragment")
         super.onCreate(savedInstanceState)
-        mViewModel.queue.observe(this, Observer {
-            mQueueUpdateCallback?.currentList = it
-            mAsyncDiffer?.submitList(it)
-        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mQueueUpdateCallback = QueueUpdateCallback(mFastItemAdapter)
-        mAsyncDiffer = AsyncListDiffer(mQueueUpdateCallback!!, AsyncDifferConfig.Builder(diffCallback).build())
+        mViewModel.queue.observe(this, Observer {
+            if (moving) return@Observer
+            val diff = mBackgroundScope.async {
+                FastAdapterDiffUtil.calculateDiff(
+                    mFastItemAdapter.itemAdapter,
+                    it.map { entry -> QueueItem(entry) },
+                    QueueItem.QueueDiffCallback()
+                )
+            }
+            mUIScope.launch {
+                FastAdapterDiffUtil.set(mFastItemAdapter.itemAdapter, diff.await())
+            }
+        })
+
+        mFastItemAdapter.onLongClickListener = object : OnLongClickListener<QueueItem> {
+            override fun onLongClick(v: View, adapter: IAdapter<QueueItem>, item: QueueItem, position: Int): Boolean {
+                moving = true
+                return true
+            }
+
+        }
 
         queue.layoutManager = LinearLayoutManager(context).apply { reverseLayout = true }
         queue.adapter = mFastItemAdapter
@@ -115,7 +120,7 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
         if (!MainActivity.connected) return
         mBackgroundScope.launch {
             val entry = mFastItemAdapter.getAdapterItem(newPosition).queueEntry
-            Timber.d("Moved $entry from $oldPosition to $newPosition")
+            Timber.d("Moved ${entry.song.title} from $oldPosition to $newPosition")
             try {
                 JMusicBot.moveSong(entry, newPosition)
             } catch (e: Exception) {
@@ -124,6 +129,8 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
                     context?.toastShort(R.string.msg_no_permission)
                     DragDropUtil.onMove(mFastItemAdapter.itemAdapter, newPosition, oldPosition)
                 }
+            } finally {
+                moving = false
             }
         }
     }
