@@ -1,9 +1,8 @@
 package me.iberger.enq.ui.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import androidx.annotation.ContentView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,6 +22,7 @@ import me.iberger.enq.utils.setupSwipeActions
 import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.JMusicBot
 
+@ContentView(R.layout.fragment_queue)
 class FavoritesFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback {
 
     companion object {
@@ -32,13 +32,6 @@ class FavoritesFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback {
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
     private lateinit var mFastItemAdapter: FastItemAdapter<FavoritesItem>
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? =
-        inflater.inflate(R.layout.fragment_queue, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

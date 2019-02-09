@@ -1,9 +1,8 @@
 package me.iberger.enq.ui.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import androidx.annotation.ContentView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -32,6 +31,7 @@ import me.iberger.jmusicbot.exceptions.AuthException
 import me.iberger.jmusicbot.model.QueueEntry
 import timber.log.Timber
 
+@ContentView(R.layout.fragment_queue)
 class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTouchCallback {
     companion object {
         fun newInstance() = QueueFragment()
@@ -62,10 +62,6 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
             mAsyncDiffer?.submitList(it)
         })
     }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_queue, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

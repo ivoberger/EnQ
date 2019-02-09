@@ -2,9 +2,8 @@ package me.iberger.enq.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import androidx.annotation.ContentView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -28,10 +27,10 @@ import me.iberger.jmusicbot.model.PlayerStates
 import me.iberger.jmusicbot.model.Song
 import timber.log.Timber
 
+@ContentView(R.layout.fragment_current_song)
 class CurrentSongFragment : Fragment() {
 
     companion object {
-
         fun newInstance(): CurrentSongFragment = CurrentSongFragment()
     }
 
@@ -71,14 +70,6 @@ class CurrentSongFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mViewModel.playerState.observe(this, Observer { onPlayerStateChanged(it) })
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_current_song, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
