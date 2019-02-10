@@ -14,7 +14,7 @@ class SuggestionsItem(song: Song) : SongItem(song) {
         val context = holder.itemView.context
 
         holder.txtDuration.compoundDrawablePadding = 20
-        if (song in MainActivity.favorites) holder.txtDuration.setCompoundDrawables(
+        if (model in MainActivity.favorites) holder.txtDuration.setCompoundDrawables(
             IconicsDrawable(context, CommunityMaterial.Icon2.cmd_star).color(
                 ContextCompat.getColor(context, R.color.colorAccent)
             ).sizeDp(10), null, null, null

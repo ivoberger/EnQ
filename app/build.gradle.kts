@@ -80,6 +80,7 @@ dependencies {
 
     implementation(Libs.glide)
     implementation(Libs.moshi)
+    implementation(Libs.okio)
 
     implementation(Libs.splitties_material_colors)
 

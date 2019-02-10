@@ -59,7 +59,7 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
                     try {
-                        JMusicBot.deleteSuggestion(mSuggesterId, entry.song)
+                        JMusicBot.deleteSuggestion(mSuggesterId, entry.model)
                         getSuggestions()
                     } catch (e: AuthException) {
                         Timber.e("AuthException with reason ${e.reason}")
@@ -70,7 +70,7 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
                     }
                 }
                 ItemTouchHelper.LEFT -> {
-                    changeFavoriteStatus(context!!, entry.song)
+                    changeFavoriteStatus(context!!, entry.model)
                     withContext(Dispatchers.Main) {
                         fastAdapter.notifyAdapterItemChanged(position)
                     }

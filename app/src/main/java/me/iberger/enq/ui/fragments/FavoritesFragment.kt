@@ -53,19 +53,19 @@ class FavoritesFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback {
             val item = mFastItemAdapter.getAdapterItem(position)
             when (direction) {
                 ItemTouchHelper.LEFT -> {
-                    JMusicBot.enqueue(item.song)
+                    JMusicBot.enqueue(item.model)
                     withContext(Dispatchers.Main) {
                         context!!.toastShort(
                             context!!.getString(
                                 R.string.msg_enqueued,
-                                item.song.title
+                                item.model.title
                             )
                         )
                         mFastItemAdapter.notifyAdapterItemChanged(position)
                     }
                 }
                 ItemTouchHelper.RIGHT -> {
-                    changeFavoriteStatus(context!!, item.song)
+                    changeFavoriteStatus(context!!, item.model)
                     withContext(Dispatchers.Main) {
                         mFastItemAdapter.remove(position)
                     }

@@ -130,6 +130,10 @@ object Libs {
     const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.okhttp
 
     /**
+     * https://github.com/square/okio/ */
+    const val okio: String = "com.squareup.okio:okio:" + Versions.okio
+
+    /**
      * https://github.com/square/retrofit/ */
     const val converter_moshi: String = "com.squareup.retrofit2:converter-moshi:" +
             Versions.com_squareup_retrofit2

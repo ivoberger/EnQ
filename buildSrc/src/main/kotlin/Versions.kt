@@ -61,6 +61,8 @@ object Versions {
 
     const val okhttp: String = "3.13.1" 
 
+    const val okio: String = "2.2.2" 
+
     const val com_squareup_retrofit2: String = "2.5.0" 
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.3.2" 

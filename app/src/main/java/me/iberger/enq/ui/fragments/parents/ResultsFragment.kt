@@ -43,13 +43,13 @@ open class ResultsFragment : Fragment() {
             override fun onClick(v: View?, adapter: IAdapter<SongItem>, item: SongItem, position: Int): Boolean {
                 if (!MainActivity.connected) return false
                 mBackgroundScope.launch {
-                    JMusicBot.enqueue(item.song)
+                    JMusicBot.enqueue(item.model)
                     withContext(Dispatchers.Main) {
                         resultsAdapter.remove(position)
                         context!!.toastShort(
                             context!!.getString(
                                 R.string.msg_enqueued,
-                                item.song.title
+                                item.model.title
                             )
                         )
                     }

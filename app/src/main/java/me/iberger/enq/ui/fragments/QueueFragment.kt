@@ -81,7 +81,7 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
         val diff = FastAdapterDiffUtil.calculateDiff(
             mFastItemAdapter.itemAdapter,
             newQueue.map { QueueItem(it) },
-            QueueItem.QueueDiffCallback()
+            QueueItem.DiffCallback()
         )
         withContext(mUIScope.coroutineContext) { FastAdapterDiffUtil.set(mFastItemAdapter.itemAdapter, diff) }
     }
@@ -121,7 +121,7 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
     override fun itemTouchDropped(oldPosition: Int, newPosition: Int) {
         if (!MainActivity.connected) return
         mBackgroundScope.launch {
-            val entry = mFastItemAdapter.getAdapterItem(newPosition).queueEntry
+            val entry = mFastItemAdapter.getAdapterItem(newPosition).model
             Timber.d("Moved ${entry.song.title} from $oldPosition to $newPosition")
             try {
                 JMusicBot.moveSong(entry, newPosition)
