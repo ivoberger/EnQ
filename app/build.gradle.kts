@@ -68,6 +68,7 @@ dependencies {
     implementation(Libs.fragment_ktx)
     // appcompat, arch components etc.
     implementation(Libs.appcompat)
+    implementation(Libs.recyclerview)
     implementation(Libs.lifecycle_extensions)
     implementation(Libs.constraintlayout)
     implementation(Libs.material)
@@ -80,7 +81,7 @@ dependencies {
     implementation(Libs.glide)
     implementation(Libs.moshi)
 
-    implementation("com.louiscad.splitties:splitties-material-colors:${Versions.com_louiscad_splitties}")
+    implementation(Libs.splitties_material_colors)
 
     implementation(Libs.fastadapter)
     implementation(Libs.fastadapter_extensions_utils)

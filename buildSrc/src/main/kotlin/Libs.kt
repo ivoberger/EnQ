@@ -29,6 +29,10 @@ object Libs {
             Versions.lifecycle_extensions
 
     /**
+     * http://developer.android.com/tools/extras/support-library.html */
+    const val recyclerview: String = "androidx.recyclerview:recyclerview:" + Versions.recyclerview
+
+    /**
      * https://developer.android.com/studio */
     const val com_android_tools_build_gradle: String = "com.android.tools.build:gradle:" +
             Versions.com_android_tools_build_gradle

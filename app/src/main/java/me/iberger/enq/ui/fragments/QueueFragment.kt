@@ -17,7 +17,10 @@ import com.mikepenz.fastadapter.listeners.OnLongClickListener
 import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
 import com.mikepenz.fastadapter.utils.DragDropUtil
 import kotlinx.android.synthetic.main.fragment_queue.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.iberger.enq.R
 import me.iberger.enq.ui.MainActivity
 import me.iberger.enq.ui.items.QueueItem
@@ -28,6 +31,7 @@ import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.KEY_QUEUE
 import me.iberger.jmusicbot.exceptions.AuthException
+import me.iberger.jmusicbot.model.QueueEntry
 import timber.log.Timber
 
 @ContentView(R.layout.fragment_queue)
@@ -40,9 +44,8 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
     private val mUIScope = CoroutineScope(Dispatchers.Main)
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
+    private var mQueue = listOf<QueueEntry>()
     private val mFastItemAdapter: FastItemAdapter<QueueItem> by lazy { FastItemAdapter<QueueItem>() }
-
-    private var moving = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("Creating Queue Fragment")
@@ -51,27 +54,7 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mViewModel.queue.observe(this, Observer {
-            if (moving) return@Observer
-            val diff = mBackgroundScope.async {
-                FastAdapterDiffUtil.calculateDiff(
-                    mFastItemAdapter.itemAdapter,
-                    it.map { entry -> QueueItem(entry) },
-                    QueueItem.QueueDiffCallback()
-                )
-            }
-            mUIScope.launch {
-                FastAdapterDiffUtil.set(mFastItemAdapter.itemAdapter, diff.await())
-            }
-        })
-
-        mFastItemAdapter.onLongClickListener = object : OnLongClickListener<QueueItem> {
-            override fun onLongClick(v: View, adapter: IAdapter<QueueItem>, item: QueueItem, position: Int): Boolean {
-                moving = true
-                return true
-            }
-
-        }
+        mViewModel.queue.observe(this, Observer { updateQueue(it) })
 
         queue.layoutManager = LinearLayoutManager(context).apply { reverseLayout = true }
         queue.adapter = mFastItemAdapter
@@ -82,6 +65,25 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
             CommunityMaterial.Icon2.cmd_star, R.color.favorites,
             CommunityMaterial.Icon.cmd_delete, R.color.delete
         )
+
+        mFastItemAdapter.onLongClickListener = object : OnLongClickListener<QueueItem> {
+            override fun onLongClick(v: View, adapter: IAdapter<QueueItem>, item: QueueItem, position: Int): Boolean {
+                mViewModel.queue.removeObservers(this@QueueFragment)
+                return true
+            }
+        }
+    }
+
+    private fun updateQueue(newQueue: List<QueueEntry>) = mBackgroundScope.launch {
+        if (newQueue == mQueue) return@launch
+        Timber.d("Updating Queue")
+        mQueue = newQueue
+        val diff = FastAdapterDiffUtil.calculateDiff(
+            mFastItemAdapter.itemAdapter,
+            newQueue.map { QueueItem(it) },
+            QueueItem.QueueDiffCallback()
+        )
+        withContext(mUIScope.coroutineContext) { FastAdapterDiffUtil.set(mFastItemAdapter.itemAdapter, diff) }
     }
 
     override fun itemSwiped(position: Int, direction: Int) {
@@ -127,10 +129,13 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
                 Timber.e(e)
                 mUIScope.launch {
                     context?.toastShort(R.string.msg_no_permission)
-                    DragDropUtil.onMove(mFastItemAdapter.itemAdapter, newPosition, oldPosition)
                 }
             } finally {
-                moving = false
+                withContext(mUIScope.coroutineContext) {
+                    mViewModel.queue.observe(
+                        this@QueueFragment,
+                        Observer { updateQueue(it) })
+                }
             }
         }
     }

@@ -25,6 +25,7 @@ class QueueItem(
     override val type: Int = R.id.queue_entry
     override val layoutRes: Int = R.layout.adapter_queue_entry
     override fun getViewHolder(v: View) = ViewHolder(v)
+    private var isDraggable = true
 
     override fun bindView(holder: ViewHolder, payloads: MutableList<Any>) {
         super.bindView(holder, payloads)
@@ -50,9 +51,12 @@ class QueueItem(
         )
     }
 
-    override fun withIsDraggable(draggable: Boolean): QueueItem = this
+    override fun withIsDraggable(draggable: Boolean): QueueItem {
+        isDraggable = draggable
+        return this
+    }
 
-    override fun isDraggable(): Boolean = true
+    override fun isDraggable(): Boolean = isDraggable
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var imgAlbumArt: ImageView = view.findViewById(R.id.song_album_art)
@@ -63,19 +67,16 @@ class QueueItem(
     }
 
     class QueueDiffCallback : DiffCallback<QueueItem> {
+        override fun getChangePayload(
+            oldItem: QueueItem?, oldItemPosition: Int, newItem: QueueItem?, newItemPosition: Int
+        ): Any? = null
+
         override fun areItemsTheSame(oldItem: QueueItem?, newItem: QueueItem?): Boolean {
             val oldEntry = oldItem?.queueEntry
             val newEntry = newItem?.queueEntry
 
             return oldEntry?.song?.id == newEntry?.song?.id && oldEntry?.userName == newEntry?.userName
         }
-
-        override fun getChangePayload(
-            oldItem: QueueItem?,
-            oldItemPosition: Int,
-            newItem: QueueItem?,
-            newItemPosition: Int
-        ): Any? = null
 
         override fun areContentsTheSame(oldItem: QueueItem?, newItem: QueueItem?): Boolean =
             oldItem?.queueEntry == newItem?.queueEntry

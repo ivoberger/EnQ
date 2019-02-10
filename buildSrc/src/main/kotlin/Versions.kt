@@ -17,6 +17,8 @@ object Versions {
 
     const val lifecycle_extensions: String = "2.0.0" 
 
+    const val recyclerview: String = "1.1.0-alpha02" 
+
     const val com_android_tools_build_gradle: String = "3.5.0-alpha03" 
 
     const val lint_gradle: String = "26.5.0-alpha03" 
@@ -81,7 +83,7 @@ object Versions {
 
         const val currentVersion: String = "5.2.1"
 
-        const val nightlyVersion: String = "5.3-20190209000057+0000"
+        const val nightlyVersion: String = "5.3-20190210000045+0000"
 
         const val releaseCandidate: String = ""
     }
