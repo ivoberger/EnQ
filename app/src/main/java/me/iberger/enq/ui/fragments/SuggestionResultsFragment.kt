@@ -6,13 +6,13 @@ import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
+import com.mikepenz.fastadapter.ui.items.ProgressItem
 import kotlinx.android.synthetic.main.fragment_queue.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.iberger.enq.R
 import me.iberger.enq.ui.fragments.parents.ResultsFragment
-import me.iberger.enq.ui.items.SuggestionsItem
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.setupSwipeActions
 import me.iberger.enq.utils.toastShort
@@ -46,11 +46,11 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
             CommunityMaterial.Icon2.cmd_star, R.color.favorites,
             CommunityMaterial.Icon.cmd_delete, R.color.delete
         )
+        loadingHeader.add(ProgressItem())
     }
 
     private fun getSuggestions() = mBackgroundScope.launch {
-        val results = JMusicBot.suggestions(mSuggesterId)
-        super.displayResults(results.map { SuggestionsItem(it) })
+        super.displayResults(JMusicBot.suggestions(mSuggesterId))
     }
 
     override fun itemSwiped(position: Int, direction: Int) {
