@@ -30,6 +30,11 @@ object Libs {
 
     /**
      * http://developer.android.com/tools/extras/support-library.html */
+    const val preference_ktx: String = "androidx.preference:preference-ktx:" +
+            Versions.preference_ktx
+
+    /**
+     * http://developer.android.com/tools/extras/support-library.html */
     const val recyclerview: String = "androidx.recyclerview:recyclerview:" + Versions.recyclerview
 
     /**

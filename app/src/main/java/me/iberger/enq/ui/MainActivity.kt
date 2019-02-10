@@ -18,10 +18,11 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import me.iberger.enq.BuildConfig
 import me.iberger.enq.R
-import me.iberger.enq.backend.Configuration
+import me.iberger.enq.persistence.Configuration
 import me.iberger.enq.ui.fragments.CurrentSongFragment
 import me.iberger.enq.ui.fragments.QueueFragment
 import me.iberger.enq.ui.fragments.SearchFragment
+import me.iberger.enq.ui.fragments.SettingsFragment
 import me.iberger.enq.ui.listener.ConnectionListener
 import me.iberger.enq.ui.listener.MainNavigationListener
 import me.iberger.enq.utils.loadFavorites
@@ -161,6 +162,10 @@ class MainActivity : AppCompatActivity() {
                     activityTitle = getString(R.string.nav_about)
                     showLicense = true
                 }.start(this)
+                true
+            }
+            R.id.app_bar_settings -> {
+                supportFragmentManager.commit { replace(R.id.main_content, SettingsFragment()) }
                 true
             }
             else -> false

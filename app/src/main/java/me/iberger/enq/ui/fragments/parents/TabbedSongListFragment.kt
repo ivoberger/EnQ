@@ -11,7 +11,7 @@ import androidx.viewpager.widget.ViewPager
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.coroutines.*
 import me.iberger.enq.R
-import me.iberger.enq.backend.Configuration
+import me.iberger.enq.persistence.Configuration
 import me.iberger.enq.ui.MainActivity
 import me.iberger.jmusicbot.listener.ConnectionChangeListener
 import me.iberger.jmusicbot.model.MusicBotPlugin

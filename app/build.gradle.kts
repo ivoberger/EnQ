@@ -34,8 +34,8 @@ android {
             versionNameSuffix = " (debug)"
         }
         getByName("release") {
-            isMinifyEnabled = false
-            isShrinkResources = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
         }
@@ -70,6 +70,7 @@ dependencies {
     implementation(Libs.appcompat)
     implementation(Libs.recyclerview)
     implementation(Libs.lifecycle_extensions)
+    implementation(Libs.preference_ktx)
     implementation(Libs.constraintlayout)
     implementation(Libs.material)
 

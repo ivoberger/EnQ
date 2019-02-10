@@ -17,6 +17,8 @@ object Versions {
 
     const val lifecycle_extensions: String = "2.0.0" 
 
+    const val preference_ktx: String = "1.1.0-alpha03" 
+
     const val recyclerview: String = "1.1.0-alpha02" 
 
     const val com_android_tools_build_gradle: String = "3.5.0-alpha03" 
