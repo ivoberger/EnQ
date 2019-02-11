@@ -86,6 +86,11 @@ object Libs {
 
     /**
      * https://github.com/LouisCAD/Splitties */
+    const val splitties_resources: String = "com.louiscad.splitties:splitties-resources:" +
+            Versions.com_louiscad_splitties
+
+    /**
+     * https://github.com/LouisCAD/Splitties */
     const val splitties_systemservices: String =
             "com.louiscad.splitties:splitties-systemservices:" + Versions.com_louiscad_splitties
 

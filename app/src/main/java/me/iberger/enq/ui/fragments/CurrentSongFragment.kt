@@ -19,12 +19,13 @@ import me.iberger.enq.ui.MainActivity
 import me.iberger.enq.ui.MainActivity.Companion.favorites
 import me.iberger.enq.ui.viewmodel.PlayerViewModel
 import me.iberger.enq.utils.changeFavoriteStatus
-import me.iberger.enq.utils.make
+import me.iberger.enq.utils.icon
 import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.model.PlayerState
 import me.iberger.jmusicbot.model.PlayerStates
 import me.iberger.jmusicbot.model.Song
+import splitties.resources.color
 import timber.log.Timber
 
 @ContentView(R.layout.fragment_current_song)
@@ -54,15 +55,14 @@ class CurrentSongFragment : Fragment() {
         super.onAttach(context)
         // pre-load drawables for player buttons
         mBackgroundScope.launch {
-            val color = R.color.white
-            mPlayDrawable = CommunityMaterial.Icon2.cmd_play.make(context, color)
-            mPauseDrawable = CommunityMaterial.Icon2.cmd_pause.make(context, color)
-            mStoppedDrawable = CommunityMaterial.Icon2.cmd_stop.make(context, color)
-            mSkipDrawable = CommunityMaterial.Icon.cmd_fast_forward.make(context, color)
-            mErrorDrawable = CommunityMaterial.Icon.cmd_alert_circle_outline.make(context, color)
-            mFavoritesAddDrawable = CommunityMaterial.Icon2.cmd_star_outline.make(context, color)
-            mFavoritesDeleteDrawable =
-                    CommunityMaterial.Icon2.cmd_star.make(context, R.color.favorites)
+            val color = color(R.color.white)
+            mPlayDrawable = context.icon(CommunityMaterial.Icon2.cmd_play).color(color)
+            mPauseDrawable = context.icon(CommunityMaterial.Icon2.cmd_pause).color(color)
+            mStoppedDrawable = context.icon(CommunityMaterial.Icon2.cmd_stop).color(color)
+            mSkipDrawable = context.icon(CommunityMaterial.Icon.cmd_fast_forward).color(color)
+            mErrorDrawable = context.icon(CommunityMaterial.Icon.cmd_alert_circle_outline).color(color)
+            mFavoritesAddDrawable = context.icon(CommunityMaterial.Icon2.cmd_star_outline).color(color)
+            mFavoritesDeleteDrawable = context.icon(CommunityMaterial.Icon2.cmd_star).color(color(R.color.favorites))
         }
     }
 

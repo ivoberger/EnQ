@@ -3,17 +3,17 @@ package me.iberger.enq.ui.items
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.fastadapter.drag.IDraggable
 import com.mikepenz.fastadapter.items.ModelAbstractItem
-import com.mikepenz.iconics.IconicsDrawable
 import me.iberger.enq.R
 import me.iberger.enq.ui.MainActivity
+import me.iberger.enq.utils.icon
 import me.iberger.jmusicbot.model.QueueEntry
 import me.iberger.jmusicbot.model.Song
+import splitties.resources.color
 
 class QueueItem(
     queueEntry: QueueEntry,
@@ -44,9 +44,9 @@ class QueueItem(
 
         holder.txtDuration.compoundDrawablePadding = 20
         if (song in MainActivity.favorites) holder.txtDuration.setCompoundDrawables(
-            IconicsDrawable(context, CommunityMaterial.Icon2.cmd_star).color(
-                ContextCompat.getColor(context, R.color.favorites)
-            ).sizeDp(10), null, null, null
+            context.icon(CommunityMaterial.Icon2.cmd_star)
+                .color(context.color(R.color.favorites)).sizeDp(10),
+            null, null, null
         )
     }
 

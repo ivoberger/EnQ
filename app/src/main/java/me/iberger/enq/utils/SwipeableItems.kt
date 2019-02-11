@@ -10,6 +10,7 @@ import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
 import com.mikepenz.fastadapter.swipe_drag.SimpleSwipeDragCallback
 import com.mikepenz.iconics.typeface.IIcon
 import me.iberger.enq.R
+import splitties.resources.color
 
 fun setupSwipeActions(
     context: Context,
@@ -18,8 +19,8 @@ fun setupSwipeActions(
     iconLeft: IIcon, @ColorRes colorLeft: Int,
     iconRight: IIcon, @ColorRes colorRight: Int
 ) {
-    val drawableRight = iconRight.make(context, R.color.white, 24)
-    val drawableLeft = iconLeft.make(context, R.color.white, 24)
+    val drawableRight = context.icon(iconRight).color(context.color(R.color.white)).sizeDp(24)
+    val drawableLeft = context.icon(iconLeft).color(context.color(R.color.white)).sizeDp(24)
     val touchCallback = SimpleSwipeCallback(
         itemSwipeCallback, drawableLeft, ItemTouchHelper.LEFT, getColor(context, colorLeft)
     )
@@ -36,8 +37,8 @@ fun setupSwipeDragActions(
     iconLeft: IIcon, @ColorRes colorLeft: Int,
     iconRight: IIcon, @ColorRes colorRight: Int
 ) {
-    val drawableRight = iconRight.make(context, R.color.white, 24)
-    val drawableLeft = iconLeft.make(context, R.color.white, 24)
+    val drawableRight = context.icon(iconRight).color(context.color(R.color.white)).sizeDp(24)
+    val drawableLeft = context.icon(iconLeft).color(context.color(R.color.white)).sizeDp(24)
     val touchCallback = SimpleSwipeDragCallback(
         itemTouchCallback, itemSwipeCallback,
         drawableLeft, ItemTouchHelper.LEFT, getColor(context, colorLeft)

@@ -25,8 +25,8 @@ import me.iberger.enq.ui.fragments.SearchFragment
 import me.iberger.enq.ui.fragments.SettingsFragment
 import me.iberger.enq.ui.listener.ConnectionListener
 import me.iberger.enq.ui.listener.MainNavigationListener
+import me.iberger.enq.utils.icon
 import me.iberger.enq.utils.loadFavorites
-import me.iberger.enq.utils.make
 import me.iberger.enq.utils.showLoginDialog
 import me.iberger.enq.utils.showServerDiscoveryDialog
 import me.iberger.jmusicbot.JMusicBot
@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
             CommunityMaterial.Icon2.cmd_playlist_play,
             CommunityMaterial.Icon.cmd_all_inclusive,
             CommunityMaterial.Icon2.cmd_star_outline
-        ).map { mBackgroundScope.async { it.make(this@MainActivity) } }
+        ).map { mBackgroundScope.async { icon(it) } }
         mUIScope.launch {
             main_bottom_navigation.menu.forEachIndexed { idx, itm -> itm.icon = icons[idx].await() }
         }

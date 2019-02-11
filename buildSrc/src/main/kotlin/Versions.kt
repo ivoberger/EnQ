@@ -57,7 +57,7 @@ object Versions {
 
     const val fastadapter: String = "4.0.0-beta1" 
 
-    const val iconics_core: String = "3.2.0" // available: "4.0.0-a1"
+    const val iconics_core: String = "3.2.0" // available: "4.0.0-b1"
 
     const val com_squareup_moshi: String = "1.8.0" 
 
@@ -87,7 +87,7 @@ object Versions {
 
         const val currentVersion: String = "5.2.1"
 
-        const val nightlyVersion: String = "5.3-20190210000045+0000"
+        const val nightlyVersion: String = "5.3-20190211022529+0000"
 
         const val releaseCandidate: String = ""
     }

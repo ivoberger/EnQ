@@ -84,6 +84,7 @@ dependencies {
     implementation(Libs.okio)
 
     implementation(Libs.splitties_material_colors)
+    implementation(Libs.splitties_resources)
 
     implementation(Libs.fastadapter)
     implementation(Libs.fastadapter_extensions_utils)
