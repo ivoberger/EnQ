@@ -22,6 +22,7 @@ import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.icon
 import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.JMusicBot
+import me.iberger.jmusicbot.model.Permissions
 import me.iberger.jmusicbot.model.PlayerState
 import me.iberger.jmusicbot.model.PlayerStates
 import me.iberger.jmusicbot.model.Song
@@ -79,6 +80,7 @@ class CurrentSongFragment : Fragment() {
         song_play_pause.setOnClickListener { changePlaybackState() }
         song_favorite.setOnClickListener { addToFavorites() }
         view.setOnClickListener {
+            if (!JMusicBot.userPermissions.contains(Permissions.SKIP)) return@setOnClickListener
             song_play_pause.setImageDrawable(
                 if (mShowSkip) {
                     mShowSkip = false

@@ -123,10 +123,10 @@ object JMusicBot {
     }
 
     private fun tokenValid(): Boolean {
-//        if (BotPreferences.authToken != null) {
-//            state = MusicBotState.CONNECTED
-//            return true
-//        }
+        if (BotPreferences.authToken != null && !BotPreferences.authToken!!.isExpired(60) && user?.password == null) {
+            state = MusicBotState.CONNECTED
+            return true
+        }
         return false
 //        try {
 //            BotPreferences.authToken?.let {

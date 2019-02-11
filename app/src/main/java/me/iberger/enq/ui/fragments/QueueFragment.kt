@@ -15,6 +15,7 @@ import com.mikepenz.fastadapter.diff.FastAdapterDiffUtil
 import com.mikepenz.fastadapter.drag.ItemTouchCallback
 import com.mikepenz.fastadapter.listeners.OnLongClickListener
 import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
+import com.mikepenz.fastadapter.swipe_drag.SimpleSwipeDragCallback
 import com.mikepenz.fastadapter.utils.DragDropUtil
 import kotlinx.android.synthetic.main.fragment_queue.*
 import kotlinx.coroutines.CoroutineScope
@@ -26,12 +27,14 @@ import me.iberger.enq.ui.MainActivity
 import me.iberger.enq.ui.items.QueueItem
 import me.iberger.enq.ui.viewmodel.QueueViewModel
 import me.iberger.enq.utils.changeFavoriteStatus
-import me.iberger.enq.utils.setupSwipeDragActions
+import me.iberger.enq.utils.icon
 import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.KEY_QUEUE
 import me.iberger.jmusicbot.exceptions.AuthException
+import me.iberger.jmusicbot.model.Permissions
 import me.iberger.jmusicbot.model.QueueEntry
+import splitties.resources.color
 import timber.log.Timber
 
 @ContentView(R.layout.fragment_queue)
@@ -60,11 +63,21 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
         queue.adapter = mFastItemAdapter
         savedInstanceState?.also { mFastItemAdapter.withSavedInstanceState(it, KEY_QUEUE) }
 
-        setupSwipeDragActions(
-            context!!, queue, this, this,
-            CommunityMaterial.Icon2.cmd_star, R.color.favorites,
-            CommunityMaterial.Icon.cmd_delete, R.color.delete
-        )
+        val drawableRight =
+            context!!.icon(CommunityMaterial.Icon2.cmd_star).color(context!!.color(R.color.white)).sizeDp(24)
+        val drawableLeft =
+            context!!.icon(CommunityMaterial.Icon.cmd_delete).color(context!!.color(R.color.white)).sizeDp(24)
+        val userPermissions = JMusicBot.userPermissions
+        val touchCallback = if (userPermissions.contains(Permissions.MOVE)) SimpleSwipeDragCallback(
+            this, this,
+            drawableLeft, ItemTouchHelper.LEFT, color(R.color.favorites)
+        ) else SimpleSwipeCallback(this, drawableLeft, ItemTouchHelper.LEFT, color(R.color.favorites))
+        if (userPermissions.contains(Permissions.SKIP)) if (touchCallback is SimpleSwipeCallback)
+            touchCallback.withBackgroundSwipeRight(color(R.color.delete)).withLeaveBehindSwipeRight(drawableRight)
+        else if (touchCallback is SimpleSwipeDragCallback)
+            touchCallback.withBackgroundSwipeRight(color(R.color.delete)).withLeaveBehindSwipeRight(drawableRight)
+
+        ItemTouchHelper(touchCallback).attachToRecyclerView(queue)
 
         mFastItemAdapter.onLongClickListener = object : OnLongClickListener<QueueItem> {
             override fun onLongClick(v: View, adapter: IAdapter<QueueItem>, item: QueueItem, position: Int): Boolean {
