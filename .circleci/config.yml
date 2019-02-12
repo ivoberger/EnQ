@@ -66,6 +66,9 @@ jobs:
           name: Signing Setup
           command: bash .circleci/signing_setup.sh
       - run:
+          name: Sentry Setup
+          command: .circleci/sentry_setup.sh
+      - run:
           name: Bundle release
           command: ./gradlew bundleRelease
       - store_artifacts:
