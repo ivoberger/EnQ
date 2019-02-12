@@ -25,7 +25,7 @@ import kotlinx.coroutines.withContext
 import me.iberger.enq.R
 import me.iberger.enq.ui.MainActivity
 import me.iberger.enq.ui.items.QueueItem
-import me.iberger.enq.ui.viewmodel.QueueViewModel
+import me.iberger.enq.ui.viewmodel.MainViewModel
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.icon
 import me.iberger.enq.utils.toastShort
@@ -43,8 +43,8 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
         fun newInstance() = QueueFragment()
     }
 
-    private val mViewModel by lazy { ViewModelProviders.of(this).get(QueueViewModel::class.java) }
-    private val mUIScope = CoroutineScope(Dispatchers.Main)
+    private val mViewModel by lazy { ViewModelProviders.of(context as MainActivity).get(MainViewModel::class.java) }
+    private val mMainScope = CoroutineScope(Dispatchers.Main)
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
     private var mQueue = listOf<QueueEntry>()
@@ -72,6 +72,7 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
             this, this,
             drawableLeft, ItemTouchHelper.LEFT, color(R.color.favorites)
         ) else SimpleSwipeCallback(this, drawableLeft, ItemTouchHelper.LEFT, color(R.color.favorites))
+
         if (userPermissions.contains(Permissions.SKIP)) if (touchCallback is SimpleSwipeCallback)
             touchCallback.withBackgroundSwipeRight(color(R.color.delete)).withLeaveBehindSwipeRight(drawableRight)
         else if (touchCallback is SimpleSwipeDragCallback)
@@ -96,7 +97,7 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
             newQueue.map { QueueItem(it) },
             QueueItem.DiffCallback()
         )
-        withContext(mUIScope.coroutineContext) { FastAdapterDiffUtil.set(mFastItemAdapter.itemAdapter, diff) }
+        withContext(mMainScope.coroutineContext) { FastAdapterDiffUtil.set(mFastItemAdapter.itemAdapter, diff) }
     }
 
     override fun itemSwiped(position: Int, direction: Int) {
@@ -104,7 +105,7 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
             val entry = mFastItemAdapter.getAdapterItem(position)
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
-                    if (!MainActivity.connected) return@launch
+                    if (!mViewModel.connected) return@launch
                     try {
                         JMusicBot.dequeue(entry.song)
                     } catch (e: AuthException) {
@@ -126,13 +127,13 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
     }
 
     override fun itemTouchOnMove(oldPosition: Int, newPosition: Int): Boolean {
-        if (!MainActivity.connected) return false
+        if (!mViewModel.connected) return false
         DragDropUtil.onMove(mFastItemAdapter.itemAdapter, oldPosition, newPosition)
         return true
     }
 
     override fun itemTouchDropped(oldPosition: Int, newPosition: Int) {
-        if (!MainActivity.connected) return
+        if (!mViewModel.connected) return
         mBackgroundScope.launch {
             val entry = mFastItemAdapter.getAdapterItem(newPosition).model
             Timber.d("Moved ${entry.song.title} from $oldPosition to $newPosition")
@@ -140,11 +141,11 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
                 JMusicBot.moveSong(entry, newPosition)
             } catch (e: Exception) {
                 Timber.e(e)
-                mUIScope.launch {
+                mMainScope.launch {
                     context?.toastShort(R.string.msg_no_permission)
                 }
             } finally {
-                withContext(mUIScope.coroutineContext) {
+                withContext(mMainScope.coroutineContext) {
                     mViewModel.queue.observe(
                         this@QueueFragment,
                         Observer { updateQueue(it) })

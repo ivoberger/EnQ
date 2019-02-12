@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import me.iberger.enq.R
 import me.iberger.enq.ui.MainActivity
 import me.iberger.enq.ui.MainActivity.Companion.favorites
-import me.iberger.enq.ui.viewmodel.PlayerViewModel
+import me.iberger.enq.ui.viewmodel.MainViewModel
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.icon
 import me.iberger.enq.utils.toastShort
@@ -30,15 +30,15 @@ import splitties.resources.color
 import timber.log.Timber
 
 @ContentView(R.layout.fragment_current_song)
-class CurrentSongFragment : Fragment() {
+class PlayerFragment : Fragment() {
 
     companion object {
-        fun newInstance(): CurrentSongFragment = CurrentSongFragment()
+        fun newInstance(): PlayerFragment = PlayerFragment()
     }
 
-    private val mUIScope = CoroutineScope(Dispatchers.Main)
+    private val mMainScope = CoroutineScope(Dispatchers.Main)
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
-    private val mViewModel by lazy { ViewModelProviders.of(this).get(PlayerViewModel::class.java) }
+    private val mViewModel by lazy { ViewModelProviders.of(context as MainActivity).get(MainViewModel::class.java) }
 
     private var mPlayerState: PlayerState = PlayerState(PlayerStates.STOP, null)
     private var mShowSkip = false
@@ -95,13 +95,13 @@ class CurrentSongFragment : Fragment() {
     }
 
     private fun changePlaybackState() = mBackgroundScope.launch {
-        if (!MainActivity.connected) return@launch
+        if (!mViewModel.connected) return@launch
         if (mShowSkip) {
             try {
                 JMusicBot.skip()
             } catch (e: Exception) {
                 Timber.e(e)
-                mUIScope.launch { context?.toastShort(R.string.msg_no_permission) }
+                mMainScope.launch { context?.toastShort(R.string.msg_no_permission) }
             } finally {
                 return@launch
             }
@@ -117,7 +117,7 @@ class CurrentSongFragment : Fragment() {
     private fun addToFavorites() {
         mBackgroundScope.launch {
             changeFavoriteStatus(mPlayerState.songEntry!!.song).join()
-            mUIScope.launch {
+            mMainScope.launch {
                 song_favorite.setImageDrawable(
                     if (mPlayerState.songEntry!!.song in favorites) mFavoritesDeleteDrawable
                     else mFavoritesAddDrawable
@@ -128,7 +128,7 @@ class CurrentSongFragment : Fragment() {
 
     private fun changeFavoriteStatus(song: Song) = mBackgroundScope.launch {
         changeFavoriteStatus(context!!, song)
-        mUIScope.launch {
+        mMainScope.launch {
             song_favorite.setImageDrawable(
                 if (song in favorites) mFavoritesDeleteDrawable
                 else mFavoritesAddDrawable
@@ -139,7 +139,7 @@ class CurrentSongFragment : Fragment() {
 
     fun onPlayerStateChanged(newState: PlayerState) {
         if (newState == mPlayerState || view == null) return
-        mUIScope.launch {
+        mMainScope.launch {
             mPlayerState = newState
             when (newState.state) {
                 PlayerStates.STOP -> {
@@ -169,8 +169,8 @@ class CurrentSongFragment : Fragment() {
             song_title.text = song.title
             song_description.text = song.description
             if (song.albumArtUrl != null)
-                Glide.with(this@CurrentSongFragment).load(song.albumArtUrl).into(song_album_art)
-            else Glide.with(this@CurrentSongFragment).clear(song_album_art)
+                Glide.with(this@PlayerFragment).load(song.albumArtUrl).into(song_album_art)
+            else Glide.with(this@PlayerFragment).clear(song_album_art)
             song.duration?.also {
                 song_duration.text = String.format("%02d:%02d", it / 60, it % 60)
             }

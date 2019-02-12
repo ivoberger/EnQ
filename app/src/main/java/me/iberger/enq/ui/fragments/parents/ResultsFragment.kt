@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.annotation.ContentView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.IAdapter
@@ -20,6 +21,7 @@ import kotlinx.coroutines.withContext
 import me.iberger.enq.R
 import me.iberger.enq.ui.MainActivity
 import me.iberger.enq.ui.items.SongItem
+import me.iberger.enq.ui.viewmodel.MainViewModel
 import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.model.Song
@@ -27,8 +29,9 @@ import me.iberger.jmusicbot.model.Song
 @ContentView(R.layout.fragment_queue)
 open class ResultsFragment : Fragment() {
 
-    val mUIScope = CoroutineScope(Dispatchers.Main)
+    val mMainScope = CoroutineScope(Dispatchers.Main)
     val mBackgroundScope = CoroutineScope(Dispatchers.IO)
+    private val mViewModel by lazy { ViewModelProviders.of(context as MainActivity).get(MainViewModel::class.java) }
 
     val loadingHeader: ItemAdapter<ProgressItem> by lazy { ItemAdapter<ProgressItem>() }
     val resultsAdapter: ModelAdapter<Song, SongItem> by lazy {
@@ -47,7 +50,7 @@ open class ResultsFragment : Fragment() {
 
         fastAdapter.onClickListener = object : OnClickListener<SongItem> {
             override fun onClick(v: View?, adapter: IAdapter<SongItem>, item: SongItem, position: Int): Boolean {
-                if (!MainActivity.connected) return false
+                if (!mViewModel.connected) return false
                 mBackgroundScope.launch {
                     JMusicBot.enqueue(item.model)
                     withContext(Dispatchers.Main) {
@@ -66,7 +69,7 @@ open class ResultsFragment : Fragment() {
     }
 
     fun displayResults(results: List<Song>?) =
-        mUIScope.launch {
+        mMainScope.launch {
             loadingHeader.clear()
             results ?: return@launch
             resultsAdapter.set(results)

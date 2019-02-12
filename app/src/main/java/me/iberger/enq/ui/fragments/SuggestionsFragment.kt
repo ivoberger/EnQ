@@ -34,7 +34,7 @@ class SuggestionsFragment : TabbedSongListFragment() {
                     async {
                         SuggestionsFragmentPager(childFragmentManager, provider)
                     }
-            mUIScope.launch { view_pager.adapter = mFragmentPagerAdapter.await() }
+            mMainScope.launch { view_pager.adapter = mFragmentPagerAdapter.await() }
         }
     }
 

@@ -27,7 +27,7 @@ class SearchResultsFragment : ResultsFragment() {
 
     fun search(query: String) {
         Timber.d("Searching for $query on provider $mProviderID")
-        mUIScope.launch {
+        mMainScope.launch {
             loadingHeader.add(ProgressItem())
             resultsAdapter.clear()
         }

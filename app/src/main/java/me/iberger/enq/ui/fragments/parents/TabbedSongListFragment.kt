@@ -20,7 +20,7 @@ import timber.log.Timber
 @ContentView(R.layout.fragment_search)
 abstract class TabbedSongListFragment : Fragment(), ViewPager.OnPageChangeListener,
     ConnectionChangeListener {
-    val mUIScope = CoroutineScope(Dispatchers.Main)
+    val mMainScope = CoroutineScope(Dispatchers.Main)
 
     val mBackgroundScope = CoroutineScope(Dispatchers.IO)
     lateinit var mProviderPlugins: Deferred<List<MusicBotPlugin>?>
@@ -32,7 +32,7 @@ abstract class TabbedSongListFragment : Fragment(), ViewPager.OnPageChangeListen
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view_pager.addOnPageChangeListener(this)
-        mUIScope.launch {
+        mMainScope.launch {
             if (mSelectedPlugin == null) mSelectedPlugin = mProviderPlugins.await()?.get(0)
             mSelectedPlugin?.let {
                 Timber.d("Setting tab to ${mProviderPlugins.await()!!.indexOf(it)}")

@@ -10,6 +10,7 @@ import androidx.core.view.forEachIndexed
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
+import androidx.lifecycle.ViewModelProviders
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.LibsBuilder
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
@@ -19,12 +20,13 @@ import kotlinx.coroutines.*
 import me.iberger.enq.BuildConfig
 import me.iberger.enq.R
 import me.iberger.enq.persistence.Configuration
-import me.iberger.enq.ui.fragments.CurrentSongFragment
+import me.iberger.enq.ui.fragments.PlayerFragment
 import me.iberger.enq.ui.fragments.QueueFragment
 import me.iberger.enq.ui.fragments.SearchFragment
 import me.iberger.enq.ui.fragments.SettingsFragment
 import me.iberger.enq.ui.listener.ConnectionListener
 import me.iberger.enq.ui.listener.MainNavigationListener
+import me.iberger.enq.ui.viewmodel.MainViewModel
 import me.iberger.enq.utils.icon
 import me.iberger.enq.utils.loadFavorites
 import me.iberger.enq.utils.showLoginDialog
@@ -32,23 +34,22 @@ import me.iberger.enq.utils.showServerDiscoveryDialog
 import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.model.Song
 import me.iberger.timbersentry.SentryTree
+import splitties.resources.colorSL
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        var connected = false
         var favorites: MutableList<Song> = mutableListOf()
         lateinit var config: Configuration
     }
 
     lateinit var optionsMenu: Menu
 
-    private val mUIScope = CoroutineScope(Dispatchers.Main)
+    val mainScope = CoroutineScope(Dispatchers.Main)
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
-    private var mPlayerCollapsed = false
-    private var mBottomNavCollapsed = false
+    private val mViewModel: MainViewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,12 +71,14 @@ class MainActivity : AppCompatActivity() {
             CommunityMaterial.Icon2.cmd_playlist_play,
             CommunityMaterial.Icon.cmd_all_inclusive,
             CommunityMaterial.Icon2.cmd_star_outline
-        ).map { mBackgroundScope.async { icon(it) } }
-        mUIScope.launch {
+        ).map { mBackgroundScope.async { icon(it).color(colorSL(R.color.main_navigation)!!) } }
+        mainScope.launch {
             main_bottom_navigation.menu.forEachIndexed { idx, itm -> itm.icon = icons[idx].await() }
         }
-        JMusicBot.discoverHost()
-        showServerDiscoveryDialog(true)
+        if (!mViewModel.connected) {
+            JMusicBot.discoverHost()
+            showServerDiscoveryDialog(true)
+        }
     }
 
     /**
@@ -87,9 +90,9 @@ class MainActivity : AppCompatActivity() {
      * continueWithBot is called by showLoginDialog after login is complete
      */
     fun continueWithBot() = mBackgroundScope.launch {
-        connected = true
+        mViewModel.connected = true
         JMusicBot.connectionChangeListeners.add((ConnectionListener(this@MainActivity)))
-        val currentSongFragment = CurrentSongFragment.newInstance()
+        val currentSongFragment = PlayerFragment.newInstance()
         supportFragmentManager.commit {
             replace(R.id.main_current_song, currentSongFragment, null)
             replace(R.id.main_content, QueueFragment.newInstance(), null)
@@ -107,14 +110,14 @@ class MainActivity : AppCompatActivity() {
         optionsMenu = menu
         val searchView = menu.findItem(R.id.app_bar_search).actionView as SearchView
 
-        var playerCollapse = mPlayerCollapsed
+        var playerCollapse = mViewModel.playerCollapsed
         // set listener to iconify the SearchView when back is pressed
         val backStackListener = FragmentManager.OnBackStackChangedListener { searchView.isIconified = true }
 
         searchView.setOnSearchClickListener {
-            if (!connected) return@setOnSearchClickListener
+            if (!mViewModel.connected) return@setOnSearchClickListener
             // save player collapse state
-            playerCollapse = mPlayerCollapsed
+            playerCollapse = mViewModel.playerCollapsed
             // collapse bottom UI
             changePlayerCollapse(true, 0)
             changeBottomNavCollapse(true, 0)
@@ -177,9 +180,9 @@ class MainActivity : AppCompatActivity() {
      * @param collapse: specifies if the player should be collapsed
      * @param duration: duration of the animation
      */
-    fun changePlayerCollapse(collapse: Boolean, duration: Long = 1000) = mUIScope.launch {
-        if (mPlayerCollapsed == collapse) return@launch
-        if (!mPlayerCollapsed) {
+    fun changePlayerCollapse(collapse: Boolean, duration: Long = 1000) = mainScope.launch {
+        if (mViewModel.playerCollapsed == collapse) return@launch
+        if (!mViewModel.playerCollapsed) {
             main_current_song.animate().setDuration(duration)
                 .translationYBy(main_current_song.height.toFloat())
                 .withEndAction { main_current_song.visibility = View.GONE }.start()
@@ -188,7 +191,7 @@ class MainActivity : AppCompatActivity() {
                 .translationYBy(-main_current_song.height.toFloat())
                 .withStartAction { main_current_song.visibility = View.VISIBLE }.start()
         }
-        mPlayerCollapsed = collapse
+        mViewModel.playerCollapsed = collapse
     }
 
     /**
@@ -197,9 +200,9 @@ class MainActivity : AppCompatActivity() {
      * @param duration: duration of the animation
      */
     private fun changeBottomNavCollapse(collapse: Boolean, duration: Long = 1000) =
-        mUIScope.launch {
-            if (mBottomNavCollapsed == collapse) return@launch
-            if (!mBottomNavCollapsed) {
+        mainScope.launch {
+            if (mViewModel.bottomNavCollapsed == collapse) return@launch
+            if (!mViewModel.bottomNavCollapsed) {
                 main_bottom_navigation.animate().setDuration(duration)
                     .translationYBy(main_current_song.height.toFloat())
                     .withEndAction { main_bottom_navigation.visibility = View.GONE }.start()
@@ -209,12 +212,12 @@ class MainActivity : AppCompatActivity() {
                     .translationYBy(-main_current_song.height.toFloat())
                     .withStartAction { main_bottom_navigation.visibility = View.VISIBLE }.start()
             }
-            mBottomNavCollapsed = collapse
+            mViewModel.bottomNavCollapsed = collapse
         }
 
     override fun onDestroy() {
         // cancel all running coroutines
-        mUIScope.coroutineContext.cancel()
+        mainScope.coroutineContext.cancel()
         mBackgroundScope.coroutineContext.cancel()
         super.onDestroy()
     }

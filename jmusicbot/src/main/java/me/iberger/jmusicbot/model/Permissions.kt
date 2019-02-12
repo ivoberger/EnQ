@@ -11,8 +11,8 @@ enum class Permissions {
             claims.forEach {
                 if (it.value.asBoolean() == true) when (it.key.toUpperCase()) {
                     MOVE.toString() -> permissions.add(MOVE)
-                    SKIP.toString() -> permissions.add(MOVE)
-                    DISLIKE.toString() -> permissions.add(MOVE)
+                    SKIP.toString() -> permissions.add(SKIP)
+                    DISLIKE.toString() -> permissions.add(DISLIKE)
                 }
             }
             return permissions
