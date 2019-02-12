@@ -71,6 +71,8 @@ dependencies {
     implementation(Libs.recyclerview)
     implementation(Libs.lifecycle_extensions)
     implementation(Libs.preference_ktx)
+    implementation("android.arch.navigation:navigation-fragment-ktx:1.0.0-beta02")
+    implementation("android.arch.navigation:navigation-ui-ktx:1.0.0-beta02")
     implementation(Libs.constraintlayout)
     implementation(Libs.material)
 

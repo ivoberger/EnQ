@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/Queue">
+    <fragment
+        android:id="@+id/Queue"
+        android:name="me.iberger.enq.ui.fragments.QueueFragment"
+        android:label="QueueFragment">
+        <action
+            android:id="@id/nav_suggestions"
+            app:destination="@id/Suggestions" />
+        <action
+            android:id="@id/nav_favorites"
+            app:destination="@id/Favorites" />
+        <action
+            android:id="@+id/nav_search"
+            app:destination="@id/Search" />
+        <action
+            android:id="@+id/nav_settings"
+            app:destination="@id/Settings" />
+    </fragment>
+    <fragment
+        android:id="@+id/Favorites"
+        android:name="me.iberger.enq.ui.fragments.FavoritesFragment"
+        android:label="FavoritesFragment">
+        <action
+            android:id="@+id/nav_settings"
+            app:destination="@id/Settings" />
+        <action
+            android:id="@+id/nav_search"
+            app:destination="@id/Search" />
+        <action
+            android:id="@id/nav_queue"
+            app:destination="@id/Queue" />
+        <action
+            android:id="@id/nav_suggestions"
+            app:destination="@id/Suggestions" />
+    </fragment>
+    <fragment
+        android:id="@+id/Suggestions"
+        android:name="me.iberger.enq.ui.fragments.SuggestionsFragment"
+        android:label="SuggestionsFragment">
+        <action
+            android:id="@id/nav_queue"
+            app:destination="@id/Queue" />
+        <action
+            android:id="@id/nav_favorites"
+            app:destination="@id/Favorites" />
+        <action
+            android:id="@+id/nav_search"
+            app:destination="@id/Search" />
+        <action
+            android:id="@+id/nav_settings"
+            app:destination="@id/Settings" />
+    </fragment>
+    <fragment
+        android:id="@+id/Search"
+        android:name="me.iberger.enq.ui.fragments.SearchFragment"
+        android:label="SearchFragment" />
+    <fragment
+        android:id="@+id/Settings"
+        android:name="me.iberger.enq.ui.fragments.SettingsFragment"
+        android:label="SettingsFragment" />
+</navigation>

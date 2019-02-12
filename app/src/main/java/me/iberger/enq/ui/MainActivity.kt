@@ -7,10 +7,11 @@ import android.view.View
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.forEachIndexed
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.setupWithNavController
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.LibsBuilder
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
@@ -22,8 +23,6 @@ import me.iberger.enq.R
 import me.iberger.enq.persistence.Configuration
 import me.iberger.enq.ui.fragments.PlayerFragment
 import me.iberger.enq.ui.fragments.QueueFragment
-import me.iberger.enq.ui.fragments.SearchFragment
-import me.iberger.enq.ui.fragments.SettingsFragment
 import me.iberger.enq.ui.listener.ConnectionListener
 import me.iberger.enq.ui.listener.MainNavigationListener
 import me.iberger.enq.ui.viewmodel.MainViewModel
@@ -50,6 +49,7 @@ class MainActivity : AppCompatActivity() {
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
     private val mViewModel: MainViewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
+    private val mNavController: NavController by lazy { main_content.findNavController() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,9 +63,9 @@ class MainActivity : AppCompatActivity() {
             favorites = loadFavorites(this@MainActivity)
             config = Configuration(this@MainActivity)
         }
-        // setup main bottom navigation
-        main_bottom_navigation.setOnNavigationItemSelectedListener(MainNavigationListener(this))
 
+        mNavController.addOnDestinationChangedListener(MainNavigationListener(this))
+        main_bottom_navigation.setupWithNavController(mNavController)
         // load bottom navigation icons async
         val icons = listOf<IIcon>(
             CommunityMaterial.Icon2.cmd_playlist_play,
@@ -112,39 +112,29 @@ class MainActivity : AppCompatActivity() {
 
         var playerCollapse = mViewModel.playerCollapsed
         // set listener to iconify the SearchView when back is pressed
-        val backStackListener = FragmentManager.OnBackStackChangedListener { searchView.isIconified = true }
+        val backStackListener = NavController.OnDestinationChangedListener { _, dest, _ ->
+            if (dest.id != R.id.Search && !searchView.isIconified) searchView.isIconified = true
+        }
 
         searchView.setOnSearchClickListener {
             if (!mViewModel.connected) return@setOnSearchClickListener
+            mNavController.navigate(R.id.Search)
             // save player collapse state
             playerCollapse = mViewModel.playerCollapsed
             // collapse bottom UI
             changePlayerCollapse(true, 0)
             changeBottomNavCollapse(true, 0)
-            supportFragmentManager.commit {
-                // hide current fragment (always at 1 as 0 ist the player)
-                hide(supportFragmentManager.fragments[1])
-                // add search fragment with transition
-                add(R.id.main_content, SearchFragment.newInstance())
-                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                addToBackStack(null)
-            }
             // execute transactions and set listener afterwards
             supportFragmentManager.executePendingTransactions()
-            supportFragmentManager.addOnBackStackChangedListener(backStackListener)
+            mNavController.addOnDestinationChangedListener(backStackListener)
         }
         searchView.setOnCloseListener {
             // un-collapse bottom UI
             changeBottomNavCollapse(false)
             changePlayerCollapse(playerCollapse)
             // remove search fragment
-            supportFragmentManager.popBackStack()
-            supportFragmentManager.commit {
-                // show previous fragment again
-                show(supportFragmentManager.fragments[1])
-                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-            }
-            supportFragmentManager.removeOnBackStackChangedListener(backStackListener)
+            mNavController.navigateUp()
+            mNavController.removeOnDestinationChangedListener(backStackListener)
             return@setOnCloseListener false
         }
         return true
@@ -167,8 +157,10 @@ class MainActivity : AppCompatActivity() {
                 }.start(this)
                 true
             }
+
+            R.id.app_bar_search -> false
             R.id.app_bar_settings -> {
-                supportFragmentManager.commit { replace(R.id.main_content, SettingsFragment()) }
+                mNavController.navigate(R.id.Settings)
                 true
             }
             else -> false

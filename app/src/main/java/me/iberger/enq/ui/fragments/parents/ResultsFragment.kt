@@ -45,8 +45,8 @@ open class ResultsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         fastAdapter = FastAdapter.with(listOf(loadingHeader, resultsAdapter))
 
-        queue.layoutManager = LinearLayoutManager(context)
-        queue.adapter = fastAdapter
+        Queue.layoutManager = LinearLayoutManager(context)
+        Queue.adapter = fastAdapter
 
         fastAdapter.onClickListener = object : OnClickListener<SongItem> {
             override fun onClick(v: View?, adapter: IAdapter<SongItem>, item: SongItem, position: Int): Boolean {

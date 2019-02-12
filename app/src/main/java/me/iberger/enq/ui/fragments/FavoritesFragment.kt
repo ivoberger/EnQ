@@ -36,13 +36,13 @@ class FavoritesFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mFastItemAdapter = FastItemAdapter()
-        queue.layoutManager = LinearLayoutManager(context)
-        queue.adapter = mFastItemAdapter
+        Queue.layoutManager = LinearLayoutManager(context)
+        Queue.adapter = mFastItemAdapter
         val favorites = loadFavorites(context!!)
         mFastItemAdapter.add(favorites.map { FavoritesItem(it) })
 
         setupSwipeActions(
-            context!!, queue, this,
+            context!!, Queue, this,
             CommunityMaterial.Icon2.cmd_plus, R.color.enqueue,
             CommunityMaterial.Icon.cmd_delete, R.color.delete
         )

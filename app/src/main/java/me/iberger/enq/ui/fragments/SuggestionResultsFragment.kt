@@ -42,7 +42,7 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
         Timber.d("Getting suggestions for suggester $mSuggesterId")
         getSuggestions()
         setupSwipeActions(
-            context!!, queue, this,
+            context!!, Queue, this,
             CommunityMaterial.Icon2.cmd_star, R.color.favorites,
             CommunityMaterial.Icon.cmd_delete, R.color.delete
         )
