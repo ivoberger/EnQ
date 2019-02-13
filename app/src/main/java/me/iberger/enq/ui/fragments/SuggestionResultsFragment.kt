@@ -19,6 +19,7 @@ import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.KEY_SUGGESTER_ID
 import me.iberger.jmusicbot.exceptions.AuthException
+import me.iberger.jmusicbot.model.Permissions
 import timber.log.Timber
 
 class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwipeCallback {
@@ -41,10 +42,11 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
         super.onViewCreated(view, savedInstanceState)
         Timber.d("Getting suggestions for suggester $mSuggesterId")
         getSuggestions()
+        val canDisklike = JMusicBot.userPermissions.contains(Permissions.DISLIKE)
         setupSwipeActions(
             context!!, Queue, this,
             CommunityMaterial.Icon2.cmd_star, R.color.favorites,
-            CommunityMaterial.Icon.cmd_delete, R.color.delete
+            if (canDisklike) CommunityMaterial.Icon.cmd_delete else null, R.color.delete
         )
         loadingHeader.add(ProgressItem())
     }
