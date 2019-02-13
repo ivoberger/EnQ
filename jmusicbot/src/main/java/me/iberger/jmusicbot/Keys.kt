@@ -1,7 +1,7 @@
 package me.iberger.jmusicbot
 
 const val KEY_AUTHORIZATION = "Authorization"
-const val KEY_PREFERENCES = "musicBotPreferences"
+internal const val KEY_PREFERENCES = "musicBotPreferences"
 
 const val KEY_PROVIDER_ID = "providerId"
 const val KEY_SONG_ID = "songId"

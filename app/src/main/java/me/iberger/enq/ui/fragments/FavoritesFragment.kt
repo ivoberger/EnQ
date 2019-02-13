@@ -1,15 +1,14 @@
 package me.iberger.enq.ui.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import androidx.annotation.ContentView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
-import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter
-import com.mikepenz.fastadapter_extensions.swipe.SimpleSwipeCallback
+import com.mikepenz.fastadapter.adapters.FastItemAdapter
+import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
 import kotlinx.android.synthetic.main.fragment_queue.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +22,7 @@ import me.iberger.enq.utils.setupSwipeActions
 import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.JMusicBot
 
+@ContentView(R.layout.fragment_queue)
 class FavoritesFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback {
 
     companion object {
@@ -33,23 +33,16 @@ class FavoritesFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback {
 
     private lateinit var mFastItemAdapter: FastItemAdapter<FavoritesItem>
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? =
-        inflater.inflate(R.layout.fragment_queue, container, false)
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mFastItemAdapter = FastItemAdapter()
-        queue.layoutManager = LinearLayoutManager(context)
-        queue.adapter = mFastItemAdapter
+        Queue.layoutManager = LinearLayoutManager(context)
+        Queue.adapter = mFastItemAdapter
         val favorites = loadFavorites(context!!)
         mFastItemAdapter.add(favorites.map { FavoritesItem(it) })
 
         setupSwipeActions(
-            context!!, queue, this,
+            context!!, Queue, this,
             CommunityMaterial.Icon2.cmd_plus, R.color.enqueue,
             CommunityMaterial.Icon.cmd_delete, R.color.delete
         )
@@ -60,19 +53,19 @@ class FavoritesFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback {
             val item = mFastItemAdapter.getAdapterItem(position)
             when (direction) {
                 ItemTouchHelper.LEFT -> {
-                    JMusicBot.enqueue(item.song)
+                    JMusicBot.enqueue(item.model)
                     withContext(Dispatchers.Main) {
                         context!!.toastShort(
                             context!!.getString(
                                 R.string.msg_enqueued,
-                                item.song.title
+                                item.model.title
                             )
                         )
                         mFastItemAdapter.notifyAdapterItemChanged(position)
                     }
                 }
                 ItemTouchHelper.RIGHT -> {
-                    changeFavoriteStatus(context!!, item.song)
+                    changeFavoriteStatus(context!!, item.model)
                     withContext(Dispatchers.Main) {
                         mFastItemAdapter.remove(position)
                     }

@@ -1,10 +1,8 @@
 package me.iberger.enq.ui.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.SearchView
+import androidx.annotation.ContentView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import kotlinx.android.synthetic.main.fragment_search.*
@@ -19,6 +17,7 @@ import me.iberger.jmusicbot.listener.ConnectionChangeListener
 import me.iberger.jmusicbot.model.MusicBotPlugin
 import timber.log.Timber
 
+@ContentView(R.layout.fragment_search)
 class SearchFragment : TabbedSongListFragment(), ConnectionChangeListener {
 
     companion object {
@@ -64,21 +63,13 @@ class SearchFragment : TabbedSongListFragment(), ConnectionChangeListener {
         })
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? =
-        inflater.inflate(R.layout.fragment_search, container, false)
-
     override fun initializeTabs() {
         mBackgroundScope.launch {
             mProviderPlugins.await() ?: return@launch
-            mFragmentPagerAdapter =
-                    async {
-                        SearchFragmentPager(childFragmentManager, mProviderPlugins.await()!!)
-                    }
-            mUIScope.launch { view_pager.adapter = mFragmentPagerAdapter.await() }
+            mFragmentPagerAdapter = async {
+                SearchFragmentPager(childFragmentManager, mProviderPlugins.await()!!)
+            }
+            mMainScope.launch { view_pager.adapter = mFragmentPagerAdapter.await() }
         }
     }
 

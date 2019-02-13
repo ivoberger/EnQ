@@ -1,22 +1,16 @@
 package me.iberger.jmusicbot
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.net.wifi.WifiManager
-import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.auth0.android.jwt.JWT
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.*
-import me.iberger.jmusicbot.exceptions.AuthException
-import me.iberger.jmusicbot.exceptions.InvalidParametersException
-import me.iberger.jmusicbot.exceptions.NotFoundException
-import me.iberger.jmusicbot.exceptions.ServerErrorException
+import me.iberger.jmusicbot.exceptions.*
 import me.iberger.jmusicbot.listener.ConnectionChangeListener
 import me.iberger.jmusicbot.model.*
 import me.iberger.jmusicbot.network.MusicBotAPI
-import me.iberger.jmusicbot.network.TokenAuthenticator
 import me.iberger.jmusicbot.network.discoverHost
 import me.iberger.jmusicbot.network.process
 import okhttp3.OkHttpClient
@@ -29,15 +23,13 @@ import kotlin.concurrent.timer
 
 
 object JMusicBot {
-    var state: MusicBotState = MusicBotState.NEEDS_INIT
+    var state: MusicBotState = MusicBotState.DISCONNECTED
         set(newState) {
             Timber.d("State changed from $field to $newState")
             field = newState
         }
-
-    private lateinit var mPreferences: SharedPreferences
-    private val mWifiManager: WifiManager by lazy { wifiManager }
-    private val mMoshi: Moshi by lazy { Moshi.Builder().build() }
+    private val mWifiManager: WifiManager? by lazy { wifiManager }
+    internal val mMoshi: Moshi by lazy { Moshi.Builder().build() }
 
     private var baseUrl: String? = null
         set(value) {
@@ -45,9 +37,10 @@ object JMusicBot {
             value?.let { mRetrofit = mRetrofit.newBuilder().baseUrl(it).build() }
         }
 
-    private var mOkHttpClient: OkHttpClient = OkHttpClient.Builder().cache(null).build()
+    internal var mOkHttpClient: OkHttpClient = OkHttpClient.Builder().cache(null).build()
         set(value) {
             field = value
+            // rebuild retrofit with new okHttpClient
             mRetrofit = mRetrofit.newBuilder().client(value).build()
         }
 
@@ -64,51 +57,27 @@ object JMusicBot {
         }
 
     private var mApiClient: MusicBotAPI = mRetrofit.create(MusicBotAPI::class.java)
+
     val connectionChangeListeners: MutableList<ConnectionChangeListener> = mutableListOf()
 
-    var user: User? = null
-        get() = if (state.isInitialized() && mPreferences.contains(KEY_USER)) User.load(mPreferences, mMoshi)
-        else field
-        set(newUser) {
-            if (state.isInitialized()) newUser?.save(mPreferences, mMoshi)
-            field = newUser
-        }
-
-    var authToken: String? = null
-        get() = if (state.isInitialized()) mPreferences.getString(KEY_AUTHORIZATION, field) else field
-        set(newToken) {
-            if (state.isInitialized()) mPreferences.edit { putString(KEY_AUTHORIZATION, newToken) }
-            field = newToken
-            // rebuild networking client if new token is not null
-            newToken?.let {
-                Timber.d("Setting new token")
-                mOkHttpClient = mOkHttpClient.newBuilder().addInterceptor { chain ->
-                    chain.proceed(chain.request().newBuilder().addHeader(KEY_AUTHORIZATION, it).build())
-                }
-                    .authenticator(TokenAuthenticator()).build()
-            }
-        }
-
     private val mQueue: MutableLiveData<List<QueueEntry>> = MutableLiveData()
-    private val mPlayerState: MutableLiveData<PlayerState> = MutableLiveData()
 
+    private val mPlayerState: MutableLiveData<PlayerState> = MutableLiveData()
     private var mQueueUpdateTimer: Timer? = null
     private var mPlayerUpdateTimer: Timer? = null
 
-    fun init(context: Context, startAutoDiscover: Boolean = true) {
-        Timber.d("Initializing MusicBot")
-        mPreferences = context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE)
-//        mPreferences.edit().remove(KEY_AUTHORIZATION).apply()
-        state = MusicBotState.DISCONNECTED
-        if (startAutoDiscover) discoverHost()
-        Timber.d("MusicBot successfully initialized")
-    }
+    var user: User?
+        get() = BotPreferences.user
+        set(value) {
+            BotPreferences.user = value
+        }
+    val userPermissions: MutableList<Permissions> = mutableListOf()
 
     fun discoverHost() = GlobalScope.launch {
         Timber.d("Discovering host")
         state = MusicBotState.CONNECTING
         state.job = launch {
-            baseUrl = mWifiManager.discoverHost()
+            baseUrl = mWifiManager?.discoverHost()
             state = if (baseUrl != null) {
                 Timber.d("Found host: $baseUrl")
                 MusicBotState.NEEDS_AUTH
@@ -120,39 +89,59 @@ object JMusicBot {
 
     }
 
-    suspend fun authorize(userName: String? = null, password: String? = null): Boolean {
+    @Throws(
+        InvalidParametersException::class,
+        NotFoundException::class,
+        ServerErrorException::class,
+        IllegalStateException::class
+    )
+    suspend fun authorize(userName: String? = null, password: String? = null) {
         state.serverCheck()
         Timber.d("Starting authorization")
-        if (tokenValid()) return true
+        if (tokenValid()) return
         try {
             register(userName)
-            password?.let { changePassword(it) }
-            if (tokenValid()) return true
-        } catch (e: Exception) {
+            if (!password.isNullOrBlank()) changePassword(password)
+            state = MusicBotState.CONNECTED
+            return
+        } catch (e: UsernameTakenException) {
             Timber.w(e)
+            if (password.isNullOrBlank() && BotPreferences.user?.password == null) {
+                Timber.d("No passwords found, throwing exception, $password, ${BotPreferences.user}")
+                throw e
+            }
         }
         try {
             login(userName, password)
-            if (tokenValid()) return true
+            if (tokenValid()) return
         } catch (e: Exception) {
             Timber.w(e)
+            Timber.d("Authorization failed")
+            throw e
         }
-        Timber.d("Authorization failed")
-        return false
+        state = MusicBotState.CONNECTED
     }
 
-    private suspend fun tokenValid(): Boolean {
-        try {
-            authToken?.let { mApiClient.testToken(it).process() }
-        } catch (e: Exception) {
-            if (e !is AuthException) {
-                Timber.d("Valid Token")
-                state = MusicBotState.CONNECTED
-                return true
-            } else Timber.w(e.localizedMessage)
+    private fun tokenValid(): Boolean {
+        if (BotPreferences.authToken != null && !BotPreferences.authToken!!.isExpired(60) && user?.password == null) {
+            state = MusicBotState.CONNECTED
+            return true
         }
-        Timber.d("Invalid Token")
         return false
+//        try {
+//            BotPreferences.authToken?.let {
+//                if (it.isExpired(60)) return false
+//                mApiClient.testToken(it.toString()).process()
+//            }
+//        } catch (e: Exception) {
+//            if (e !is AuthException && e !is ServerErrorException) {
+//                Timber.d("Valid Token")
+//                state = MusicBotState.CONNECTED
+//                return true
+//            } else Timber.w(e.localizedMessage)
+//        }
+//        Timber.d("Invalid Token")
+//        return false
     }
 
     @Throws(
@@ -160,22 +149,21 @@ object JMusicBot {
         AuthException::class,
         NotFoundException::class,
         ServerErrorException::class,
-        IllegalStateException::class,
-        IllegalArgumentException::class
+        IllegalStateException::class
     )
     suspend fun register(userName: String? = null) {
-        Timber.d("Registering user")
+        Timber.d("Registering ${BotPreferences.user}")
         state.serverCheck()
         val credentials = when {
-            (userName != null) -> {
-                user = User(userName)
+            (!userName.isNullOrBlank()) -> {
+                BotPreferences.user = User(userName)
                 Credentials.Register(userName)
             }
-            user != null -> Credentials.Register(user!!)
-            else -> throw IllegalArgumentException("No username stored or supplied")
+            BotPreferences.user != null -> Credentials.Register(BotPreferences.user!!)
+            else -> throw IllegalStateException("No username stored or supplied")
         }
-        authToken = mApiClient.registerUser(credentials).process()
-        Timber.d("Registered user")
+        BotPreferences.authToken = JWT(mApiClient.registerUser(credentials).process())
+        Timber.d("Registered ${BotPreferences.user}")
     }
 
     @Throws(
@@ -183,31 +171,28 @@ object JMusicBot {
         AuthException::class,
         NotFoundException::class,
         ServerErrorException::class,
-        IllegalStateException::class,
-        IllegalArgumentException::class
+        IllegalStateException::class
     )
     suspend fun login(userName: String? = null, password: String? = null) {
-        Timber.d("Logging in user")
+        Timber.d("Logging in ${BotPreferences.user}")
         state.serverCheck()
         val credentials = when {
-            (userName != null && password != null) -> {
-                user = User(userName, password)
+            (!(userName.isNullOrBlank() || password.isNullOrBlank())) -> {
+                BotPreferences.user = User(userName, password)
                 Credentials.Login(userName, password)
             }
-            user != null -> Credentials.Login(user!!)
-            else -> throw IllegalArgumentException("No user stored or supplied")
+            BotPreferences.user != null -> Credentials.Login(BotPreferences.user!!)
+            else -> throw IllegalStateException("No user stored or supplied")
         }
-        authToken = mApiClient.login(credentials).process()
+        BotPreferences.authToken = JWT(mApiClient.login(credentials).process())
     }
 
     @Throws(InvalidParametersException::class, AuthException::class)
     suspend fun changePassword(newPassword: String) {
         state.connectionCheck()
-        authToken = mApiClient.changePassword(Credentials.PasswordChange((newPassword))).process()
-        authToken?.also {
-            user?.password = newPassword
-            user?.save(mPreferences)
-        }
+        BotPreferences.authToken =
+                JWT(mApiClient.changePassword(Credentials.PasswordChange((newPassword))).process())
+        BotPreferences.authToken?.also { BotPreferences.user?.password = newPassword }
     }
 
     @Throws(
@@ -219,14 +204,20 @@ object JMusicBot {
     )
     suspend fun deleteUser() {
         state.connectionCheck()
-        authToken ?: throw IllegalStateException("Auth token is null")
+        BotPreferences.authToken ?: throw IllegalStateException("Auth token is null")
         mApiClient.deleteUser().process()
     }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     suspend fun enqueue(song: Song) {
         state.connectionCheck()
-        updateQueue(mApiClient.enqueue(song.id, song.provider.id).process())
+        try {
+            val res = mApiClient.enqueue(song.id, song.provider.id).process()
+            updateQueue(res)
+        } catch (e: ServerErrorException) {
+            onConnectionLost(e)
+        }
+
     }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
@@ -285,6 +276,11 @@ object JMusicBot {
         return mQueue
     }
 
+    fun startQueueUpdates() {
+        if (mQueue.hasObservers())
+            mQueueUpdateTimer = timer(period = 500) { updateQueue() }
+    }
+
     fun stopQueueUpdates() {
         if (!mQueue.hasObservers()) {
             mQueueUpdateTimer?.cancel()
@@ -295,6 +291,10 @@ object JMusicBot {
     fun getPlayerState(period: Long = 500): LiveData<PlayerState> {
         if (mPlayerUpdateTimer == null) mPlayerUpdateTimer = timer(period = period) { updatePlayer() }
         return mPlayerState
+    }
+
+    fun startPlayerUpdates() {
+        if (mPlayerState.hasObservers()) mPlayerUpdateTimer = timer(period = 500) { updatePlayer() }
     }
 
     fun stopPlayerUpdates() {
@@ -348,5 +348,7 @@ object JMusicBot {
             }
         }
         connectionChangeListeners.forEach { it.onConnectionRecovered() }
+        startQueueUpdates()
+        startPlayerUpdates()
     }
 }

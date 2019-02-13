@@ -3,10 +3,7 @@ package me.iberger.jmusicbot.network
 import android.net.wifi.WifiManager
 import kotlinx.coroutines.Deferred
 import me.iberger.jmusicbot.JMusicBot
-import me.iberger.jmusicbot.exceptions.AuthException
-import me.iberger.jmusicbot.exceptions.InvalidParametersException
-import me.iberger.jmusicbot.exceptions.NotFoundException
-import me.iberger.jmusicbot.exceptions.ServerErrorException
+import me.iberger.jmusicbot.exceptions.*
 import retrofit2.Response
 import timber.log.Timber
 import java.io.IOException
@@ -71,8 +68,9 @@ internal suspend fun <T> Deferred<Response<T>>.process(
             response.errorBody()!!.string()
         )
         404 -> throw NotFoundException(notFoundType, response.errorBody()!!.string())
+        409 -> throw UsernameTakenException()
         else -> {
-            Timber.e("Error: ${response.errorBody()!!.string()}")
+            Timber.e("Server Error: ${response.errorBody()!!.string()}, ${response.code()}")
             throw ServerErrorException(response.code())
         }
     }

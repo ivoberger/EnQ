@@ -1,31 +1,50 @@
 package me.iberger.enq.ui.listener
 
 import androidx.recyclerview.widget.ListUpdateCallback
-import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.mikepenz.fastadapter.IItem
+import com.mikepenz.fastadapter.adapters.ModelAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import me.iberger.enq.ui.items.QueueItem
-import me.iberger.jmusicbot.model.QueueEntry
 
-class QueueUpdateCallback(private val mFastItemAdapter: FastItemAdapter<QueueItem>) : ListUpdateCallback {
-
-    var currentList = listOf<QueueEntry>()
-
-    override fun onChanged(position: Int, count: Int, payload: Any?) =
-        mFastItemAdapter.notifyAdapterItemRangeChanged(position, count, payload)
-
-    override fun onMoved(fromPosition: Int, toPosition: Int) {
-        mFastItemAdapter.move(fromPosition, toPosition)
-//        mFastItemAdapter.notifyAdapterItemMoved(fromPosition, toPosition)
-    }
+class QueueUpdateCallback<A : ModelAdapter<Model, Item>, Model, Item : IItem<out RecyclerView.ViewHolder>>(private val adapter: A) :
+    ListUpdateCallback {
 
     override fun onInserted(position: Int, count: Int) {
-        val addList = currentList.subList(position, position + count).map { QueueItem(it) }
-        GlobalScope.launch(Dispatchers.Main) { mFastItemAdapter.add(position, addList) }
+        GlobalScope.launch(Dispatchers.Main) {
+            adapter.fastAdapter!!.notifyAdapterItemRangeInserted(
+                adapter.fastAdapter!!.getPreItemCountByOrder(adapter.order) + position,
+                count
+            )
+        }
     }
 
     override fun onRemoved(position: Int, count: Int) {
-        mFastItemAdapter.removeItemRange(position, count)
+        GlobalScope.launch(Dispatchers.Main) {
+            adapter.fastAdapter!!.notifyAdapterItemRangeRemoved(
+                adapter.fastAdapter!!.getPreItemCountByOrder(adapter.order) + position,
+                count
+            )
+        }
+    }
+
+    override fun onMoved(fromPosition: Int, toPosition: Int) {
+        GlobalScope.launch(Dispatchers.Main) {
+            adapter.fastAdapter!!.notifyAdapterItemMoved(
+                adapter.fastAdapter!!.getPreItemCountByOrder(adapter.order) + fromPosition,
+                toPosition
+            )
+        }
+    }
+
+    override fun onChanged(position: Int, count: Int, payload: Any?) {
+        GlobalScope.launch(Dispatchers.Main) {
+            adapter.fastAdapter!!.notifyAdapterItemRangeChanged(
+                adapter.fastAdapter!!.getPreItemCountByOrder(adapter.order) + position,
+                count,
+                payload
+            )
+        }
     }
 }

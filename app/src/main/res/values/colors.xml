@@ -3,14 +3,14 @@
     <color name="white">@android:color/white</color>
     <color name="black">@android:color/black</color>
     <color name="colorPrimary">#212121</color>
-    <color name="colorPrimaryDark">@color/colorPrimary</color>
-    <color name="colorAccent">#00e676</color>
+    <color name="colorPrimaryDark">#000a12</color>
+    <color name="colorAccent">#9ccc65</color>
     <color name="backgroundDark">#101010</color>
     <color name="background">@color/colorPrimary</color>
 
-    <color name="favorites">#43A047</color>
-    <color name="enqueue">#7CB342</color>
-    <color name="delete">#BF360C</color>
+    <color name="favorites">#6b9b37</color>
+    <color name="enqueue">#6b9b37</color>
+    <color name="delete">#e64a19</color>
 
-    <color name="ic_launcher_background">#7CB342</color>
+    <color name="ic_launcher_background">#6b9b37</color>
 </resources>

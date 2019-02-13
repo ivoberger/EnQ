@@ -1,11 +1,11 @@
 package me.iberger.enq.ui.items
 
-import androidx.core.content.ContextCompat
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
-import com.mikepenz.iconics.IconicsDrawable
 import me.iberger.enq.R
 import me.iberger.enq.ui.MainActivity
+import me.iberger.enq.utils.icon
 import me.iberger.jmusicbot.model.Song
+import splitties.resources.color
 
 class SuggestionsItem(song: Song) : SongItem(song) {
 
@@ -14,10 +14,10 @@ class SuggestionsItem(song: Song) : SongItem(song) {
         val context = holder.itemView.context
 
         holder.txtDuration.compoundDrawablePadding = 20
-        if (song in MainActivity.favorites) holder.txtDuration.setCompoundDrawables(
-            IconicsDrawable(context, CommunityMaterial.Icon2.cmd_star).color(
-                ContextCompat.getColor(context, R.color.colorAccent)
-            ).sizeDp(10), null, null, null
+        if (model in MainActivity.favorites) holder.txtDuration.setCompoundDrawables(
+            context.icon(CommunityMaterial.Icon2.cmd_star)
+                .color(context.color(R.color.colorAccent)).sizeDp(10),
+            null, null, null
         )
     }
 }

@@ -5,20 +5,21 @@ import android.view.View
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
-import com.mikepenz.fastadapter_extensions.swipe.SimpleSwipeCallback
+import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
+import com.mikepenz.fastadapter.ui.items.ProgressItem
 import kotlinx.android.synthetic.main.fragment_queue.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.iberger.enq.R
 import me.iberger.enq.ui.fragments.parents.ResultsFragment
-import me.iberger.enq.ui.items.SuggestionsItem
 import me.iberger.enq.utils.changeFavoriteStatus
 import me.iberger.enq.utils.setupSwipeActions
 import me.iberger.enq.utils.toastShort
 import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.KEY_SUGGESTER_ID
 import me.iberger.jmusicbot.exceptions.AuthException
+import me.iberger.jmusicbot.model.Permissions
 import timber.log.Timber
 
 class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwipeCallback {
@@ -41,38 +42,39 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
         super.onViewCreated(view, savedInstanceState)
         Timber.d("Getting suggestions for suggester $mSuggesterId")
         getSuggestions()
+        val canDisklike = JMusicBot.userPermissions.contains(Permissions.DISLIKE)
         setupSwipeActions(
-            context!!, queue, this,
+            context!!, Queue, this,
             CommunityMaterial.Icon2.cmd_star, R.color.favorites,
-            CommunityMaterial.Icon.cmd_delete, R.color.delete
+            if (canDisklike) CommunityMaterial.Icon.cmd_delete else null, R.color.delete
         )
+        loadingHeader.add(ProgressItem())
     }
 
     private fun getSuggestions() = mBackgroundScope.launch {
-        val results = JMusicBot.suggestions(mSuggesterId)
-        super.displayResults(results.map { SuggestionsItem(it) })
+        super.displayResults(JMusicBot.suggestions(mSuggesterId))
     }
 
     override fun itemSwiped(position: Int, direction: Int) {
         mBackgroundScope.launch {
-            val entry = fastItemAdapter.getAdapterItem(position)
+            val entry = resultsAdapter.getAdapterItem(position)
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
                     try {
-                        JMusicBot.deleteSuggestion(mSuggesterId, entry.song)
+                        JMusicBot.deleteSuggestion(mSuggesterId, entry.model)
                         getSuggestions()
                     } catch (e: AuthException) {
                         Timber.e("AuthException with reason ${e.reason}")
                         withContext(Dispatchers.Main) {
                             context!!.toastShort(R.string.msg_no_permission)
-                            fastItemAdapter.notifyAdapterItemChanged(position)
+                            fastAdapter.notifyAdapterItemChanged(position)
                         }
                     }
                 }
                 ItemTouchHelper.LEFT -> {
-                    changeFavoriteStatus(context!!, entry.song)
+                    changeFavoriteStatus(context!!, entry.model)
                     withContext(Dispatchers.Main) {
-                        fastItemAdapter.notifyAdapterItemChanged(position)
+                        fastAdapter.notifyAdapterItemChanged(position)
                     }
                 }
             }

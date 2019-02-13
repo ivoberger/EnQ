@@ -6,6 +6,12 @@ import kotlin.String
  * Update this file with
  *   `$ ./gradlew buildSrcVersions` */
 object Libs {
+    const val navigation_fragment_ktx: String = "android.arch.navigation:navigation-fragment-ktx:" +
+            Versions.android_arch_navigation
+
+    const val navigation_ui_ktx: String = "android.arch.navigation:navigation-ui-ktx:" +
+            Versions.android_arch_navigation
+
     /**
      * http://developer.android.com/tools/extras/support-library.html */
     const val appcompat: String = "androidx.appcompat:appcompat:" + Versions.appcompat
@@ -29,6 +35,15 @@ object Libs {
             Versions.lifecycle_extensions
 
     /**
+     * http://developer.android.com/tools/extras/support-library.html */
+    const val preference_ktx: String = "androidx.preference:preference-ktx:" +
+            Versions.preference_ktx
+
+    /**
+     * http://developer.android.com/tools/extras/support-library.html */
+    const val recyclerview: String = "androidx.recyclerview:recyclerview:" + Versions.recyclerview
+
+    /**
      * https://developer.android.com/studio */
     const val com_android_tools_build_gradle: String = "com.android.tools.build:gradle:" +
             Versions.com_android_tools_build_gradle
@@ -36,6 +51,10 @@ object Libs {
     /**
      * https://developer.android.com/studio */
     const val lint_gradle: String = "com.android.tools.lint:lint-gradle:" + Versions.lint_gradle
+
+    /**
+     * https://github.com/auth0/jwtdecode.android */
+    const val jwtdecode: String = "com.auth0.android:jwtdecode:" + Versions.jwtdecode
 
     const val timbersentry: String = "com.github.IIIuminator:timberSentry:" + Versions.timbersentry
 
@@ -63,8 +82,23 @@ object Libs {
 
     /**
      * https://github.com/LouisCAD/Splitties */
+    const val splitties_material_colors: String =
+            "com.louiscad.splitties:splitties-material-colors:" + Versions.com_louiscad_splitties
+
+    /**
+     * https://github.com/LouisCAD/Splitties */
+    const val splitties_preferences: String = "com.louiscad.splitties:splitties-preferences:" +
+            Versions.com_louiscad_splitties
+
+    /**
+     * https://github.com/LouisCAD/Splitties */
+    const val splitties_resources: String = "com.louiscad.splitties:splitties-resources:" +
+            Versions.com_louiscad_splitties
+
+    /**
+     * https://github.com/LouisCAD/Splitties */
     const val splitties_systemservices: String =
-            "com.louiscad.splitties:splitties-systemservices:" + Versions.splitties_systemservices
+            "com.louiscad.splitties:splitties-systemservices:" + Versions.com_louiscad_splitties
 
     /**
      * https://github.com/mikepenz/AboutLibraries */
@@ -75,15 +109,20 @@ object Libs {
     const val community_material_typeface: String = "com.mikepenz:community-material-typeface:" +
             Versions.community_material_typeface
 
-    /**
-     * https://github.com/mikepenz/FastAdapter */
-    const val fastadapter_commons: String = "com.mikepenz:fastadapter-commons:" +
-            Versions.fastadapter_commons
+    const val fastadapter_extensions_diff: String = "com.mikepenz:fastadapter-extensions-diff:" +
+            Versions.fastadapter_extensions_diff
 
-    /**
-     * https://github.com/mikepenz/FastAdapter */
-    const val fastadapter_extensions: String = "com.mikepenz:fastadapter-extensions:" +
-            Versions.fastadapter_extensions
+    const val fastadapter_extensions_drag: String = "com.mikepenz:fastadapter-extensions-drag:" +
+            Versions.fastadapter_extensions_drag
+
+    const val fastadapter_extensions_swipe: String = "com.mikepenz:fastadapter-extensions-swipe:" +
+            Versions.fastadapter_extensions_swipe
+
+    const val fastadapter_extensions_ui: String = "com.mikepenz:fastadapter-extensions-ui:" +
+            Versions.fastadapter_extensions_ui
+
+    const val fastadapter_extensions_utils: String = "com.mikepenz:fastadapter-extensions-utils:" +
+            Versions.fastadapter_extensions_utils
 
     /**
      * https://github.com/mikepenz/FastAdapter */
@@ -105,6 +144,10 @@ object Libs {
     /**
      * https://github.com/square/okhttp */
     const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.okhttp
+
+    /**
+     * https://github.com/square/okio/ */
+    const val okio: String = "com.squareup.okio:okio:" + Versions.okio
 
     /**
      * https://github.com/square/retrofit/ */

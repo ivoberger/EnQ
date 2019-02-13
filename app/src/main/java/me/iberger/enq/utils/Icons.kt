@@ -1,21 +1,21 @@
 package me.iberger.enq.utils
 
 import android.content.Context
-import androidx.annotation.ColorRes
-import androidx.annotation.Size
-import androidx.core.content.ContextCompat.getColor
+import android.graphics.Bitmap
+import android.view.View
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.IIcon
 
+fun Context.icon(icon: IIcon): IconicsDrawable = IconicsDrawable(this, icon)
 
-fun IIcon.make(context: Context): IconicsDrawable = IconicsDrawable(context, this)
-fun IIcon.make(context: Context, @ColorRes color: Int): IconicsDrawable =
-    make(context).color(getColor(context, color))
+fun Context.icon(icon: String): IconicsDrawable = IconicsDrawable(this, icon)
 
-fun IIcon.make(context: Context, @ColorRes color: Int, @Size sizeDp: Int): IconicsDrawable =
-    make(context, color).sizeDp(sizeDp)
+fun View.icon(icon: String): IconicsDrawable = context.icon(icon)
 
-fun IIcon.makeBitmap(context: Context) = make(context).toBitmap()
-fun IIcon.makeBitmap(context: Context, @ColorRes color: Int) = make(context, color).toBitmap()
-fun IIcon.makeBitmap(context: Context, @ColorRes color: Int, @Size sizeDp: Int) =
-    make(context, color, sizeDp).toBitmap()
+fun View.bitmap(icon: String) = icon(icon).bitmap()
+
+fun Context.bitmap(icon: IIcon): Bitmap = icon(icon).bitmap()
+
+fun Context.bitmap(icon: String): Bitmap = icon(icon).bitmap()
+
+fun IconicsDrawable.bitmap() = toBitmap()

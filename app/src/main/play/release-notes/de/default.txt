@@ -1,0 +1,6 @@
+v0.3.0:
+- Navigationsverbesserungen fuer konsistentes Verhalten
+- Move, Skip, Dislike nur noch moeglich wenn der Nutzer die entsprecheneden Rechte hat
+- Ladeanzeiger fur Vorschlaege und Suche
+- Neues App-Icon!
+- Fehlerbehebungen und Performanz Verbesserungen

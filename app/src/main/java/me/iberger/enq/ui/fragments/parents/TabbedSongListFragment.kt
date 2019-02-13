@@ -1,9 +1,9 @@
 package me.iberger.enq.ui.fragments.parents
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.ContentView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
@@ -11,15 +11,16 @@ import androidx.viewpager.widget.ViewPager
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.coroutines.*
 import me.iberger.enq.R
-import me.iberger.enq.backend.Configuration
+import me.iberger.enq.persistence.Configuration
 import me.iberger.enq.ui.MainActivity
-import me.iberger.jmusicbot.model.MusicBotPlugin
 import me.iberger.jmusicbot.listener.ConnectionChangeListener
+import me.iberger.jmusicbot.model.MusicBotPlugin
 import timber.log.Timber
 
+@ContentView(R.layout.fragment_search)
 abstract class TabbedSongListFragment : Fragment(), ViewPager.OnPageChangeListener,
     ConnectionChangeListener {
-    val mUIScope = CoroutineScope(Dispatchers.Main)
+    val mMainScope = CoroutineScope(Dispatchers.Main)
 
     val mBackgroundScope = CoroutineScope(Dispatchers.IO)
     lateinit var mProviderPlugins: Deferred<List<MusicBotPlugin>?>
@@ -28,17 +29,10 @@ abstract class TabbedSongListFragment : Fragment(), ViewPager.OnPageChangeListen
     var mSelectedPlugin: MusicBotPlugin? = null
     lateinit var mFragmentPagerAdapter: Deferred<SongListFragmentPager>
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? =
-        inflater.inflate(R.layout.fragment_search, container, false)
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view_pager.addOnPageChangeListener(this)
-        mUIScope.launch {
+        mMainScope.launch {
             if (mSelectedPlugin == null) mSelectedPlugin = mProviderPlugins.await()?.get(0)
             mSelectedPlugin?.let {
                 Timber.d("Setting tab to ${mProviderPlugins.await()!!.indexOf(it)}")

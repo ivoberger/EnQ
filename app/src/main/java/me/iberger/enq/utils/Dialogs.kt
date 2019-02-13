@@ -11,6 +11,8 @@ import me.iberger.enq.R
 import me.iberger.enq.ui.MainActivity
 import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.exceptions.AuthException
+import me.iberger.jmusicbot.exceptions.InvalidParametersException
+import me.iberger.jmusicbot.exceptions.ServerErrorException
 import me.iberger.jmusicbot.exceptions.UsernameTakenException
 import timber.log.Timber
 
@@ -63,6 +65,7 @@ fun MainActivity.showLoginDialog(
     if (!loggingIn) {
         val dialogView =
             withContext(Dispatchers.Main) { this@showLoginDialog.layoutInflater.inflate(R.layout.dialog_login, null) }
+        withContext(Dispatchers.Main) { dialogView.findViewById<EditText>(R.id.login_username)?.setText(userName) }
         loginDialogBuilder
             .setView(dialogView)
             .setTitle(R.string.tlt_login)
@@ -82,7 +85,7 @@ fun MainActivity.showLoginDialog(
         loginDialog.show()
         if (!loggingIn) return@withContext
         try {
-            JMusicBot.authorize(userName, password)
+            withContext(Dispatchers.Default) { JMusicBot.authorize(userName, password) }
             continueWithBot()
             this@showLoginDialog.toastShort(getString(R.string.msg_logged_in, JMusicBot.user!!.name))
             loginDialog.dismiss()
@@ -93,13 +96,32 @@ fun MainActivity.showLoginDialog(
                 R.string.msg_username_taken,
                 Toast.LENGTH_LONG
             ).show()
-            showLoginDialog(false)
+            showLoginDialog(false, userName, password)
             loginDialog.cancel()
         } catch (e: AuthException) {
             Timber.w("Authentication error with reason ${e.reason}")
             Timber.w(e)
             this@showLoginDialog.toastLong(R.string.msg_password_wrong)
-            showLoginDialog(false)
+            showLoginDialog(false, userName, password)
+            loginDialog.cancel()
+        } catch (e: IllegalStateException) {
+            Timber.w(e)
+            showLoginDialog(false, userName, password)
+            loginDialog.cancel()
+        } catch (e: InvalidParametersException) {
+            Timber.w(e)
+            this@showLoginDialog.toastLong(R.string.msg_password_wrong)
+            showLoginDialog(false, userName, password)
+            loginDialog.cancel()
+        } catch (e: ServerErrorException) {
+            Timber.e(e)
+            this@showLoginDialog.toastLong(R.string.msg_server_error)
+            showLoginDialog(false, userName, password)
+            loginDialog.cancel()
+        } catch (e: Exception) {
+            Timber.e(e)
+            this@showLoginDialog.toastLong(R.string.msg_unknown_error)
+            showLoginDialog(false, userName, password)
             loginDialog.cancel()
         }
     }
