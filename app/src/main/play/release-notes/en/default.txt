@@ -1,0 +1,6 @@
+v0.3.0:
+- Navigation improvements for more consistent behavior
+- Only Allow Move, Skip, Dislike if user has the corresponding rights
+- Loading indicator for search an suggestions
+- New icon!
+- Bugfixes & Performance improvements
