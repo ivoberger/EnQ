@@ -112,8 +112,11 @@ class MainActivity : AppCompatActivity() {
 
         var playerCollapse = mViewModel.playerCollapsed
         // set listener to iconify the SearchView when back is pressed
-        val backStackListener = NavController.OnDestinationChangedListener { _, dest, _ ->
-            if (dest.id != R.id.Search && !searchView.isIconified) searchView.isIconified = true
+        mNavController.addOnDestinationChangedListener { _, dest, _ ->
+            if (dest.id != R.id.Search && !searchView.isIconified) {
+                Timber.d("Closing Search View")
+                searchView.isIconified = true
+            }
         }
 
         searchView.setOnSearchClickListener {
@@ -124,9 +127,6 @@ class MainActivity : AppCompatActivity() {
             // collapse bottom UI
             changePlayerCollapse(true, 0)
             changeBottomNavCollapse(true, 0)
-            // execute transactions and set listener afterwards
-            supportFragmentManager.executePendingTransactions()
-            mNavController.addOnDestinationChangedListener(backStackListener)
         }
         searchView.setOnCloseListener {
             // un-collapse bottom UI
@@ -134,7 +134,6 @@ class MainActivity : AppCompatActivity() {
             changePlayerCollapse(playerCollapse)
             // remove search fragment
             mNavController.navigateUp()
-            mNavController.removeOnDestinationChangedListener(backStackListener)
             return@setOnCloseListener false
         }
         return true

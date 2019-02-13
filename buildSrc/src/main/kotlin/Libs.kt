@@ -6,6 +6,12 @@ import kotlin.String
  * Update this file with
  *   `$ ./gradlew buildSrcVersions` */
 object Libs {
+    const val navigation_fragment_ktx: String = "android.arch.navigation:navigation-fragment-ktx:" +
+            Versions.android_arch_navigation
+
+    const val navigation_ui_ktx: String = "android.arch.navigation:navigation-ui-ktx:" +
+            Versions.android_arch_navigation
+
     /**
      * http://developer.android.com/tools/extras/support-library.html */
     const val appcompat: String = "androidx.appcompat:appcompat:" + Versions.appcompat

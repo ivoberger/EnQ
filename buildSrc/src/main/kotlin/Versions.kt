@@ -7,6 +7,8 @@ import kotlin.String
  *
  * YOU are responsible for updating manually the dependency version. */
 object Versions {
+    const val android_arch_navigation: String = "1.0.0-beta02" 
+
     const val appcompat: String = "1.1.0-alpha02" 
 
     const val constraintlayout: String = "2.0.0-alpha2" 

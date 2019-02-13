@@ -13,28 +13,18 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="500" />
-                            <option name="y" value="191" />
+                            <option name="x" value="13" />
+                            <option name="y" value="252" />
                           </Point>
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_Favorites_to_Queue">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
                             <entry key="action_Favorites_to_Search">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
                             <entry key="action_Favorites_to_Settings">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                            <entry key="action_Favorites_to_Suggestions">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -50,27 +40,17 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="12" />
-                            <option name="y" value="415" />
+                            <option name="y" value="544" />
                           </Point>
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_Queue_to_Favorites">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
                             <entry key="action_Queue_to_Search">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
                             <entry key="action_Queue_to_Settings">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                            <entry key="action_Queue_to_Suggestions">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -85,8 +65,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="744" />
-                            <option name="y" value="12" />
+                            <option name="x" value="500" />
+                            <option name="y" value="20" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -97,8 +77,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="744" />
-                            <option name="y" value="369" />
+                            <option name="x" value="500" />
+                            <option name="y" value="461" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -109,22 +89,12 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="256" />
-                            <option name="y" value="292" />
+                            <option name="x" value="17" />
+                            <option name="y" value="-45" />
                           </Point>
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_Suggestions_to_Favorites">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                            <entry key="action_Suggestions_to_Queue">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
                             <entry key="action_Suggestions_to_Search">
                               <value>
                                 <LayoutPositions />
@@ -138,6 +108,21 @@
                           </map>
                         </option>
                       </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="nav_favorites">
+                    <value>
+                      <LayoutPositions />
+                    </value>
+                  </entry>
+                  <entry key="nav_queue">
+                    <value>
+                      <LayoutPositions />
+                    </value>
+                  </entry>
+                  <entry key="nav_suggestions">
+                    <value>
+                      <LayoutPositions />
                     </value>
                   </entry>
                 </map>
