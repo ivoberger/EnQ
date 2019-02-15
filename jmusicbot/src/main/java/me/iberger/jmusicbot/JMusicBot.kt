@@ -339,6 +339,7 @@ object JMusicBot {
     }
 
     private fun updatePlayer(playerState: PlayerState? = null) = GlobalScope.launch {
+        if (playerState != null) Timber.d("Manual Player Update")
         try {
             state.connectionCheck()
             val state = playerState ?: mApiClient.getPlayerState().process() ?: PlayerState(PlayerStates.ERROR)
