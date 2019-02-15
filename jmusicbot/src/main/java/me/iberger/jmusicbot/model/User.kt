@@ -15,20 +15,23 @@ import java.util.*
 class User(
     @Json(name = "name") val name: String,
     password: String? = null,
-    @Json(name = "uuid") val uuid: String = UUID.randomUUID().toString(),
-    @Json(name = "permissions") var permissions: MutableList<Permissions> = mutableListOf()
+    @Json(name = "userId") val id: String = UUID.randomUUID().toString(),
+    @Json(name = "permissions") permissions: List<Permissions> = listOf()
 ) {
 
     @Json(name = "password")
     var password: String? = password
         set(value) {
             field = value
-            BotPreferences.user = this
+            JMusicBot.user = this
         }
 
-    init {
-        Timber.d("Creating User $this")
-    }
+    @Json(name = "permissions")
+    var permissions: List<Permissions> = permissions
+        set(value) {
+            field = value
+            JMusicBot.user = this
+        }
 
     companion object {
         private val mUserAdapter by lazy { JMusicBot.mMoshi.adapter<User>(User::class.java) }

@@ -24,6 +24,6 @@ class MainViewModel : ViewModel(), ConnectionChangeListener {
     var bottomNavCollapsed = false
 
 
-    val playerState: LiveData<PlayerState> = JMusicBot.getPlayerState()
-    val queue: LiveData<List<QueueEntry>> = JMusicBot.getQueue()
+    val playerState: LiveData<PlayerState> by lazy { JMusicBot.getPlayerState() }
+    val queue: LiveData<List<QueueEntry>>by lazy { JMusicBot.getQueue() }
 }

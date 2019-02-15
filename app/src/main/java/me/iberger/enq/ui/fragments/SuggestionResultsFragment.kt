@@ -40,9 +40,8 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Timber.d("Getting suggestions for suggester $mSuggesterId")
         getSuggestions()
-        val canDisklike = JMusicBot.userPermissions.contains(Permissions.DISLIKE)
+        val canDisklike = JMusicBot.user!!.permissions.contains(Permissions.DISLIKE)
         setupSwipeActions(
             context!!, Queue, this,
             CommunityMaterial.Icon2.cmd_star, R.color.favorites,
@@ -52,6 +51,7 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
     }
 
     private fun getSuggestions() = mBackgroundScope.launch {
+        Timber.d("Getting suggestions for suggester $mSuggesterId")
         super.displayResults(JMusicBot.suggestions(mSuggesterId))
     }
 

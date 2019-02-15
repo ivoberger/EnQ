@@ -22,7 +22,6 @@ import me.iberger.enq.BuildConfig
 import me.iberger.enq.R
 import me.iberger.enq.persistence.Configuration
 import me.iberger.enq.ui.fragments.PlayerFragment
-import me.iberger.enq.ui.fragments.QueueFragment
 import me.iberger.enq.ui.listener.ConnectionListener
 import me.iberger.enq.ui.listener.MainNavigationListener
 import me.iberger.enq.ui.viewmodel.MainViewModel
@@ -87,15 +86,14 @@ class MainActivity : AppCompatActivity() {
     fun continueToLogin() = mBackgroundScope.launch { showLoginDialog() }
 
     /**
-     * continueWithBot is called by showLoginDialog after login is complete
+     * continueWithBot is called by showLoginDialog after loginUser is complete
      */
     fun continueWithBot() = mBackgroundScope.launch {
         mViewModel.connected = true
         JMusicBot.connectionChangeListeners.add((ConnectionListener(this@MainActivity)))
-        val currentSongFragment = PlayerFragment.newInstance()
+        mNavController.setGraph(R.navigation.nav_graph)
         supportFragmentManager.commit {
-            replace(R.id.main_current_song, currentSongFragment, null)
-            replace(R.id.main_content, QueueFragment.newInstance(), null)
+            replace(R.id.main_current_song, PlayerFragment.newInstance(), null)
         }
     }
 

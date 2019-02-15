@@ -67,7 +67,7 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
             context!!.icon(CommunityMaterial.Icon2.cmd_star).color(context!!.color(R.color.white)).sizeDp(24)
         val drawableLeft =
             context!!.icon(CommunityMaterial.Icon.cmd_delete).color(context!!.color(R.color.white)).sizeDp(24)
-        val userPermissions = JMusicBot.userPermissions
+        val userPermissions = JMusicBot.user!!.permissions
         val touchCallback = if (userPermissions.contains(Permissions.MOVE)) SimpleSwipeDragCallback(
             this, this,
             drawableLeft, ItemTouchHelper.LEFT, color(R.color.favorites)

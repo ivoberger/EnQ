@@ -1,9 +1,13 @@
-package me.iberger.jmusicbot.network
+package me.iberger.jmusicbot.api
 
 import android.net.wifi.WifiManager
+import com.auth0.android.jwt.JWT
 import kotlinx.coroutines.Deferred
 import me.iberger.jmusicbot.JMusicBot
+import me.iberger.jmusicbot.KEY_AUTHORIZATION
 import me.iberger.jmusicbot.exceptions.*
+import me.iberger.jmusicbot.model.toHTTPAuth
+import okhttp3.OkHttpClient
 import retrofit2.Response
 import timber.log.Timber
 import java.io.IOException
@@ -28,7 +32,7 @@ internal fun WifiManager.discoverHost(): String? {
             socket.broadcast = true
             socket.receive(packet)
             socket.leaveGroup(groupAddress)
-            "http://${packet.address.hostAddress}:$PORT/v1/"
+            "http://${packet.address.hostAddress}:$PORT"
         }
     } catch (e: IOException) {
         null
@@ -36,6 +40,10 @@ internal fun WifiManager.discoverHost(): String? {
         lock.release()
     }
 }
+
+internal fun OkHttpClient.withToken(token: JWT) = newBuilder().addInterceptor { chain ->
+    chain.proceed(chain.request().newBuilder().header(KEY_AUTHORIZATION, token.toHTTPAuth()).build())
+}.authenticator(TokenAuthenticator()).build()
 
 
 @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class, ServerErrorException::class)
@@ -48,7 +56,7 @@ internal suspend fun <T> Deferred<Response<T>>.process(
     val response: Response<T>
     try {
         response = await()
-    } catch (e: Exception) {
+    } catch (e: IOException) {
         JMusicBot.onConnectionLost(e)
         throw e
     }

@@ -71,6 +71,7 @@ class PlayerFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mViewModel.playerState.observe(this, Observer { onPlayerStateChanged(it) })
+        Timber.d("Player created")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -80,7 +81,7 @@ class PlayerFragment : Fragment() {
         song_play_pause.setOnClickListener { changePlaybackState() }
         song_favorite.setOnClickListener { addToFavorites() }
         view.setOnClickListener {
-            if (!JMusicBot.userPermissions.contains(Permissions.SKIP)) return@setOnClickListener
+            if (!JMusicBot.user!!.permissions.contains(Permissions.SKIP)) return@setOnClickListener
             song_play_pause.setImageDrawable(
                 if (mShowSkip) {
                     mShowSkip = false
