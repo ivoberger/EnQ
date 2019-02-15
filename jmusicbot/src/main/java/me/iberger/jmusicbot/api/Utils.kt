@@ -47,12 +47,12 @@ internal fun OkHttpClient.withToken(token: JWT) = newBuilder().addInterceptor { 
 
 
 @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class, ServerErrorException::class)
-internal suspend fun <T> Deferred<Response<T>>.process(
+internal suspend inline fun <reified T> Deferred<Response<T>>.process(
     successCodes: List<Int> = listOf(200, 201, 204),
     errorCodes: Map<Int, Exception> = mapOf(),
     notFoundType: NotFoundException.Type = NotFoundException.Type.SONG,
     invalidParamsType: InvalidParametersException.Type = InvalidParametersException.Type.MISSING
-): T {
+): T? {
     val response: Response<T>
     try {
         response = await()
@@ -61,7 +61,7 @@ internal suspend fun <T> Deferred<Response<T>>.process(
         throw e
     }
     return when (response.code()) {
-        in successCodes -> response.body()!!
+        in successCodes -> response.body()
         in errorCodes -> throw errorCodes[response.code()]!!
         400 -> throw InvalidParametersException(
             invalidParamsType,

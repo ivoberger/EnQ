@@ -148,7 +148,7 @@ object JMusicBot {
                 return false
             }
             val tmpUser = mApiClient.testToken(authToken!!.toHTTPAuth()).process()
-            if (tmpUser.name == user?.name) {
+            if (tmpUser?.name == user?.name) {
                 Timber.d("Valid Token: $user")
                 mOkHttpClient = mOkHttpClient.withToken(authToken!!)
                 state = MusicBotState.CONNECTED
@@ -180,7 +180,7 @@ object JMusicBot {
             user != null -> Credentials.Register(user!!)
             else -> throw IllegalStateException("No username stored or supplied")
         }
-        val token = mApiClient.registerUser(credentials).process()
+        val token = mApiClient.registerUser(credentials).process()!!
         Timber.d("Registered $user")
         authToken = JWT(token)
     }
@@ -204,7 +204,7 @@ object JMusicBot {
             else -> throw IllegalStateException("No user stored or supplied")
         }
         Timber.d("Credentials: $credentials")
-        val token = mApiClient.loginUser(credentials).process()
+        val token = mApiClient.loginUser(credentials).process()!!
         Timber.d("Logged in $user")
         authToken = JWT(token)
     }
@@ -213,7 +213,7 @@ object JMusicBot {
     suspend fun changePassword(newPassword: String) {
         state.connectionCheck()
         authToken =
-                JWT(mApiClient.changePassword(Credentials.PasswordChange((newPassword))).process())
+                JWT(mApiClient.changePassword(Credentials.PasswordChange((newPassword))).process()!!)
         authToken?.also { user?.password = newPassword }
     }
 
@@ -248,24 +248,24 @@ object JMusicBot {
         updateQueue(mApiClient.dequeue(song.id, song.provider.id).process())
     }
 
-    suspend fun moveSong(entry: QueueEntry, newPosition: Int) {
+    suspend fun moveEntry(entry: QueueEntry, newPosition: Int) {
         state.connectionCheck()
-        updateQueue(mApiClient.moveSong(entry, newPosition).process())
+        updateQueue(mApiClient.moveEntry(entry, newPosition).process())
     }
 
     suspend fun search(providerId: String, query: String): List<Song> {
         state.connectionCheck()
-        return mApiClient.searchForSong(providerId, query).process()
+        return mApiClient.searchForSong(providerId, query).process() ?: listOf()
     }
 
     suspend fun suggestions(suggesterId: String): List<Song> {
         state.connectionCheck()
-        return mApiClient.getSuggestions(suggesterId).process()
+        return mApiClient.getSuggestions(suggesterId).process() ?: listOf()
     }
 
     suspend fun deleteSuggestion(suggesterId: String, song: Song) {
         state.connectionCheck()
-        return mApiClient.deleteSuggestion(suggesterId, song.id, song.provider.id).process()
+        mApiClient.deleteSuggestion(suggesterId, song.id, song.provider.id).process()
     }
 
     suspend fun pause() {
@@ -285,12 +285,12 @@ object JMusicBot {
 
     suspend fun getProvider(): List<MusicBotPlugin> {
         state.connectionCheck()
-        return mApiClient.getProvider().process()
+        return mApiClient.getProvider().process() ?: listOf()
     }
 
     suspend fun getSuggesters(): List<MusicBotPlugin> {
         state.connectionCheck()
-        return mApiClient.getSuggesters().process()
+        return mApiClient.getSuggesters().process() ?: listOf()
     }
 
     fun getQueue(period: Long = 500): LiveData<List<QueueEntry>> {
@@ -327,12 +327,13 @@ object JMusicBot {
     }
 
     private fun updateQueue(newQueue: List<QueueEntry>? = null) = GlobalScope.launch {
+        if (newQueue != null) Timber.d("Manual Queue Update")
         try {
             state.connectionCheck()
             val queue = newQueue ?: mApiClient.getQueue().process() ?: listOf()
             withContext(Dispatchers.Main) { mQueue.value = queue }
         } catch (e: Exception) {
-//            Timber.w(e)
+            Timber.w(e)
             // TODO: propagate error
         }
     }

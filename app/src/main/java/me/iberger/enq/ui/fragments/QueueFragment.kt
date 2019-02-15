@@ -138,19 +138,14 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
             val entry = mFastItemAdapter.getAdapterItem(newPosition).model
             Timber.d("Moved ${entry.song.title} from $oldPosition to $newPosition")
             try {
-                JMusicBot.moveSong(entry, newPosition)
+                JMusicBot.moveEntry(entry, newPosition)
             } catch (e: Exception) {
                 Timber.e(e)
                 mMainScope.launch {
                     context?.toastShort(R.string.msg_no_permission)
                 }
-            } finally {
-                withContext(mMainScope.coroutineContext) {
-                    mViewModel.queue.observe(
-                        this@QueueFragment,
-                        Observer { updateQueue(it) })
-                }
             }
         }
+        mViewModel.queue.observe(this, Observer { updateQueue(it) })
     }
 }
