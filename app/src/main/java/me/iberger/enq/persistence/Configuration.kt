@@ -5,8 +5,8 @@ import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import androidx.core.content.edit
 import com.squareup.moshi.Moshi
-import me.iberger.jmusicbot.model.MusicBotPlugin
 import me.iberger.jmusicbot.model.MusicBotPluginJsonAdapter
+import me.iberger.jmusicbot.model.MusicBotPlugin
 import me.iberger.jmusicbot.model.User
 import timber.log.Timber
 
@@ -32,7 +32,7 @@ class Configuration(private val preferences: SharedPreferences) {
         set(value) = saveString(KEY_LAST_PROVIDER, mMusicBotPluginAdapter.toJson(value))
     var lastSuggester: MusicBotPlugin?
         get() = loadString(KEY_LAST_SUGGESTER)?.let { mMusicBotPluginAdapter.fromJson(it) }
-        set(value) = saveString(KEY_LAST_SUGGESTER, mMusicBotPluginAdapter.toJson(value))
+        set(value) = value?.let { saveString(KEY_LAST_SUGGESTER, mMusicBotPluginAdapter.toJson(it)) } ?: Unit
 
 
     var savedUsers: List<User>?

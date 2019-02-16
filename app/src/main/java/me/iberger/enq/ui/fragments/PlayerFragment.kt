@@ -2,8 +2,11 @@ package me.iberger.enq.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.ContentView
+import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -25,7 +28,6 @@ import me.iberger.jmusicbot.JMusicBot
 import me.iberger.jmusicbot.model.Permissions
 import me.iberger.jmusicbot.model.PlayerState
 import me.iberger.jmusicbot.model.PlayerStates
-import me.iberger.jmusicbot.model.Song
 import splitties.resources.color
 import timber.log.Timber
 
@@ -43,14 +45,30 @@ class PlayerFragment : Fragment() {
     private var mPlayerState: PlayerState = PlayerState(PlayerStates.STOP, null)
     private var mShowSkip = false
 
+    private val mFlingListener by lazy {
+        object : GestureDetector.SimpleOnGestureListener() {
+            override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
+                Timber.d("FLING! $velocityX, $velocityY")
+                if (velocityX > Math.abs(velocityY)) if (JMusicBot.user!!.permissions.contains(Permissions.SKIP)) {
+                    mBackgroundScope.launch { JMusicBot.skip() }
+                    return true
+                } else {
+                    context!!.toastShort(R.string.msg_no_permission)
+                }
+                return super.onFling(e1, e2, velocityX, velocityY)
+            }
+        }
+    }
+    private val mGestureDetector by lazy { GestureDetectorCompat(context, mFlingListener) }
+
     private lateinit var mPlayDrawable: IconicsDrawable
     private lateinit var mPauseDrawable: IconicsDrawable
     private lateinit var mStoppedDrawable: IconicsDrawable
     private lateinit var mSkipDrawable: IconicsDrawable
     private lateinit var mErrorDrawable: IconicsDrawable
 
-    private lateinit var mFavoritesAddDrawable: IconicsDrawable
-    private lateinit var mFavoritesDeleteDrawable: IconicsDrawable
+    private lateinit var mNotInFavoritesDrawable: IconicsDrawable
+    private lateinit var mInFavoritesDrawable: IconicsDrawable
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -62,8 +80,8 @@ class PlayerFragment : Fragment() {
             mStoppedDrawable = context.icon(CommunityMaterial.Icon2.cmd_stop).color(color)
             mSkipDrawable = context.icon(CommunityMaterial.Icon.cmd_fast_forward).color(color)
             mErrorDrawable = context.icon(CommunityMaterial.Icon.cmd_alert_circle_outline).color(color)
-            mFavoritesAddDrawable = context.icon(CommunityMaterial.Icon2.cmd_star_outline).color(color)
-            mFavoritesDeleteDrawable = context.icon(CommunityMaterial.Icon2.cmd_star).color(color(R.color.favorites))
+            mNotInFavoritesDrawable = context.icon(CommunityMaterial.Icon2.cmd_star_outline).color(color)
+            mInFavoritesDrawable = context.icon(CommunityMaterial.Icon2.cmd_star).color(color(R.color.favorites))
         }
     }
 
@@ -71,6 +89,7 @@ class PlayerFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mViewModel.playerState.observe(this, Observer { onPlayerStateChanged(it) })
+        Timber.d("Player created")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -79,18 +98,9 @@ class PlayerFragment : Fragment() {
         song_description.isSelected = true
         song_play_pause.setOnClickListener { changePlaybackState() }
         song_favorite.setOnClickListener { addToFavorites() }
-        view.setOnClickListener {
-            if (!JMusicBot.userPermissions.contains(Permissions.SKIP)) return@setOnClickListener
-            song_play_pause.setImageDrawable(
-                if (mShowSkip) {
-                    mShowSkip = false
-                    if (mPlayerState.state == PlayerStates.PLAY) mPauseDrawable
-                    else mPlayDrawable
-                } else {
-                    mShowSkip = true
-                    mSkipDrawable
-                }
-            )
+        view.setOnTouchListener { _, event ->
+            mGestureDetector.onTouchEvent(event)
+            true
         }
     }
 
@@ -116,23 +126,13 @@ class PlayerFragment : Fragment() {
 
     private fun addToFavorites() {
         mBackgroundScope.launch {
-            changeFavoriteStatus(mPlayerState.songEntry!!.song).join()
+            changeFavoriteStatus(context!!, mPlayerState.songEntry!!.song).join()
             mMainScope.launch {
                 song_favorite.setImageDrawable(
-                    if (mPlayerState.songEntry!!.song in favorites) mFavoritesDeleteDrawable
-                    else mFavoritesAddDrawable
+                    if (mPlayerState.songEntry!!.song in favorites) mInFavoritesDrawable
+                    else mNotInFavoritesDrawable
                 )
             }
-        }
-    }
-
-    private fun changeFavoriteStatus(song: Song) = mBackgroundScope.launch {
-        changeFavoriteStatus(context!!, song)
-        mMainScope.launch {
-            song_favorite.setImageDrawable(
-                if (song in favorites) mFavoritesDeleteDrawable
-                else mFavoritesAddDrawable
-            )
         }
     }
 
@@ -178,8 +178,8 @@ class PlayerFragment : Fragment() {
             songEntry.userName?.also { song_chosen_by.text = it }
             // set fav status
             song_favorite.setImageDrawable(
-                if (song in favorites) mFavoritesDeleteDrawable
-                else mFavoritesAddDrawable
+                if (song in favorites) mInFavoritesDrawable
+                else mNotInFavoritesDrawable
             )
         }
     }

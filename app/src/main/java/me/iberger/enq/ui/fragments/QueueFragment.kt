@@ -59,26 +59,26 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
         super.onViewCreated(view, savedInstanceState)
         mViewModel.queue.observe(this, Observer { updateQueue(it) })
 
-        Queue.layoutManager = LinearLayoutManager(context).apply { reverseLayout = true }
-        Queue.adapter = mFastItemAdapter
+        recycler_queue.layoutManager = LinearLayoutManager(context).apply { reverseLayout = true }
+        recycler_queue.adapter = mFastItemAdapter
         savedInstanceState?.also { mFastItemAdapter.withSavedInstanceState(it, KEY_QUEUE) }
 
-        val drawableRight =
+        val deleteDrawable =
             context!!.icon(CommunityMaterial.Icon2.cmd_star).color(context!!.color(R.color.white)).sizeDp(24)
-        val drawableLeft =
+        val favoritesDrawable =
             context!!.icon(CommunityMaterial.Icon.cmd_delete).color(context!!.color(R.color.white)).sizeDp(24)
-        val userPermissions = JMusicBot.userPermissions
+        val userPermissions = JMusicBot.user!!.permissions
         val touchCallback = if (userPermissions.contains(Permissions.MOVE)) SimpleSwipeDragCallback(
             this, this,
-            drawableLeft, ItemTouchHelper.LEFT, color(R.color.favorites)
-        ) else SimpleSwipeCallback(this, drawableLeft, ItemTouchHelper.LEFT, color(R.color.favorites))
+            deleteDrawable, ItemTouchHelper.LEFT, color(R.color.favorites)
+        ) else SimpleSwipeCallback(this, deleteDrawable, ItemTouchHelper.LEFT, color(R.color.favorites))
 
         if (userPermissions.contains(Permissions.SKIP)) if (touchCallback is SimpleSwipeCallback)
-            touchCallback.withBackgroundSwipeRight(color(R.color.delete)).withLeaveBehindSwipeRight(drawableRight)
+            touchCallback.withBackgroundSwipeRight(color(R.color.delete)).withLeaveBehindSwipeRight(favoritesDrawable)
         else if (touchCallback is SimpleSwipeDragCallback)
-            touchCallback.withBackgroundSwipeRight(color(R.color.delete)).withLeaveBehindSwipeRight(drawableRight)
+            touchCallback.withBackgroundSwipeRight(color(R.color.delete)).withLeaveBehindSwipeRight(favoritesDrawable)
 
-        ItemTouchHelper(touchCallback).attachToRecyclerView(Queue)
+        ItemTouchHelper(touchCallback).attachToRecyclerView(recycler_queue)
 
         mFastItemAdapter.onLongClickListener = object : OnLongClickListener<QueueItem> {
             override fun onLongClick(v: View, adapter: IAdapter<QueueItem>, item: QueueItem, position: Int): Boolean {
@@ -138,19 +138,14 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
             val entry = mFastItemAdapter.getAdapterItem(newPosition).model
             Timber.d("Moved ${entry.song.title} from $oldPosition to $newPosition")
             try {
-                JMusicBot.moveSong(entry, newPosition)
+                JMusicBot.moveEntry(entry, newPosition)
             } catch (e: Exception) {
                 Timber.e(e)
                 mMainScope.launch {
                     context?.toastShort(R.string.msg_no_permission)
                 }
-            } finally {
-                withContext(mMainScope.coroutineContext) {
-                    mViewModel.queue.observe(
-                        this@QueueFragment,
-                        Observer { updateQueue(it) })
-                }
             }
         }
+        mViewModel.queue.observe(this, Observer { updateQueue(it) })
     }
 }

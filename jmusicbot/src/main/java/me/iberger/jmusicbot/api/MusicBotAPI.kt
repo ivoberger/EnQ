@@ -1,4 +1,4 @@
-package me.iberger.jmusicbot.network
+package me.iberger.jmusicbot.api
 
 import kotlinx.coroutines.Deferred
 import me.iberger.jmusicbot.*
@@ -26,15 +26,13 @@ internal interface MusicBotAPI {
     @POST(URL_USER)
     fun registerUser(@Body credentials: Credentials.Register): Deferred<Response<String>>
 
-    @PUT("token")
-    fun login(@Body loginCredentials: Credentials.Login): Deferred<Response<String>>
+    @GET("token")
+    fun loginUser(@Header(KEY_AUTHORIZATION) loginCredentials: String): Deferred<Response<String>>
 
-    @PUT("$URL_PLAYER/$URL_QUEUE")
+    @GET(URL_USER)
     fun testToken(
-        @Header(KEY_AUTHORIZATION) authToken: String,
-        @Query(KEY_SONG_ID) songId: String = "",
-        @Query(KEY_PROVIDER_ID) providerId: String = ""
-    ): Deferred<Response<List<QueueEntry>>>
+        @Header(KEY_AUTHORIZATION) authToken: String
+    ): Deferred<Response<User>>
 
     // Song operations
 
@@ -53,7 +51,7 @@ internal interface MusicBotAPI {
     fun enqueue(@Query(KEY_SONG_ID) songId: String, @Query(KEY_PROVIDER_ID) providerId: String): Deferred<Response<List<QueueEntry>>>
 
     @PUT("$URL_PLAYER/$URL_QUEUE/order")
-    fun moveSong(@Body entry: QueueEntry, @Query("index") index: Int): Deferred<Response<List<QueueEntry>>>
+    fun moveEntry(@Body entry: QueueEntry, @Query("index") index: Int): Deferred<Response<List<QueueEntry>>>
 
     @GET("$URL_PLAYER/$URL_QUEUE")
     fun getQueue(): Deferred<Response<List<QueueEntry>>>
@@ -89,12 +87,12 @@ internal interface MusicBotAPI {
     @PUT(URL_PLAYER)
     fun setPlayerState(@Body playerStateChange: PlayerStateChange): Deferred<Response<PlayerState>>
 
-    @PUT("$URL_PLAYER/pause")
-    fun pause(): Deferred<Response<PlayerState>>
+    @PUT(URL_PLAYER)
+    fun pause(@Body playerStateChange: PlayerStateChange = PlayerStateChange(PlayerAction.PAUSE)): Deferred<Response<PlayerState>>
 
-    @PUT("$URL_PLAYER/play")
-    fun play(): Deferred<Response<PlayerState>>
+    @PUT(URL_PLAYER)
+    fun play(@Body playerStateChange: PlayerStateChange = PlayerStateChange(PlayerAction.PLAY)): Deferred<Response<PlayerState>>
 
-    @PUT("$URL_PLAYER/next")
-    fun skip(): Deferred<Response<PlayerState>>
+    @PUT(URL_PLAYER)
+    fun skip(@Body playerStateChange: PlayerStateChange = PlayerStateChange(PlayerAction.SKIP)): Deferred<Response<PlayerState>>
 }

@@ -56,8 +56,6 @@ object Libs {
      * https://github.com/auth0/jwtdecode.android */
     const val jwtdecode: String = "com.auth0.android:jwtdecode:" + Versions.jwtdecode
 
-    const val timbersentry: String = "com.github.IIIuminator:timberSentry:" + Versions.timbersentry
-
     /**
      * https://github.com/bumptech/glide */
     const val glide: String = "com.github.bumptech.glide:glide:" + Versions.glide
@@ -69,6 +67,10 @@ object Libs {
     /**
      * http://developer.android.com/tools/extras/support-library.html */
     const val material: String = "com.google.android.material:material:" + Versions.material
+
+    /**
+     * https://github.com/IIIuminator/timberSentry */
+    const val timbersentry: String = "com.ivoberger:timberSentry:" + Versions.timbersentry
 
     /**
      * https://github.com/JakeWharton/retrofit2-kotlin-coroutines-adapter/ */

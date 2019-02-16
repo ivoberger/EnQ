@@ -19,12 +19,12 @@ class QueueItem(
     queueEntry: QueueEntry,
     val song: Song = queueEntry.song
 ) :
-    ModelAbstractItem<QueueEntry, QueueItem.ViewHolder>(queueEntry), IDraggable<QueueItem, QueueItem> {
+    ModelAbstractItem<QueueEntry, QueueItem.ViewHolder>(queueEntry), IDraggable {
 
     override val type: Int = R.id.queue_entry
     override val layoutRes: Int = R.layout.adapter_queue_entry
     override fun getViewHolder(v: View) = ViewHolder(v)
-    private var isDraggable = true
+    override var isDraggable = true
 
     override fun bindView(holder: ViewHolder, payloads: MutableList<Any>) {
         super.bindView(holder, payloads)
@@ -50,13 +50,6 @@ class QueueItem(
         )
     }
 
-    override fun withIsDraggable(draggable: Boolean): QueueItem {
-        isDraggable = draggable
-        return this
-    }
-
-    override fun isDraggable(): Boolean = isDraggable
-
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var imgAlbumArt: ImageView = view.findViewById(R.id.song_album_art)
         var txtTitle: TextView = view.findViewById(R.id.song_title)
@@ -67,18 +60,18 @@ class QueueItem(
 
     class DiffCallback : com.mikepenz.fastadapter.diff.DiffCallback<QueueItem> {
         override fun getChangePayload(
-            oldItem: QueueItem?, oldItemPosition: Int, newItem: QueueItem?, newItemPosition: Int
+            oldItem: QueueItem, oldItemPosition: Int, newItem: QueueItem, newItemPosition: Int
         ): Any? = null
 
-        override fun areItemsTheSame(oldItem: QueueItem?, newItem: QueueItem?): Boolean {
-            val oldEntry = oldItem?.model
-            val newEntry = newItem?.model
+        override fun areItemsTheSame(oldItem: QueueItem, newItem: QueueItem): Boolean {
+            val oldEntry = oldItem.model
+            val newEntry = newItem.model
 
-            return oldEntry?.song?.id == newEntry?.song?.id && oldEntry?.userName == newEntry?.userName
+            return oldEntry.song.id == newEntry.song.id && oldEntry.userName == newEntry.userName
         }
 
-        override fun areContentsTheSame(oldItem: QueueItem?, newItem: QueueItem?): Boolean =
-            oldItem?.model == newItem?.model
+        override fun areContentsTheSame(oldItem: QueueItem, newItem: QueueItem): Boolean =
+            oldItem.model == newItem.model
 
     }
 

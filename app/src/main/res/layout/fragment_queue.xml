@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/Queue"
-    android:background="@color/backgroundDark"
+    android:id="@+id/recycler_queue"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/backgroundDark">
 
 </androidx.recyclerview.widget.RecyclerView>
