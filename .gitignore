@@ -71,3 +71,5 @@ fastlane/readme.md
 keystore\.properties
 
 app/play_credentials\.json
+
+\.idea/

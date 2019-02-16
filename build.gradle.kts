@@ -27,6 +27,11 @@ allprojects {
     }
 }
 
+tasks.wrapper {
+    version = Versions.Gradle.runningVersion
+    distributionType = Wrapper.DistributionType.BIN
+}
+
 tasks {
     val clean by registering(Delete::class) {
         delete(buildDir)
