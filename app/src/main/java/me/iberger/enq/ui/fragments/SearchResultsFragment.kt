@@ -29,7 +29,7 @@ class SearchResultsFragment : ResultsFragment() {
         Timber.d("Searching for $query on provider $mProviderID")
         mMainScope.launch {
             loadingHeader.add(ProgressItem())
-            resultsAdapter.clear()
+            songAdapter.clear()
         }
         mBackgroundScope.launch {
             val results = JMusicBot.search(mProviderID, query)

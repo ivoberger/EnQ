@@ -7,7 +7,7 @@ import me.iberger.enq.utils.icon
 import me.iberger.jmusicbot.model.Song
 import splitties.resources.color
 
-class SuggestionsItem(song: Song) : SongItem(song) {
+class ResultItem(song: Song) : SongItem(song) {
 
     override fun bindView(holder: ViewHolder, payloads: MutableList<Any>) {
         super.bindView(holder, payloads)
