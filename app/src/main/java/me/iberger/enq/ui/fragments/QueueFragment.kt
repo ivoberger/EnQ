@@ -63,20 +63,20 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
         Queue.adapter = mFastItemAdapter
         savedInstanceState?.also { mFastItemAdapter.withSavedInstanceState(it, KEY_QUEUE) }
 
-        val drawableRight =
+        val deleteDrawable =
             context!!.icon(CommunityMaterial.Icon2.cmd_star).color(context!!.color(R.color.white)).sizeDp(24)
-        val drawableLeft =
+        val favoritesDrawable =
             context!!.icon(CommunityMaterial.Icon.cmd_delete).color(context!!.color(R.color.white)).sizeDp(24)
         val userPermissions = JMusicBot.user!!.permissions
         val touchCallback = if (userPermissions.contains(Permissions.MOVE)) SimpleSwipeDragCallback(
             this, this,
-            drawableLeft, ItemTouchHelper.LEFT, color(R.color.favorites)
-        ) else SimpleSwipeCallback(this, drawableLeft, ItemTouchHelper.LEFT, color(R.color.favorites))
+            deleteDrawable, ItemTouchHelper.LEFT, color(R.color.favorites)
+        ) else SimpleSwipeCallback(this, deleteDrawable, ItemTouchHelper.LEFT, color(R.color.favorites))
 
         if (userPermissions.contains(Permissions.SKIP)) if (touchCallback is SimpleSwipeCallback)
-            touchCallback.withBackgroundSwipeRight(color(R.color.delete)).withLeaveBehindSwipeRight(drawableRight)
+            touchCallback.withBackgroundSwipeRight(color(R.color.delete)).withLeaveBehindSwipeRight(favoritesDrawable)
         else if (touchCallback is SimpleSwipeDragCallback)
-            touchCallback.withBackgroundSwipeRight(color(R.color.delete)).withLeaveBehindSwipeRight(drawableRight)
+            touchCallback.withBackgroundSwipeRight(color(R.color.delete)).withLeaveBehindSwipeRight(favoritesDrawable)
 
         ItemTouchHelper(touchCallback).attachToRecyclerView(Queue)
 
