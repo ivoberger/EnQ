@@ -1,3 +1,8 @@
+v0.4.0:
+- Compatibility with JMusicBot API >= v0.10
+- BREAKS compatibility with all earlier versions
+- Controls improvement for suggestions and favorites
+- Bugfixes
 v0.3.0:
 - Navigation improvements for more consistent behavior
 - Only Allow Move, Skip, Dislike if user has the corresponding rights
