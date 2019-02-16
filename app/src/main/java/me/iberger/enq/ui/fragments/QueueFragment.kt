@@ -59,8 +59,8 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
         super.onViewCreated(view, savedInstanceState)
         mViewModel.queue.observe(this, Observer { updateQueue(it) })
 
-        Queue.layoutManager = LinearLayoutManager(context).apply { reverseLayout = true }
-        Queue.adapter = mFastItemAdapter
+        recycler_queue.layoutManager = LinearLayoutManager(context).apply { reverseLayout = true }
+        recycler_queue.adapter = mFastItemAdapter
         savedInstanceState?.also { mFastItemAdapter.withSavedInstanceState(it, KEY_QUEUE) }
 
         val deleteDrawable =
@@ -78,7 +78,7 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
         else if (touchCallback is SimpleSwipeDragCallback)
             touchCallback.withBackgroundSwipeRight(color(R.color.delete)).withLeaveBehindSwipeRight(favoritesDrawable)
 
-        ItemTouchHelper(touchCallback).attachToRecyclerView(Queue)
+        ItemTouchHelper(touchCallback).attachToRecyclerView(recycler_queue)
 
         mFastItemAdapter.onLongClickListener = object : OnLongClickListener<QueueItem> {
             override fun onLongClick(v: View, adapter: IAdapter<QueueItem>, item: QueueItem, position: Int): Boolean {

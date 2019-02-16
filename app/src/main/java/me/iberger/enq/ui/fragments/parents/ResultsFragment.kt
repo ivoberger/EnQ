@@ -40,13 +40,14 @@ open class ResultsFragment : Fragment() {
         })
     }
     lateinit var fastAdapter: FastAdapter<SongItem>
+    open val isRemoveAfterEnQ = true
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         fastAdapter = FastAdapter.with(listOf(loadingHeader, resultsAdapter))
 
-        Queue.layoutManager = LinearLayoutManager(context)
-        Queue.adapter = fastAdapter
+        recycler_queue.layoutManager = LinearLayoutManager(context)
+        recycler_queue.adapter = fastAdapter
 
         fastAdapter.onClickListener = object : OnClickListener<SongItem> {
             override fun onClick(v: View?, adapter: IAdapter<SongItem>, item: SongItem, position: Int): Boolean {
@@ -54,7 +55,7 @@ open class ResultsFragment : Fragment() {
                 mBackgroundScope.launch {
                     JMusicBot.enqueue(item.model)
                     withContext(Dispatchers.Main) {
-                        resultsAdapter.remove(position)
+                        if (isRemoveAfterEnQ) resultsAdapter.remove(position)
                         context!!.toastShort(
                             context!!.getString(
                                 R.string.msg_enqueued,

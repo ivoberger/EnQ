@@ -43,7 +43,7 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
         getSuggestions()
         val canDisklike = JMusicBot.user!!.permissions.contains(Permissions.DISLIKE)
         setupSwipeActions(
-            context!!, Queue, this,
+            context!!, recycler_queue, this,
             CommunityMaterial.Icon2.cmd_star, R.color.favorites,
             if (canDisklike) CommunityMaterial.Icon.cmd_delete else null, R.color.delete
         )
