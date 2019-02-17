@@ -28,3 +28,8 @@
   public *;
 }
 -dontwarn com.bumptech.glide.load.resource.bitmap.VideoDecoder
+
+-keep @kotlin.Metadata class com.ivoberger.jmusicbot.model.**
+-keep class com.ivoberger.jmusicbot.model.** {
+    <fields>;
+}

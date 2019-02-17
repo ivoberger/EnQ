@@ -73,3 +73,9 @@ keystore\.properties
 app/play_credentials\.json
 
 \.idea/
+
+play-credentials\.json
+
+*.jks
+
+sentry\.properties
