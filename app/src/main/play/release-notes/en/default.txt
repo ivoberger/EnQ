@@ -1,3 +1,5 @@
+v0.4.2:
+- critical bugfix - the app works now..
 v0.4.1:
 - fixes enqueue in suggestions and search
 v0.4.0:
