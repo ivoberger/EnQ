@@ -14,7 +14,7 @@ android {
         minSdkVersion(21)
         targetSdkVersion(28)
         versionCode = 2
-        versionName = "0.4.1"
+        versionName = "0.4.2"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -82,6 +82,7 @@ dependencies {
     implementation(Libs.timbersentry)
 
     implementation(Libs.glide)
+    kapt(Libs.com_github_bumptech_glide_compiler)
     implementation(Libs.moshi)
     implementation(Libs.okio)
 

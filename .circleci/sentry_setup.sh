@@ -3,13 +3,13 @@ echo "Setting environment variables"
 export SENTRY_FILE=app/src/main/resources/sentry.properties
 export SENTRY_PG_FILE=sentry.properties
 echo "Setting version"
-export APP_VERSION=`sed -n 's/^\s*versionName\s//p' app/build.gradle | sed 's/"//g'`
+export APP_VERSION=`sed -n 's/^\s*versionName\s//p' app/build.gradle.kts | sed 's/"//g'`
 echo "App version is ${APP_VERSION}"
 echo "Writing ${SENTRY_FILE}"
 mkdir -p app/src/main/resources
 cat <<EOF > ${SENTRY_FILE}
 dsn=${SENTRY_DSN}
-stacktrace.app.packages=me.iberger.enq
+stacktrace.app.packages=com.ivoberger.enq
 release=${APP_VERSION}
 EOF
 echo "Writing ${SENTRY_PG_FILE}"

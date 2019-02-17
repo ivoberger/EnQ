@@ -58,7 +58,13 @@ object Libs {
 
     /**
      * https://github.com/bumptech/glide */
-    const val glide: String = "com.github.bumptech.glide:glide:" + Versions.glide
+    const val com_github_bumptech_glide_compiler: String = "com.github.bumptech.glide:compiler:" +
+            Versions.com_github_bumptech_glide
+
+    /**
+     * https://github.com/bumptech/glide */
+    const val glide: String = "com.github.bumptech.glide:glide:" +
+            Versions.com_github_bumptech_glide
 
     const val com_github_triplet_play_gradle_plugin: String =
             "com.github.triplet.play:com.github.triplet.play.gradle.plugin:" +

@@ -23,13 +23,13 @@ object Versions {
 
     const val recyclerview: String = "1.1.0-alpha02" 
 
-    const val com_android_tools_build_gradle: String = "3.5.0-alpha03"
+    const val com_android_tools_build_gradle: String = "3.5.0-alpha03" 
 
     const val lint_gradle: String = "26.5.0-alpha04" 
 
     const val jwtdecode: String = "1.2.0" 
 
-    const val glide: String = "4.8.0" 
+    const val com_github_bumptech_glide: String = "4.8.0" 
 
     const val com_github_triplet_play_gradle_plugin: String = "2.1.0" 
 

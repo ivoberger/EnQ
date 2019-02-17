@@ -5,23 +5,23 @@
     app:startDestination="@id/Queue">
     <fragment
         android:id="@+id/Queue"
-        android:name="me.iberger.enq.ui.fragments.QueueFragment"
+        android:name="com.ivoberger.enq.ui.fragments.QueueFragment"
         android:label="QueueFragment" />
     <fragment
         android:id="@+id/Favorites"
-        android:name="me.iberger.enq.ui.fragments.FavoritesFragment"
+        android:name="com.ivoberger.enq.ui.fragments.FavoritesFragment"
         android:label="FavoritesFragment" />
     <fragment
         android:id="@+id/Suggestions"
-        android:name="me.iberger.enq.ui.fragments.SuggestionsFragment"
+        android:name="com.ivoberger.enq.ui.fragments.SuggestionsFragment"
         android:label="SuggestionsFragment" />
     <fragment
         android:id="@+id/Search"
-        android:name="me.iberger.enq.ui.fragments.SearchFragment"
+        android:name="com.ivoberger.enq.ui.fragments.SearchFragment"
         android:label="SearchFragment" />
     <fragment
         android:id="@+id/Settings"
-        android:name="me.iberger.enq.ui.fragments.SettingsFragment"
+        android:name="com.ivoberger.enq.ui.fragments.SettingsFragment"
         android:label="SettingsFragment" />
 
     <action
