@@ -34,9 +34,13 @@ abstract class SongListFragment<T : SongItem> : Fragment() {
     open lateinit var fastAdapter: FastAdapter<T>
     open val isRemoveAfterEnQ = true
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        fastAdapter = FastAdapter.with(songAdapter)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fastAdapter = FastAdapter.with(songAdapter)
 
         recycler_queue.layoutManager = LinearLayoutManager(context)
         recycler_queue.adapter = fastAdapter
