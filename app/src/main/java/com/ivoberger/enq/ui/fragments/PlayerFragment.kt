@@ -10,8 +10,8 @@ import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.bumptech.glide.Glide
 import com.ivoberger.enq.R
+import com.ivoberger.enq.persistence.GlideApp
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.MainActivity.Companion.favorites
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
@@ -169,8 +169,8 @@ class PlayerFragment : Fragment() {
             song_title.text = song.title
             song_description.text = song.description
             if (song.albumArtUrl != null)
-                Glide.with(this@PlayerFragment).load(song.albumArtUrl).into(song_album_art)
-            else Glide.with(this@PlayerFragment).clear(song_album_art)
+                GlideApp.with(this@PlayerFragment).load(song.albumArtUrl).into(song_album_art)
+            else GlideApp.with(this@PlayerFragment).clear(song_album_art)
             song.duration?.also {
                 song_duration.text = String.format("%02d:%02d", it / 60, it % 60)
             }

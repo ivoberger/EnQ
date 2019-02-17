@@ -4,8 +4,8 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.ivoberger.enq.R
+import com.ivoberger.enq.persistence.GlideApp
 import com.ivoberger.jmusicbot.model.Song
 import com.mikepenz.fastadapter.items.ModelAbstractItem
 
@@ -22,7 +22,7 @@ open class SongItem(song: Song) : ModelAbstractItem<Song, SongItem.ViewHolder>(s
         holder.txtTitle.text = model.title
         holder.txtDescription.text = model.description
 
-        model.albumArtUrl?.also { Glide.with(holder.itemView).load(it).into(holder.imgAlbumArt) }
+        model.albumArtUrl?.also { GlideApp.with(holder.itemView).load(it).into(holder.imgAlbumArt) }
         model.duration?.also {
             holder.txtDuration.text = String.format("%02d:%02d", it / 60, it % 60)
         }

@@ -82,6 +82,7 @@ dependencies {
     implementation(Libs.timbersentry)
 
     implementation(Libs.glide)
+    kapt(Libs.com_github_bumptech_glide_compiler)
     implementation(Libs.moshi)
     implementation(Libs.okio)
 

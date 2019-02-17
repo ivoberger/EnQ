@@ -4,8 +4,8 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.ivoberger.enq.R
+import com.ivoberger.enq.persistence.GlideApp
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.utils.icon
 import com.ivoberger.jmusicbot.model.QueueEntry
@@ -35,7 +35,7 @@ class QueueItem(
         holder.txtTitle.text = song.title
         holder.txtDescription.text = song.description
 
-        song.albumArtUrl?.also { Glide.with(holder.itemView).load(it).into(holder.imgAlbumArt) }
+        song.albumArtUrl?.also { GlideApp.with(holder.itemView).load(it).into(holder.imgAlbumArt) }
         song.duration?.also {
             holder.txtDuration.text = String.format("%02d:%02d", it / 60, it % 60)
         }
