@@ -1,28 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/Queue">
     <fragment
         android:id="@+id/Queue"
         android:name="com.ivoberger.enq.ui.fragments.QueueFragment"
-        android:label="QueueFragment" />
+        android:label="QueueFragment"
+        tools:layout="@layout/fragment_queue" />
     <fragment
         android:id="@+id/Favorites"
         android:name="com.ivoberger.enq.ui.fragments.FavoritesFragment"
-        android:label="FavoritesFragment" />
+        android:label="FavoritesFragment"
+        tools:layout="@layout/fragment_queue" />
     <fragment
         android:id="@+id/Suggestions"
         android:name="com.ivoberger.enq.ui.fragments.SuggestionsFragment"
-        android:label="SuggestionsFragment" />
+        android:label="SuggestionsFragment"
+        tools:layout="@layout/fragment_results" />
     <fragment
         android:id="@+id/Search"
         android:name="com.ivoberger.enq.ui.fragments.SearchFragment"
-        android:label="SearchFragment" />
+        android:label="SearchFragment"
+        tools:layout="@layout/fragment_results" />
     <fragment
         android:id="@+id/Settings"
         android:name="com.ivoberger.enq.ui.fragments.SettingsFragment"
         android:label="SettingsFragment" />
+    <fragment
+        android:id="@+id/UserInfo"
+        android:name="com.ivoberger.enq.ui.fragments.UserInfoFragment"
+        android:label="fragment_user_info"
+        tools:layout="@layout/fragment_user_info" />
 
     <action
         android:id="@id/nav_queue"
@@ -39,4 +49,7 @@
     <action
         android:id="@+id/nav_settings"
         app:destination="@id/Settings" />
+    <action
+        android:id="@+id/nav_user_info"
+        app:destination="@id/UserInfo" />
 </navigation>

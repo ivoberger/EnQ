@@ -6,15 +6,11 @@ import androidx.fragment.app.FragmentManager
 import com.ivoberger.enq.ui.fragments.parents.TabbedSongListFragment
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.MusicBotPlugin
-import kotlinx.android.synthetic.main.fragment_search.*
+import kotlinx.android.synthetic.main.fragment_results.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class SuggestionsFragment : TabbedSongListFragment() {
-    companion object {
-
-        fun newInstance() = SuggestionsFragment()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

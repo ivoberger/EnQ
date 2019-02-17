@@ -11,13 +11,13 @@ import com.ivoberger.enq.ui.fragments.parents.TabbedSongListFragment
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
 import com.ivoberger.jmusicbot.model.MusicBotPlugin
-import kotlinx.android.synthetic.main.fragment_search.*
+import kotlinx.android.synthetic.main.fragment_results.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-@ContentView(R.layout.fragment_search)
+@ContentView(R.layout.fragment_results)
 class SearchFragment : TabbedSongListFragment(), ConnectionChangeListener {
 
     companion object {

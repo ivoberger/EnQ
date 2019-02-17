@@ -29,4 +29,5 @@
     <string name="nav_about">Info</string>
     <string name="msg_unknown_error">Ein unbekannter Fehler ist aufgetreten</string>
     <string name="msg_server_error">Unbekannter Server Fehler</string>
+    <string name="desc_avatar">Avatar</string>
 </resources>

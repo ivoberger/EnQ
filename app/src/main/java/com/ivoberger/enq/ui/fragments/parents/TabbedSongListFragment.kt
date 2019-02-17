@@ -13,11 +13,11 @@ import com.ivoberger.enq.persistence.Configuration
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
 import com.ivoberger.jmusicbot.model.MusicBotPlugin
-import kotlinx.android.synthetic.main.fragment_search.*
+import kotlinx.android.synthetic.main.fragment_results.*
 import kotlinx.coroutines.*
 import timber.log.Timber
 
-@ContentView(R.layout.fragment_search)
+@ContentView(R.layout.fragment_results)
 abstract class TabbedSongListFragment : Fragment(), ViewPager.OnPageChangeListener,
     ConnectionChangeListener {
     val mMainScope = CoroutineScope(Dispatchers.Main)
