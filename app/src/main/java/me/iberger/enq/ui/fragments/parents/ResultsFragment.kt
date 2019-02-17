@@ -25,9 +25,13 @@ open class ResultsFragment : SongListFragment<ResultItem>() {
         })
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        fastAdapter = FastAdapter.with(listOf(loadingHeader, songAdapter))
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fastAdapter = FastAdapter.with(listOf(loadingHeader, songAdapter))
 
         recycler_queue.layoutManager = LinearLayoutManager(context)
         recycler_queue.adapter = fastAdapter
