@@ -11,12 +11,10 @@ import com.ivoberger.jmusicbot.api.withToken
 import com.ivoberger.jmusicbot.exceptions.*
 import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
 import com.ivoberger.jmusicbot.model.*
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import splitties.systemservices.wifiManager
 import timber.log.Timber
 import java.util.*
@@ -27,6 +25,12 @@ object JMusicBot {
     var state: MusicBotState = MusicBotState.DISCONNECTED
         set(newState) {
             Timber.d("State changed from $field to $newState")
+            if (newState == MusicBotState.NEEDS_AUTH || newState == MusicBotState.DISCONNECTED) {
+                stopQueueUpdates()
+                stopPlayerUpdates()
+                mOkHttpClient = getDefaultOkHttpClient()
+                mRetrofit = getDefaultRetrofitClient(mOkHttpClient, baseUrl)
+            }
             field = newState
         }
     private val mWifiManager: WifiManager? by lazy { wifiManager }
@@ -38,19 +42,14 @@ object JMusicBot {
             value?.let { mRetrofit = mRetrofit.newBuilder().baseUrl(it).build() }
         }
 
-    private var mOkHttpClient: OkHttpClient = OkHttpClient.Builder().cache(null).build()
+    private var mOkHttpClient: OkHttpClient = getDefaultOkHttpClient()
         set(value) {
             field = value
             // rebuild retrofit with new okHttpClient
             mRetrofit = mRetrofit.newBuilder().client(value).build()
         }
 
-    private var mRetrofit: Retrofit = Retrofit.Builder()
-        .addConverterFactory(MoshiConverterFactory.create(mMoshi).asLenient())
-        .baseUrl(baseUrl ?: "http://localhost")
-        .client(mOkHttpClient)
-        .addCallAdapterFactory(CoroutineCallAdapterFactory())
-        .build()
+    private var mRetrofit: Retrofit = getDefaultRetrofitClient(mOkHttpClient, baseUrl)
         set(value) {
             field = value
             // rebuild API client with new retrofit
@@ -60,24 +59,33 @@ object JMusicBot {
     private var mApiClient: MusicBotAPI = mRetrofit.create(MusicBotAPI::class.java)
 
     val connectionChangeListeners: MutableList<ConnectionChangeListener> = mutableListOf()
+    var isConnected: Boolean = false
+        get() = state.isConnected()
+        set(value) {
+            field = value
+            connectionChangeListeners.forEach { if (value) it.onConnectionRecovered() else it.onConnectionLost() }
+            if (!value) state = MusicBotState.DISCONNECTED
+        }
 
     private val mQueue: MutableLiveData<List<QueueEntry>> = MutableLiveData()
-
     private val mPlayerState: MutableLiveData<PlayerState> = MutableLiveData()
+
     private var mQueueUpdateTimer: Timer? = null
     private var mPlayerUpdateTimer: Timer? = null
 
     var user: User?
         get() = BotPreferences.user
         set(value) {
+            if (value == null) authToken = null
             BotPreferences.user = value
         }
 
     var authToken: JWT? = BotPreferences.authToken
         get() = BotPreferences.authToken
         set(value) {
-            field = value
             BotPreferences.authToken = value
+            if (value == null) state = MusicBotState.NEEDS_AUTH
+            field = value
             field?.let {
                 state = MusicBotState.CONNECTED
                 user?.permissions = Permissions.fromClaims(it.claims)
@@ -136,7 +144,6 @@ object JMusicBot {
     }
 
     private suspend fun tokenValid(): Boolean {
-        authToken = null
         if (authToken == null) {
             Timber.d("Invalid Token: No token stored")
             return false
@@ -217,6 +224,11 @@ object JMusicBot {
         authToken?.also { user?.password = newPassword }
     }
 
+    suspend fun reloadPermissions() {
+        authToken = null
+        authorize()
+    }
+
     @Throws(
         InvalidParametersException::class,
         AuthException::class,
@@ -228,6 +240,7 @@ object JMusicBot {
         state.connectionCheck()
         authToken ?: throw IllegalStateException("Auth token is null")
         mApiClient.deleteUser().process()
+        user = null
     }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
@@ -353,10 +366,8 @@ object JMusicBot {
 
     fun onConnectionLost(e: Exception) {
         Timber.e(e)
-        stopQueueUpdates()
-        stopPlayerUpdates()
+        isConnected = false
         baseUrl = null
-        connectionChangeListeners.forEach { it.onConnectionLost(e) }
         runBlocking {
             while (true) {
                 try {
@@ -372,7 +383,7 @@ object JMusicBot {
                 }
             }
         }
-        connectionChangeListeners.forEach { it.onConnectionRecovered() }
+        isConnected = true
         startQueueUpdates()
         startPlayerUpdates()
     }

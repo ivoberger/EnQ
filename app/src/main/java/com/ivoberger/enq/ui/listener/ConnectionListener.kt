@@ -8,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ConnectionListener(private val mainActivity: MainActivity) : ConnectionChangeListener {
-    override fun onConnectionLost(e: Exception) {
+    override fun onConnectionLost(e: Exception?) {
         mainActivity.mainScope.launch(Dispatchers.Main) {
             mainActivity.main_bottom_navigation.setBackgroundResource(R.color.red_500)
         }

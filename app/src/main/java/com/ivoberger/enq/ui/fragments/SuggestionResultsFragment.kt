@@ -45,7 +45,7 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
         getSuggestions()
         if (mCanDisklike) fastAdapter.onLongClickListener = object : OnLongClickListener<ResultItem> {
             override fun onLongClick(v: View, adapter: IAdapter<ResultItem>, item: ResultItem, position: Int): Boolean {
-                if (!mViewModel.connected) return false
+                if (!JMusicBot.isConnected) return false
                 mBackgroundScope.launch {
                     JMusicBot.deleteSuggestion(mSuggesterId, item.model)
                     withContext(mMainScope.coroutineContext) { songAdapter.remove(position) }

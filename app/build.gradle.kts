@@ -86,6 +86,8 @@ dependencies {
     implementation(Libs.moshi)
     implementation(Libs.okio)
 
+    implementation(Libs.splitties_views_appcompat)
+    implementation(Libs.splitties_toast)
     implementation(Libs.splitties_material_colors)
     implementation(Libs.splitties_resources)
 

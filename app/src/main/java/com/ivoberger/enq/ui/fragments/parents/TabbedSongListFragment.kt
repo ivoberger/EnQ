@@ -47,7 +47,7 @@ abstract class TabbedSongListFragment : Fragment(), ViewPager.OnPageChangeListen
 
     abstract fun initializeTabs()
 
-    override fun onConnectionLost(e: Exception) {
+    override fun onConnectionLost(e: Exception?) {
         view_pager.adapter = null
     }
 

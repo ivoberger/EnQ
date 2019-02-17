@@ -47,7 +47,7 @@ abstract class SongListFragment<T : SongItem> : Fragment() {
 
         fastAdapter.onClickListener = object : OnClickListener<T> {
             override fun onClick(v: View?, adapter: IAdapter<T>, item: T, position: Int): Boolean {
-                if (!mViewModel.connected) return false
+                if (!JMusicBot.isConnected) return false
                 mBackgroundScope.launch {
                     JMusicBot.enqueue(item.model)
                     withContext(Dispatchers.Main) {

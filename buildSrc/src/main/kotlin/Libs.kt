@@ -109,6 +109,16 @@ object Libs {
             "com.louiscad.splitties:splitties-systemservices:" + Versions.com_louiscad_splitties
 
     /**
+     * https://github.com/LouisCAD/Splitties */
+    const val splitties_toast: String = "com.louiscad.splitties:splitties-toast:" +
+            Versions.com_louiscad_splitties
+
+    /**
+     * https://github.com/LouisCAD/Splitties */
+    const val splitties_views_appcompat: String =
+            "com.louiscad.splitties:splitties-views-appcompat:" + Versions.com_louiscad_splitties
+
+    /**
      * https://github.com/mikepenz/AboutLibraries */
     const val aboutlibraries: String = "com.mikepenz:aboutlibraries:" + Versions.aboutlibraries
 

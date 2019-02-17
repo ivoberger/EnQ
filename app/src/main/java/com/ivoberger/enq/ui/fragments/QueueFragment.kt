@@ -105,7 +105,7 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
             val entry = mFastItemAdapter.getAdapterItem(position)
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
-                    if (!mViewModel.connected) return@launch
+                    if (!JMusicBot.isConnected) return@launch
                     try {
                         JMusicBot.dequeue(entry.song)
                     } catch (e: AuthException) {
@@ -127,13 +127,13 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
     }
 
     override fun itemTouchOnMove(oldPosition: Int, newPosition: Int): Boolean {
-        if (!mViewModel.connected) return false
+        if (!JMusicBot.isConnected) return false
         DragDropUtil.onMove(mFastItemAdapter.itemAdapter, oldPosition, newPosition)
         return true
     }
 
     override fun itemTouchDropped(oldPosition: Int, newPosition: Int) {
-        if (!mViewModel.connected) return
+        if (!JMusicBot.isConnected) return
         mBackgroundScope.launch {
             val entry = mFastItemAdapter.getAdapterItem(newPosition).model
             Timber.d("Moved ${entry.song.title} from $oldPosition to $newPosition")

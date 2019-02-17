@@ -20,10 +20,6 @@ import timber.log.Timber
 @ContentView(R.layout.fragment_results)
 class SearchFragment : TabbedSongListFragment(), ConnectionChangeListener {
 
-    companion object {
-        fun newInstance() = SearchFragment()
-    }
-
     private lateinit var mSearchView: SearchView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,7 +75,7 @@ class SearchFragment : TabbedSongListFragment(), ConnectionChangeListener {
         }
     }
 
-    override fun onConnectionLost(e: Exception) {
+    override fun onConnectionLost(e: Exception?) {
         activity?.supportFragmentManager?.popBackStack()
     }
 

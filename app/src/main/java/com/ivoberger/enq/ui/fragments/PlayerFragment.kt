@@ -105,7 +105,7 @@ class PlayerFragment : Fragment() {
     }
 
     private fun changePlaybackState() = mBackgroundScope.launch {
-        if (!mViewModel.connected) return@launch
+        if (!JMusicBot.isConnected) return@launch
         if (mShowSkip) {
             try {
                 JMusicBot.skip()
