@@ -9,7 +9,7 @@ echo "Writing ${SENTRY_FILE}"
 mkdir -p app/src/main/resources
 cat <<EOF > ${SENTRY_FILE}
 dsn=${SENTRY_DSN}
-stacktrace.app.packages=me.iberger.enq
+stacktrace.app.packages=com.ivoberger.enq
 release=${APP_VERSION}
 EOF
 echo "Writing ${SENTRY_PG_FILE}"

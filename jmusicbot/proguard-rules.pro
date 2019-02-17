@@ -21,8 +21,8 @@
 #-renamesourcefileattribute SourceFile
 
 # don't obfuscate data classes
--keep @kotlin.Metadata class me.iberger.jmusicbot.dayta.**
--keep class me.iberger.jmusicbot.data.** {
+-keep @kotlin.Metadata class com.ivoberger.jmusicbot.model.**
+-keep class com.ivoberger.jmusicbot.model.** {
     <fields>;
 }
 
