@@ -3,14 +3,14 @@ package com.ivoberger.enq.ui.fragments
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import com.ivoberger.enq.ui.fragments.parents.TabbedSongListFragment
+import com.ivoberger.enq.ui.fragments.parents.TabbedResultsFragment
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.MusicBotPlugin
 import kotlinx.android.synthetic.main.fragment_results.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
-class SuggestionsFragment : TabbedSongListFragment() {
+class SuggestionsFragment : TabbedResultsFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +40,7 @@ class SuggestionsFragment : TabbedSongListFragment() {
     }
 
     inner class SuggestionsFragmentPager(fm: FragmentManager, provider: List<MusicBotPlugin>) :
-        TabbedSongListFragment.SongListFragmentPager(fm, provider) {
+        TabbedResultsFragment.SongListFragmentPager(fm, provider) {
 
         override fun getItem(position: Int): Fragment =
             SuggestionResultsFragment.newInstance(provider[position].id)

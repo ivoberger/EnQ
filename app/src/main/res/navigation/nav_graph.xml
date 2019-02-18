@@ -31,7 +31,7 @@
     <fragment
         android:id="@+id/UserInfo"
         android:name="com.ivoberger.enq.ui.fragments.UserInfoFragment"
-        android:label="fragment_user_info"
+        android:label="UserInfoFragment"
         tools:layout="@layout/fragment_user_info" />
 
     <action

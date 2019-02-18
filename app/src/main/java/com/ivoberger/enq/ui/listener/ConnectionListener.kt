@@ -16,7 +16,7 @@ class ConnectionListener(private val mainActivity: MainActivity) : ConnectionCha
 
     override fun onConnectionRecovered() {
         mainActivity.mainScope.launch(Dispatchers.Main) {
-            mainActivity.main_bottom_navigation.setBackgroundResource(R.color.background)
+            mainActivity.main_bottom_navigation.setBackgroundResource(R.color.primaryDarkColor)
         }
     }
 }

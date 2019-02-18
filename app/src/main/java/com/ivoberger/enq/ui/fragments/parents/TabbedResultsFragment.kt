@@ -18,7 +18,7 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 
 @ContentView(R.layout.fragment_results)
-abstract class TabbedSongListFragment : Fragment(), ViewPager.OnPageChangeListener,
+abstract class TabbedResultsFragment : Fragment(), ViewPager.OnPageChangeListener,
     ConnectionChangeListener {
     val mMainScope = CoroutineScope(Dispatchers.Main)
 

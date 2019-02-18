@@ -5,7 +5,7 @@
     android:id="@+id/current_song_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="?attr/colorPrimary"
     tools:ignore="MissingPrefix,UnusedAttribute">
 
     <ImageView
@@ -17,7 +17,7 @@
         android:layout_marginBottom="5dp"
         android:contentDescription="@string/lbl_album_art"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingPrefix" />
 
@@ -29,23 +29,24 @@
         android:ellipsize="marquee"
         android:marqueeRepeatLimit="marquee_forever"
         android:singleLine="true"
+        android:textAppearance="?attr/textAppearanceBody1"
         app:layout_constraintBottom_toTopOf="@id/song_description"
-        app:layout_constraintLeft_toRightOf="@id/song_album_art"
-        app:layout_constraintRight_toLeftOf="@id/song_chosen_by"
+        app:layout_constraintEnd_toStartOf="@id/song_chosen_by"
+        app:layout_constraintStart_toEndOf="@id/song_album_art"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/song_description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/song_info_margin"
         android:layout_marginBottom="1dp"
         android:ellipsize="marquee"
         android:marqueeRepeatLimit="marquee_forever"
         android:singleLine="true"
+        android:textAppearance="?attr/textAppearanceBody2"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/song_album_art"
-        app:layout_constraintRight_toLeftOf="@id/song_duration"
+        app:layout_constraintEnd_toStartOf="@id/song_duration"
+        app:layout_constraintStart_toStartOf="@id/song_title"
         app:layout_constraintTop_toBottomOf="@id/song_title" />
 
     <TextView
@@ -53,11 +54,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/song_info_margin"
-        android:layout_marginEnd="5dp"
+        android:layout_marginEnd="15dp"
         android:layout_marginBottom="1dp"
+        android:textAppearance="?attr/textAppearanceCaption"
         android:textStyle="italic"
         app:layout_constraintBottom_toTopOf="@id/song_duration"
-        app:layout_constraintRight_toLeftOf="@id/song_play_pause"
+        app:layout_constraintEnd_toStartOf="@id/song_play_pause"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -65,11 +67,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/song_info_margin"
-        android:layout_marginEnd="10dp"
         android:layout_marginBottom="1dp"
+        android:textAppearance="?attr/textAppearanceCaption"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/song_description"
-        app:layout_constraintRight_toLeftOf="@id/song_play_pause"
+        app:layout_constraintEnd_toEndOf="@id/song_chosen_by"
         app:layout_constraintTop_toBottomOf="@id/song_chosen_by" />
 
     <ImageButton
@@ -80,7 +81,7 @@
         android:layout_marginBottom="1dp"
         android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/song_favorite"
+        app:layout_constraintEnd_toStartOf="@id/song_favorite"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
@@ -91,7 +92,7 @@
         android:layout_marginBottom="1dp"
         android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
@@ -99,5 +100,6 @@
         style="@android:style/Widget.Material.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:progressBackgroundTint="?attr/colorPrimaryVariant"
         app:layout_constraintBottom_toBottomOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

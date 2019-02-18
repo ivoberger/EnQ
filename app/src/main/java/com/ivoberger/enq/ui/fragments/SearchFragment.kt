@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.ivoberger.enq.R
 import com.ivoberger.enq.ui.MainActivity
-import com.ivoberger.enq.ui.fragments.parents.TabbedSongListFragment
+import com.ivoberger.enq.ui.fragments.parents.TabbedResultsFragment
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
 import com.ivoberger.jmusicbot.model.MusicBotPlugin
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @ContentView(R.layout.fragment_results)
-class SearchFragment : TabbedSongListFragment(), ConnectionChangeListener {
+class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
 
     private lateinit var mSearchView: SearchView
 
@@ -88,7 +88,7 @@ class SearchFragment : TabbedSongListFragment(), ConnectionChangeListener {
     }
 
     inner class SearchFragmentPager(fm: FragmentManager, provider: List<MusicBotPlugin>) :
-        TabbedSongListFragment.SongListFragmentPager(fm, provider) {
+        TabbedResultsFragment.SongListFragmentPager(fm, provider) {
 
         override fun getItem(position: Int): Fragment =
             SearchResultsFragment.newInstance(provider[position].id)

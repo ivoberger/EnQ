@@ -8,12 +8,12 @@ import com.ivoberger.enq.R
 import com.ivoberger.enq.persistence.GlideApp
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.utils.icon
+import com.ivoberger.enq.utils.secondaryColor
 import com.ivoberger.jmusicbot.model.QueueEntry
 import com.ivoberger.jmusicbot.model.Song
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.fastadapter.drag.IDraggable
 import com.mikepenz.fastadapter.items.ModelAbstractItem
-import splitties.resources.color
 
 class QueueItem(
     queueEntry: QueueEntry,
@@ -45,7 +45,7 @@ class QueueItem(
         holder.txtDuration.compoundDrawablePadding = 20
         if (song in MainActivity.favorites) holder.txtDuration.setCompoundDrawables(
             context.icon(CommunityMaterial.Icon2.cmd_star)
-                .color(context.color(R.color.favorites)).sizeDp(10),
+                .color(context.secondaryColor()).sizeDp(10),
             null, null, null
         )
     }

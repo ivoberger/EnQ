@@ -17,10 +17,12 @@ class MainNavigationListener(private val mainActivity: MainActivity) : NavContro
             R.id.Queue -> checkIfNotChecked(0)
             R.id.Suggestions -> checkIfNotChecked(1)
             R.id.Favorites -> checkIfNotChecked(2)
+            else -> mainActivity.main_bottom_navigation.menu.setGroupCheckable(0, false, true)
         }
     }
 
     private fun checkIfNotChecked(idx: Int) {
+        mainActivity.main_bottom_navigation.menu.setGroupCheckable(0, true, true)
         if (!mainActivity.main_bottom_navigation.menu[idx].isChecked)
             mainActivity.main_bottom_navigation.menu[idx].isChecked = true
     }
