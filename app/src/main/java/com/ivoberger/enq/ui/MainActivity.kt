@@ -20,10 +20,7 @@ import com.ivoberger.enq.ui.fragments.PlayerFragment
 import com.ivoberger.enq.ui.listener.ConnectionListener
 import com.ivoberger.enq.ui.listener.MainNavigationListener
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
-import com.ivoberger.enq.utils.icon
-import com.ivoberger.enq.utils.loadFavorites
-import com.ivoberger.enq.utils.showLoginDialog
-import com.ivoberger.enq.utils.showServerDiscoveryDialog
+import com.ivoberger.enq.utils.*
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.Song
 import com.mikepenz.aboutlibraries.Libs
@@ -64,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         mBackgroundScope.launch {
             // logging
             if (!mTreePlanted) {
-                Timber.plant(if (BuildConfig.DEBUG) Timber.DebugTree() else SentryTree(context = this@MainActivity))
+                Timber.plant(if (BuildConfig.DEBUG) EnQDebugTree() else SentryTree(context = this@MainActivity))
                 mTreePlanted = true
             }
             // saved data
