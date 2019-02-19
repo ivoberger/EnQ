@@ -104,4 +104,11 @@
         <item name="itemIconSize">22dp</item>
     </style>
 
+
+    <style name="Divider">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">?attr/colorPrimaryVariant</item>
+    </style>
+
 </resources>
