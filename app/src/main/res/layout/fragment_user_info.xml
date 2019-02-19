@@ -6,74 +6,80 @@
     android:layout_height="match_parent"
     tools:context="com.ivoberger.enq.ui.fragments.UserInfoFragment">
 
-    <ImageView
-        android:id="@+id/img_user_avatar"
-        android:layout_width="200dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="100dp"
-        android:contentDescription="@string/desc_avatar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@tools:sample/avatars" />
-
-    <TextView
-        android:id="@+id/lbl_username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/lbl_username"
-        app:layout_constraintEnd_toStartOf="@id/txt_username"
-        app:layout_constraintStart_toStartOf="@id/img_user_avatar"
-        app:layout_constraintTop_toBottomOf="@id/img_user_avatar" />
-
     <TextView
         android:id="@+id/txt_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="@id/img_user_avatar"
-        app:layout_constraintStart_toEndOf="@id/lbl_username"
-        app:layout_constraintTop_toBottomOf="@id/img_user_avatar" />
+        android:layout_marginBottom="50dp"
+        android:minWidth="200dp"
+        android:textAlignment="center"
+        android:textAppearance="?attr/textAppearanceHeadline3"
+        app:layout_constraintBottom_toTopOf="@id/input_password"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/input_password"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/hint_password"
+        android:theme="@style/Widget.EnQ.TextInputLayout"
+        app:layout_constraintBottom_toTopOf="@id/btn_change_password"
+        app:layout_constraintEnd_toEndOf="@id/txt_username"
+        app:layout_constraintStart_toStartOf="@id/txt_username"
+        app:layout_constraintTop_toBottomOf="@+id/txt_username"
+        app:passwordToggleEnabled="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_change_password"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="@string/btn_change_password"
-        app:layout_constraintEnd_toEndOf="@id/img_user_avatar"
-        app:layout_constraintStart_toStartOf="@id/img_user_avatar"
-        app:layout_constraintTop_toBottomOf="@+id/txt_username" />
+        android:text="@string/btn_set_password"
+        app:layout_constraintBottom_toTopOf="@id/btn_reload_permissions"
+        app:layout_constraintEnd_toEndOf="@id/txt_username"
+        app:layout_constraintStart_toStartOf="@id/txt_username"
+        app:layout_constraintTop_toBottomOf="@+id/input_password" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_reload_permissions"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:text="@string/btn_reload_permissons"
-        app:layout_constraintEnd_toEndOf="@id/img_user_avatar"
-        app:layout_constraintStart_toStartOf="@id/img_user_avatar"
+        app:layout_constraintBottom_toTopOf="@id/btn_logout"
+        app:layout_constraintEnd_toEndOf="@id/txt_username"
+        app:layout_constraintStart_toStartOf="@id/txt_username"
         app:layout_constraintTop_toBottomOf="@+id/btn_change_password" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_logout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:text="@string/btn_logout"
-        app:layout_constraintEnd_toEndOf="@id/img_user_avatar"
-        app:layout_constraintStart_toStartOf="@id/img_user_avatar"
+        app:layout_constraintBottom_toTopOf="@id/btn_delete_user"
+        app:layout_constraintEnd_toEndOf="@id/txt_username"
+        app:layout_constraintStart_toStartOf="@id/txt_username"
         app:layout_constraintTop_toBottomOf="@+id/btn_reload_permissions" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_delete_user"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:text="@string/btn_delete_user"
-        app:layout_constraintEnd_toEndOf="@id/img_user_avatar"
-        app:layout_constraintStart_toStartOf="@id/img_user_avatar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/txt_username"
+        app:layout_constraintStart_toStartOf="@id/txt_username"
         app:layout_constraintTop_toBottomOf="@+id/btn_logout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

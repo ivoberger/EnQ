@@ -14,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import splitties.resources.str
 import splitties.toast.toast
 import splitties.views.onClick
 
@@ -28,7 +29,11 @@ class UserInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mUserViewModel.user?.let {
-            txt_username.text = it.name
+            txt_username.text = str(R.string.txt_username, it.name)
+            if (it.password != null) {
+                btn_change_password.text = str(R.string.btn_change_password)
+                input_password.hint = str(R.string.hint_new_password)
+            }
             btn_change_password.onClick { toast("This could be your password change!") }
             btn_reload_permissions.onClick {
                 if (it.password != null) {

@@ -42,8 +42,8 @@
     </style>
 
     <style name="TextAppearance.Enq.Headline3" parent="TextAppearance.MaterialComponents.Headline3">
-        <item name="fontFamily">@font/rubik_regular</item>
-        <item name="android:fontFamily">@font/rubik_regular</item>
+        <item name="fontFamily">@font/rubik_light</item>
+        <item name="android:fontFamily">@font/rubik_light</item>
     </style>
 
     <style name="TextAppearance.Enq.Headline4" parent="TextAppearance.MaterialComponents.Headline4">
@@ -105,6 +105,9 @@
         <item name="itemIconSize">22dp</item>
     </style>
 
+    <style name="Widget.EnQ.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="colorPrimary">?attr/colorSecondary</item>
+    </style>
 
     <style name="Divider">
         <item name="android:layout_width">0dp</item>

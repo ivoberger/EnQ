@@ -10,12 +10,15 @@
     <string name="tlt_no_server">Server not found</string>
     <string name="btn_retry">Retry</string>
     <string name="msg_server_found">Server found</string>
-    <string name="tlt_server_discovery">Discovering Server...</string>
-    <string name="tlt_logging_in">Logging in...</string>
+    <string name="tlt_server_discovery">Discovering Server…</string>
+    <string name="tlt_logging_in">Logging in…</string>
     <string name="msg_logged_in">Logged in successfully as %1$s</string>
     <string name="msg_username_taken">This username is already taken</string>
     <string name="lbl_username">Username:</string>
+    <string name="txt_username">Username: %1$s</string>
     <string name="lbl_password">Password:</string>
+    <string name="hint_new_password">New Password</string>
+    <string name="btn_set_password">Set Password</string>
     <string name="msg_password_wrong">Wrong password or username</string>
     <string name="msg_nothing_playing">Nothing is playing at the moment</string>
     <string name="msg_queue_smth">EnQ something!</string>
@@ -30,11 +33,12 @@
     <string name="hint_search">Search for a song</string>
     <string name="lbl_search">Search</string>
     <string name="nav_about">About</string>
-    <string name="msg_unknown_error">An unknown error ocurred</string>
+    <string name="msg_unknown_error">An unknown error occurred</string>
     <string name="msg_server_error">Unknown Server Error</string>
-    <string name="btn_change_password">Change Password</string>
     <string name="desc_avatar">Avatar</string>
+    <string name="btn_change_password">Change Password</string>
     <string name="btn_delete_user">Delete User</string>
     <string name="btn_logout">Logout</string>
-    <string name="btn_reload_permissons">Reload Permissons</string>
+    <string name="btn_reload_permissons">Reload Permissions</string>
+    <string name="hint_password">Password</string>
 </resources>
