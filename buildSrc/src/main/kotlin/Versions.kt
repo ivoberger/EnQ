@@ -29,7 +29,7 @@ object Versions {
 
     const val jwtdecode: String = "1.2.0" 
 
-    const val com_github_bumptech_glide: String = "4.8.0" 
+    const val com_github_bumptech_glide: String = "4.9.0" 
 
     const val com_github_triplet_play_gradle_plugin: String = "2.1.0" 
 
@@ -71,7 +71,7 @@ object Versions {
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.3.2" 
 
-    const val sentry_android_gradle_plugin: String = "1.7.20" 
+    const val sentry_android_gradle_plugin: String = "1.7.21" 
 
     const val org_jetbrains_kotlin: String = "1.3.21" 
 
@@ -89,7 +89,7 @@ object Versions {
 
         const val currentVersion: String = "5.2.1"
 
-        const val nightlyVersion: String = "5.3-20190211022529+0000"
+        const val nightlyVersion: String = "5.3-20190219072348+0000"
 
         const val releaseCandidate: String = ""
     }
