@@ -6,8 +6,7 @@
     <color name="secondaryColor">#7cb342</color>
     <color name="secondaryLightColor">#aee571</color>
     <color name="secondaryDarkColor">#4b830d</color>
-    <color name="primaryTextColor">#ffffff</color>
-    <color name="primaryTextColorInactive">#8AFFFFFF</color>
+    <color name="primaryTextColor">#FFFFFF</color>
     <color name="secondaryTextColor">#000000</color>
 
     <color name="white">@android:color/white</color>

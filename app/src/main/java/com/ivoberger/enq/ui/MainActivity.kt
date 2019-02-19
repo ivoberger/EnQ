@@ -79,7 +79,7 @@ class MainActivity : AppCompatActivity() {
             CommunityMaterial.Icon2.cmd_playlist_play,
             CommunityMaterial.Icon.cmd_all_inclusive,
             CommunityMaterial.Icon2.cmd_star_outline
-        ).map { mBackgroundScope.async { icon(it).color(colorSL(R.color.main_navigation)!!) } }
+        ).map { mBackgroundScope.async { icon(it).color(colorSL(R.color.bottom_navigation)!!) } }
         mainScope.launch {
             main_bottom_navigation.menu.forEachIndexed { idx, itm -> itm.icon = icons[idx].await() }
         }

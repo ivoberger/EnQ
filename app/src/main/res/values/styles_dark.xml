@@ -18,31 +18,47 @@
         <item name="textAppearanceBody2">@style/TextAppearance.Enq.Body2</item>
         <item name="textAppearanceCaption">@style/TextAppearance.Enq.Caption</item>
         <item name="textAppearanceButton">@style/TextAppearance.Enq.Button</item>
+
+        <item name="bottomNavigationStyle">@style/Widget.EnQ.BottomNavigationView</item>
     </style>
 
-    <style name="TextAppearance.Enq.Button" parent="TextAppearance.MaterialComponents.Button">
-        <item name="fontFamily">@font/work_sans</item>
-    </style>
+    <!-- TYPOGRAPHY -->
 
     <style name="TextAppearance.Enq.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
-        <item name="fontFamily">@font/work_sans_medium</item>
+        <item name="fontFamily">@font/rubik_medium</item>
+        <item name="android:fontFamily">@font/rubik_medium</item>
     </style>
 
     <style name="TextAppearance.Enq.Body1" parent="TextAppearance.MaterialComponents.Body1">
-        <item name="fontFamily">@font/work_sans</item>
-        <item name="android:fontFamily">@font/work_sans</item>
+        <item name="fontFamily">@font/rubik_regular</item>
+        <item name="android:fontFamily">@font/rubik_regular</item>
     </style>
 
     <style name="TextAppearance.Enq.Body2" parent="TextAppearance.MaterialComponents.Body2">
-        <item name="fontFamily">@font/work_sans</item>
+        <item name="fontFamily">@font/rubik_regular</item>
+        <item name="android:fontFamily">@font/rubik_regular</item>
+    </style>
+
+    <style name="TextAppearance.Enq.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="fontFamily">@font/rubik_medium</item>
+        <item name="android:fontFamily">@font/rubik_medium</item>
     </style>
 
     <style name="TextAppearance.Enq.Caption" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="fontFamily">@font/work_sans_medium</item>
+        <item name="fontFamily">@font/rubik_regular</item>
+        <item name="android:fontFamily">@font/rubik_regular</item>
     </style>
 
     <style name="TextAppearance.Enq.Overline" parent="TextAppearance.MaterialComponents.Overline">
-        <item name="fontFamily">@font/work_sans_semi_bold</item>
+        <item name="fontFamily">@font/rubik_regular</item>
+        <item name="android:fontFamily">@font/rubik_regular</item>
+    </style>
+
+    <!-- COMPONENT STYLES -->
+
+    <style name="Widget.EnQ.BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView.Colored">
+        <item name="itemTextColor">@color/bottom_navigation</item>
+        <item name="itemIconTint">@color/bottom_navigation</item>
     </style>
 
 </resources>
