@@ -18,7 +18,8 @@
     <string name="txt_username">Username: %1$s</string>
     <string name="hint_new_password">Neues Passwort</string>
     <string name="btn_set_password">Passwort setzen</string>
-    <string name="msg_password_wrong">Falsches passwort oder Nutzername</string>
+    <string name="msg_password_wrong">Falsches Passwort oder Nutzername</string>
+    <string name="msg_inavlid_password">Invalides Passwort</string>
     <string name="msg_nothing_playing">Zur Zeit wird nichts abgespielt</string>
     <string name="msg_queue_smth">Spiel was ab!</string>
     <string name="nav_suggestions">Vorschlaege</string>
@@ -39,4 +40,5 @@
     <string name="btn_logout">Ausloggen</string>
     <string name="btn_reload_permissons">Berechtigungen neu laden</string>
     <string name="hint_password">Password</string>
+    <string name="msg_password_changed">Passwort erfolgreich geändert</string>
 </resources>

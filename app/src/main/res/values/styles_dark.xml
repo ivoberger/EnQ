@@ -47,8 +47,8 @@
     </style>
 
     <style name="TextAppearance.Enq.Headline4" parent="TextAppearance.MaterialComponents.Headline4">
-        <item name="fontFamily">@font/rubik_regular</item>
-        <item name="android:fontFamily">@font/rubik_regular</item>
+        <item name="fontFamily">@font/rubik_light</item>
+        <item name="android:fontFamily">@font/rubik_light</item>
     </style>
 
     <style name="TextAppearance.Enq.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
