@@ -72,13 +72,13 @@ class PlayerFragment : Fragment() {
         // pre-load drawables for player buttons
         mBackgroundScope.launch {
             val color = context.onPrimaryColor()
-            mPlayDrawable = context.icon(CommunityMaterial.Icon2.cmd_play).color(color)
-            mPauseDrawable = context.icon(CommunityMaterial.Icon2.cmd_pause).color(color)
-            mStoppedDrawable = context.icon(CommunityMaterial.Icon2.cmd_stop).color(color)
-            mSkipDrawable = context.icon(CommunityMaterial.Icon.cmd_fast_forward).color(color)
-            mErrorDrawable = context.icon(CommunityMaterial.Icon.cmd_alert_circle_outline).color(color)
-            mNotInFavoritesDrawable = context.icon(CommunityMaterial.Icon2.cmd_star_outline).color(color)
-            mInFavoritesDrawable = context.icon(CommunityMaterial.Icon2.cmd_star).color(context.secondaryColor())
+            mPlayDrawable = icon(CommunityMaterial.Icon2.cmd_play).color(color)
+            mPauseDrawable = icon(CommunityMaterial.Icon2.cmd_pause).color(color)
+            mStoppedDrawable = icon(CommunityMaterial.Icon2.cmd_stop).color(color)
+            mSkipDrawable = icon(CommunityMaterial.Icon.cmd_fast_forward).color(color)
+            mErrorDrawable = icon(CommunityMaterial.Icon.cmd_alert_circle_outline).color(color)
+            mNotInFavoritesDrawable = icon(CommunityMaterial.Icon2.cmd_star_outline).color(color)
+            mInFavoritesDrawable = icon(CommunityMaterial.Icon2.cmd_star).color(context.secondaryColor())
         }
     }
 

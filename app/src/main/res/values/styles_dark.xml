@@ -101,6 +101,7 @@
     <style name="Widget.EnQ.BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView.Colored">
         <item name="itemTextColor">@color/bottom_navigation</item>
         <item name="itemIconTint">@color/bottom_navigation</item>
+        <item name="itemIconSize">22dp</item>
     </style>
 
 </resources>
