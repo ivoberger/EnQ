@@ -23,4 +23,6 @@ fun Context.attributeColor(attributeId: Int): Int {
 
 
 fun Context.primaryColor() = attributeColor(R.attr.colorPrimary)
+fun Context.onPrimaryColor() = attributeColor(R.attr.colorOnPrimary)
 fun Context.secondaryColor() = attributeColor(R.attr.colorSecondary)
+fun Context.onSecondaryColor() = attributeColor(R.attr.colorOnSecondary)

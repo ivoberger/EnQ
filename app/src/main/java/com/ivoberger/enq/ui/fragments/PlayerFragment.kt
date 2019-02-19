@@ -15,10 +15,7 @@ import com.ivoberger.enq.persistence.GlideApp
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.MainActivity.Companion.favorites
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
-import com.ivoberger.enq.utils.changeFavoriteStatus
-import com.ivoberger.enq.utils.icon
-import com.ivoberger.enq.utils.secondaryColor
-import com.ivoberger.enq.utils.toastShort
+import com.ivoberger.enq.utils.*
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.Permissions
 import com.ivoberger.jmusicbot.model.PlayerState
@@ -29,7 +26,6 @@ import kotlinx.android.synthetic.main.fragment_player.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import splitties.resources.color
 import timber.log.Timber
 
 @ContentView(R.layout.fragment_player)
@@ -75,7 +71,7 @@ class PlayerFragment : Fragment() {
         super.onAttach(context)
         // pre-load drawables for player buttons
         mBackgroundScope.launch {
-            val color = color(R.color.white)
+            val color = context.onPrimaryColor()
             mPlayDrawable = context.icon(CommunityMaterial.Icon2.cmd_play).color(color)
             mPauseDrawable = context.icon(CommunityMaterial.Icon2.cmd_pause).color(color)
             mStoppedDrawable = context.icon(CommunityMaterial.Icon2.cmd_stop).color(color)

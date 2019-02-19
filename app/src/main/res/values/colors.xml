@@ -9,16 +9,12 @@
     <color name="primaryTextColor">#FFFFFF</color>
     <color name="secondaryTextColor">#000000</color>
 
-    <color name="white">@android:color/white</color>
-    <color name="black">@android:color/black</color>
-    <color name="colorPrimary">@color/md_grey_900</color>
-    <color name="colorPrimaryDark">#000a12</color>
+    <!--<color name="white">@android:color/white</color>-->
+    <!--<color name="black">@android:color/black</color>-->
+    <!--<color name="colorPrimary">@color/md_grey_900</color>-->
+    <!--<color name="colorPrimaryDark">#000a12</color>-->
 
-    <color name="favorites">#6b9b37</color>
-    <color name="enqueue">#6b9b37</color>
     <color name="delete">#e64a19</color>
-
-    <color name="darktheme_text">@color/white</color>
 
     <color name="ic_launcher_background">#6b9b37</color>
 </resources>

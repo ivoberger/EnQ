@@ -12,9 +12,7 @@ import com.ivoberger.enq.R
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.items.QueueItem
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
-import com.ivoberger.enq.utils.changeFavoriteStatus
-import com.ivoberger.enq.utils.icon
-import com.ivoberger.enq.utils.toastShort
+import com.ivoberger.enq.utils.*
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.KEY_QUEUE
 import com.ivoberger.jmusicbot.exceptions.AuthException
@@ -64,14 +62,14 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
         savedInstanceState?.also { mFastItemAdapter.withSavedInstanceState(it, KEY_QUEUE) }
 
         val deleteDrawable =
-            context!!.icon(CommunityMaterial.Icon2.cmd_star).color(context!!.color(R.color.white)).sizeDp(24)
+            context!!.icon(CommunityMaterial.Icon2.cmd_star).color(context!!.onSecondaryColor()).sizeDp(24)
         val favoritesDrawable =
-            context!!.icon(CommunityMaterial.Icon.cmd_delete).color(context!!.color(R.color.white)).sizeDp(24)
+            context!!.icon(CommunityMaterial.Icon.cmd_delete).color(context!!.onSecondaryColor()).sizeDp(24)
         val userPermissions = JMusicBot.user!!.permissions
         val touchCallback = if (userPermissions.contains(Permissions.MOVE)) SimpleSwipeDragCallback(
             this, this,
-            deleteDrawable, ItemTouchHelper.LEFT, color(R.color.favorites)
-        ) else SimpleSwipeCallback(this, deleteDrawable, ItemTouchHelper.LEFT, color(R.color.favorites))
+            deleteDrawable, ItemTouchHelper.LEFT, context!!.secondaryColor()
+        ) else SimpleSwipeCallback(this, deleteDrawable, ItemTouchHelper.LEFT, context!!.secondaryColor())
 
         if (userPermissions.contains(Permissions.SKIP)) if (touchCallback is SimpleSwipeCallback)
             touchCallback.withBackgroundSwipeRight(color(R.color.delete)).withLeaveBehindSwipeRight(favoritesDrawable)
