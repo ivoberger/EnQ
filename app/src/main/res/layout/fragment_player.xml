@@ -10,8 +10,8 @@
 
     <ImageView
         android:id="@+id/song_album_art"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         android:layout_marginStart="@dimen/song_albumArt_margin"
         android:layout_marginTop="@dimen/song_albumArt_margin"
         android:layout_marginBottom="@dimen/song_albumArt_margin"
@@ -28,7 +28,7 @@
         android:ellipsize="marquee"
         android:marqueeRepeatLimit="marquee_forever"
         android:singleLine="true"
-        android:textAppearance="?attr/textAppearanceBody1"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
         app:layout_constraintBottom_toTopOf="@id/song_description"
         app:layout_constraintEnd_toStartOf="@id/song_chosen_by"
         app:layout_constraintStart_toEndOf="@id/song_album_art"
@@ -42,7 +42,7 @@
         android:ellipsize="marquee"
         android:marqueeRepeatLimit="marquee_forever"
         android:singleLine="true"
-        android:textAppearance="?attr/textAppearanceBody2"
+        android:textAppearance="?attr/textAppearanceBody1"
         app:layout_constraintBottom_toBottomOf="@id/song_album_art"
         app:layout_constraintEnd_toStartOf="@id/song_duration"
         app:layout_constraintStart_toStartOf="@id/song_title"
