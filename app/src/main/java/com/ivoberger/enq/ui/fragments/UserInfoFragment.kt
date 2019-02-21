@@ -12,7 +12,10 @@ import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.viewmodel.UserInfoViewModel
 import com.ivoberger.jmusicbot.JMusicBot
 import kotlinx.android.synthetic.main.fragment_user_info.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import splitties.resources.str
 import splitties.systemservices.inputMethodManager
 import splitties.toast.toast
@@ -57,7 +60,6 @@ class UserInfoFragment : Fragment() {
                         Timber.w(e, "Error changing password")
                         withContext(mMainScope.coroutineContext) { toast.setText(R.string.msg_server_error) }
                     }
-                    delay(500)
                     withContext(mMainScope.coroutineContext) { toast.show() }
                 }
             }
@@ -69,17 +71,19 @@ class UserInfoFragment : Fragment() {
                     }
                 } else toast("You need to set a password first")
             }
-            btn_logout.onClick {
-                JMusicBot.user = null
-                (context as MainActivity).reset()
-            }
+            btn_logout.onClick { logout() }
             btn_delete_user.onClick {
                 mBackgroundScope.launch {
                     JMusicBot.deleteUser()
-                    withContext(mMainScope.coroutineContext) { btn_logout.callOnClick() }
+                    logout()
                 }
             }
         }
+    }
+
+    private fun logout() {
+        JMusicBot.user = null
+        (context as MainActivity).reset()
     }
 
 }

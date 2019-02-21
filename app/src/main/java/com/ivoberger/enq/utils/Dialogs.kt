@@ -54,7 +54,7 @@ fun MainActivity.showLoginDialog(
     userName: String? = null,
     password: String? = null
 ): Job = GlobalScope.launch {
-    Timber.d("Showing Login Dialog for user $userName, Logging in: $loggingIn")
+    Timber.d("Showing Basic Dialog for user $userName, Logging in: $loggingIn")
     val loginDialogBuilder = AlertDialog.Builder(this@showLoginDialog)
         .setCancelable(false)
         .setTitle(R.string.tlt_logging_in)

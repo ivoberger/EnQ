@@ -15,18 +15,15 @@ private const val URL_QUEUE = "queue"
 internal interface MusicBotAPI {
     // User operations
     @PUT(URL_USER)
-    fun changePassword(@Body newPassword: Credentials.PasswordChange): Deferred<Response<String>>
-
-    @PUT(URL_USER)
-    fun changePasswordWithToken(@Header(KEY_AUTHORIZATION) authToken: String, @Body newPassword: Credentials.PasswordChange): Deferred<Response<String>>
+    fun changePassword(@Body newPassword: AuthTypes.PasswordChange): Deferred<Response<String>>
 
     @DELETE(URL_USER)
     fun deleteUser(): Deferred<Response<Unit>>
 
     @POST(URL_USER)
-    fun registerUser(@Body credentials: Credentials.Register): Deferred<Response<String>>
+    fun registerUser(@Body credentials: AuthTypes.Register): Deferred<Response<String>>
 
-    @GET("token")
+    @GET("jwt")
     fun loginUser(@Header(KEY_AUTHORIZATION) loginCredentials: String): Deferred<Response<String>>
 
     @GET(URL_USER)

@@ -1,6 +1,5 @@
 package com.ivoberger.jmusicbot.model
 
-import com.auth0.android.jwt.JWT
 import com.ivoberger.jmusicbot.KEY_PREFERENCES
 import splitties.preferences.Preferences
 
@@ -13,9 +12,9 @@ internal object BotPreferences : Preferences(KEY_PREFERENCES) {
         }
     private var serializedUser: String? by stringOrNullPref()
 
-    var authToken: JWT? = null
+    var authToken: AuthTypes.Token? = null
         get() {
-            return mAuthToken?.let { JWT(it) }
+            return mAuthToken?.let { AuthTypes.Token(it) }
         }
         set(value) {
             field = value
@@ -23,5 +22,3 @@ internal object BotPreferences : Preferences(KEY_PREFERENCES) {
         }
     private var mAuthToken: String? by stringOrNullPref()
 }
-
-fun JWT.toHTTPAuth(): String = "Bearer $this"
