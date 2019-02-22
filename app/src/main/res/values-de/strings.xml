@@ -42,4 +42,7 @@
     <string name="hint_password">Password</string>
     <string name="msg_password_changed">Passwort erfolgreich geändert</string>
     <string name="msg_function_unsupported">Diese Funktion wird momentan nicht vom Server unterstützt</string>
+    <string name="msg_set_password_needed">Für diese muss ein Passwort gesetzt werden</string>
+    <string name="msg_error_password_change">Beim Ändern des Passworts ist ein Fehler aufgetreten</string>
+    <string name="msg_permissions_reloaded">Berechtigungen erfolgreich neu geladen</string>
 </resources>

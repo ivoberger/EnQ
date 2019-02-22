@@ -44,4 +44,7 @@
     <string name="hint_password">Password</string>
     <string name="msg_password_changed">Password was successfully changed</string>
     <string name="msg_function_unsupported">This function is currently not supported by the server</string>
+    <string name="msg_set_password_needed">You need so set a password first</string>
+    <string name="msg_error_password_change">Error changing the password</string>
+    <string name="msg_permissions_reloaded">Permissions successfully reloaded</string>
 </resources>

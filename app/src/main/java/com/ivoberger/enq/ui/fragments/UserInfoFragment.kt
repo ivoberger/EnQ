@@ -58,7 +58,7 @@ class UserInfoFragment : Fragment() {
                         }
                     } catch (e: Exception) {
                         Timber.w(e, "Error changing password")
-                        withContext(mMainScope.coroutineContext) { toast.setText(R.string.msg_server_error) }
+                        withContext(mMainScope.coroutineContext) { toast.setText(R.string.msg_error_password_change) }
                     }
                     withContext(mMainScope.coroutineContext) { toast.show() }
                 }
@@ -67,9 +67,9 @@ class UserInfoFragment : Fragment() {
                 if (it.password != null) {
                     mBackgroundScope.launch {
                         JMusicBot.reloadPermissions()
-                        withContext(mMainScope.coroutineContext) { toast("Permissions successfully reloaded") }
+                        withContext(mMainScope.coroutineContext) { toast(R.string.msg_permissions_reloaded) }
                     }
-                } else toast("You need to set a password first")
+                } else toast(R.string.msg_set_password_needed)
             }
             btn_logout.onClick { logout() }
             btn_delete_user.onClick {
