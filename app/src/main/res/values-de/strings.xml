@@ -41,4 +41,5 @@
     <string name="btn_reload_permissons">Berechtigungen neu laden</string>
     <string name="hint_password">Password</string>
     <string name="msg_password_changed">Passwort erfolgreich geändert</string>
+    <string name="msg_function_unsupported">Diese Funktion wird momentan nicht vom Server unterstützt</string>
 </resources>
