@@ -1,11 +1,10 @@
 package com.ivoberger.jmusicbot.api
 
 import android.net.wifi.WifiManager
-import com.auth0.android.jwt.JWT
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.KEY_AUTHORIZATION
 import com.ivoberger.jmusicbot.exceptions.*
-import com.ivoberger.jmusicbot.model.toHTTPAuth
+import com.ivoberger.jmusicbot.model.AuthTypes
 import kotlinx.coroutines.Deferred
 import okhttp3.OkHttpClient
 import retrofit2.Response
@@ -41,8 +40,8 @@ internal fun WifiManager.discoverHost(): String? {
     }
 }
 
-internal fun OkHttpClient.withToken(token: JWT) = newBuilder().addInterceptor { chain ->
-    chain.proceed(chain.request().newBuilder().header(KEY_AUTHORIZATION, token.toHTTPAuth()).build())
+internal fun OkHttpClient.withToken(token: AuthTypes.Token) = newBuilder().addInterceptor { chain ->
+    chain.proceed(chain.request().newBuilder().header(KEY_AUTHORIZATION, token.toAuthHeader()).build())
 }.authenticator(TokenAuthenticator()).build()
 
 
@@ -57,7 +56,7 @@ internal suspend inline fun <reified T> Deferred<Response<T>>.process(
     try {
         response = await()
     } catch (e: IOException) {
-        JMusicBot.onConnectionLost(e)
+        JMusicBot.isConnected = false
         throw e
     }
     return when (response.code()) {

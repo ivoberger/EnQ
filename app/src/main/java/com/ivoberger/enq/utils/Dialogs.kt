@@ -1,11 +1,9 @@
 package com.ivoberger.enq.utils
 
-import android.content.Context
 import android.widget.EditText
 import android.widget.Toast
-import androidx.annotation.ColorRes
+import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat.getColor
 import com.ivoberger.enq.R
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.jmusicbot.JMusicBot
@@ -16,9 +14,9 @@ import com.ivoberger.jmusicbot.exceptions.UsernameTakenException
 import kotlinx.coroutines.*
 import timber.log.Timber
 
-private fun AlertDialog.styleButtons(context: Context, @ColorRes colorResource: Int) {
+private fun AlertDialog.styleButtons(@ColorInt color: Int) {
     setOnShowListener {
-        getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(context, colorResource))
+        getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(color)
     }
 }
 
@@ -37,9 +35,7 @@ fun MainActivity.showServerDiscoveryDialog(searching: Boolean = false): Job = Gl
     if (searching) serverDialogBuilder.setView(R.layout.dialog_progress_spinner)
     withContext(Dispatchers.Main) {
         val serverDialog = serverDialogBuilder.create()
-        if (!searching) serverDialog.styleButtons(
-            this@showServerDiscoveryDialog, R.color.colorAccent
-        )
+        if (!searching) serverDialog.styleButtons(secondaryColor())
         serverDialog.show()
         if (!searching) return@withContext
         if (withContext(Dispatchers.IO) { JMusicBot.state.job?.join(); JMusicBot.state.hasServer() }) {
@@ -58,7 +54,7 @@ fun MainActivity.showLoginDialog(
     userName: String? = null,
     password: String? = null
 ): Job = GlobalScope.launch {
-    Timber.d("Showing Login Dialog for user $userName, Logging in: $loggingIn")
+    Timber.d("Showing Basic Dialog for user $userName, Logging in: $loggingIn")
     val loginDialogBuilder = AlertDialog.Builder(this@showLoginDialog)
         .setCancelable(false)
         .setTitle(R.string.tlt_logging_in)
@@ -81,7 +77,7 @@ fun MainActivity.showLoginDialog(
     if (loggingIn) loginDialogBuilder.setView(R.layout.dialog_progress_spinner)
     withContext(Dispatchers.Main) {
         val loginDialog = loginDialogBuilder.create()
-        if (!loggingIn) loginDialog.styleButtons(this@showLoginDialog, R.color.colorAccent)
+        if (!loggingIn) loginDialog.styleButtons(secondaryColor())
         loginDialog.show()
         if (!loggingIn) return@withContext
         try {

@@ -23,7 +23,8 @@ object Libs {
 
     /**
      * http://developer.android.com/tools/extras/support-library.html */
-    const val core_ktx: String = "androidx.core:core-ktx:" + Versions.core_ktx
+    const val androidx_core_core_ktx: String = "androidx.core:core-ktx:" +
+            Versions.androidx_core_core_ktx
 
     /**
      * http://developer.android.com/tools/extras/support-library.html */
@@ -107,6 +108,16 @@ object Libs {
      * https://github.com/LouisCAD/Splitties */
     const val splitties_systemservices: String =
             "com.louiscad.splitties:splitties-systemservices:" + Versions.com_louiscad_splitties
+
+    /**
+     * https://github.com/LouisCAD/Splitties */
+    const val splitties_toast: String = "com.louiscad.splitties:splitties-toast:" +
+            Versions.com_louiscad_splitties
+
+    /**
+     * https://github.com/LouisCAD/Splitties */
+    const val splitties_views_appcompat: String =
+            "com.louiscad.splitties:splitties-views-appcompat:" + Versions.com_louiscad_splitties
 
     /**
      * https://github.com/mikepenz/AboutLibraries */
@@ -205,5 +216,6 @@ object Libs {
 
     /**
      * https://github.com/zTrap/Android-Iconics-Kt */
-    const val core_kt: String = "ru.ztrap.iconics:core-kt:" + Versions.core_kt
+    const val ru_ztrap_iconics_core_ktx: String = "ru.ztrap.iconics:core-ktx:" +
+            Versions.ru_ztrap_iconics_core_ktx
 }

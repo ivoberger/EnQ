@@ -13,12 +13,12 @@ import com.ivoberger.enq.persistence.Configuration
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
 import com.ivoberger.jmusicbot.model.MusicBotPlugin
-import kotlinx.android.synthetic.main.fragment_search.*
+import kotlinx.android.synthetic.main.fragment_results.*
 import kotlinx.coroutines.*
 import timber.log.Timber
 
-@ContentView(R.layout.fragment_search)
-abstract class TabbedSongListFragment : Fragment(), ViewPager.OnPageChangeListener,
+@ContentView(R.layout.fragment_results)
+abstract class TabbedResultsFragment : Fragment(), ViewPager.OnPageChangeListener,
     ConnectionChangeListener {
     val mMainScope = CoroutineScope(Dispatchers.Main)
 
@@ -47,7 +47,7 @@ abstract class TabbedSongListFragment : Fragment(), ViewPager.OnPageChangeListen
 
     abstract fun initializeTabs()
 
-    override fun onConnectionLost(e: Exception) {
+    override fun onConnectionLost(e: Exception?) {
         view_pager.adapter = null
     }
 

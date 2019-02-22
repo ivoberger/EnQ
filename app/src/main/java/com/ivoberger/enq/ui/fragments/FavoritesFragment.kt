@@ -10,6 +10,7 @@ import com.ivoberger.enq.ui.items.SongItem
 import com.ivoberger.enq.utils.changeFavoriteStatus
 import com.ivoberger.enq.utils.icon
 import com.ivoberger.enq.utils.loadFavorites
+import com.ivoberger.enq.utils.onSecondaryColor
 import com.ivoberger.jmusicbot.model.Song
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.fastadapter.IInterceptor
@@ -36,7 +37,7 @@ class FavoritesFragment : SongListFragment<SongItem>(), SimpleSwipeCallback.Item
         mMainScope.launch { songAdapter.add(favorites.await()) }
 
         val swipeToDeleteIcon =
-            context!!.icon(CommunityMaterial.Icon.cmd_delete).color(context!!.color(R.color.white)).sizeDp(24)
+            context!!.icon(CommunityMaterial.Icon.cmd_delete).color(context!!.onSecondaryColor()).sizeDp(24)
         val swipeToDeleteColor = context!!.color(R.color.delete)
 
         ItemTouchHelper(

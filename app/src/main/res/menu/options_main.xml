@@ -9,6 +9,9 @@
         app:actionViewClass="android.widget.SearchView"
         app:showAsAction="always" />
     <item
+        android:id="@+id/app_bar_user_options"
+        android:title="@string/nav_user_options" />
+    <item
         android:id="@+id/app_bar_settings"
         android:title="@string/nav_settings" />
     <item

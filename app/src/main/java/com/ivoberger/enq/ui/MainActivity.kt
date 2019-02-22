@@ -8,6 +8,7 @@ import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.forEachIndexed
 import androidx.fragment.app.commit
+import androidx.fragment.app.commitNow
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
@@ -19,10 +20,7 @@ import com.ivoberger.enq.ui.fragments.PlayerFragment
 import com.ivoberger.enq.ui.listener.ConnectionListener
 import com.ivoberger.enq.ui.listener.MainNavigationListener
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
-import com.ivoberger.enq.utils.icon
-import com.ivoberger.enq.utils.loadFavorites
-import com.ivoberger.enq.utils.showLoginDialog
-import com.ivoberger.enq.utils.showServerDiscoveryDialog
+import com.ivoberger.enq.utils.*
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.Song
 import com.mikepenz.aboutlibraries.Libs
@@ -38,6 +36,7 @@ import timber.log.Timber
 class MainActivity : AppCompatActivity() {
 
     companion object {
+        private var mTreePlanted = false
         var favorites: MutableList<Song> = mutableListOf()
         lateinit var config: Configuration
     }
@@ -48,7 +47,11 @@ class MainActivity : AppCompatActivity() {
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
     private val mViewModel: MainViewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
-    private val mNavController: NavController by lazy { main_content.findNavController() }
+    private val mNavController: NavController by lazy {
+        main_content.findNavController()
+    }
+
+    private val mPlayerFragment by lazy { PlayerFragment.newInstance() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +60,10 @@ class MainActivity : AppCompatActivity() {
         // general setup
         mBackgroundScope.launch {
             // logging
-            Timber.plant(if (BuildConfig.DEBUG) Timber.DebugTree() else SentryTree(context = this@MainActivity))
+            if (!mTreePlanted) {
+                Timber.plant(if (BuildConfig.DEBUG) EnQDebugTree() else SentryTree(context = this@MainActivity))
+                mTreePlanted = true
+            }
             // saved data
             favorites = loadFavorites(this@MainActivity)
             config = Configuration(this@MainActivity)
@@ -70,31 +76,35 @@ class MainActivity : AppCompatActivity() {
             CommunityMaterial.Icon2.cmd_playlist_play,
             CommunityMaterial.Icon.cmd_all_inclusive,
             CommunityMaterial.Icon2.cmd_star_outline
-        ).map { mBackgroundScope.async { icon(it).color(colorSL(R.color.main_navigation)!!) } }
+        ).map { mBackgroundScope.async { icon(it).color(colorSL(R.color.bottom_navigation)!!) } }
         mainScope.launch {
             main_bottom_navigation.menu.forEachIndexed { idx, itm -> itm.icon = icons[idx].await() }
         }
-        if (!mViewModel.connected) {
+
+        if (!JMusicBot.state.hasServer()) {
             JMusicBot.discoverHost()
             showServerDiscoveryDialog(true)
-        }
+        } else continueToLogin()
     }
 
     /**
      * continueToLogin is called by showServerDiscoveryDialog after a server was found
      */
-    fun continueToLogin() = mBackgroundScope.launch { showLoginDialog() }
+    fun continueToLogin() = mBackgroundScope.launch {
+        Timber.d("Continuing with login")
+        showLoginDialog()
+    }
 
     /**
      * continueWithBot is called by showLoginDialog after loginUser is complete
      */
     fun continueWithBot() = mBackgroundScope.launch {
-        mViewModel.connected = true
         JMusicBot.connectionChangeListeners.add((ConnectionListener(this@MainActivity)))
         mNavController.setGraph(R.navigation.nav_graph)
         supportFragmentManager.commit {
-            replace(R.id.main_current_song, PlayerFragment.newInstance(), null)
+            replace(R.id.main_current_song, mPlayerFragment, null)
         }
+        Timber.d("${this@MainActivity}")
     }
 
     override fun onBackPressed() {
@@ -118,7 +128,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         searchView.setOnSearchClickListener {
-            if (!mViewModel.connected) return@setOnSearchClickListener
+            if (!JMusicBot.isConnected) return@setOnSearchClickListener
             mNavController.navigate(R.id.Search)
             // save player collapse state
             playerCollapse = mViewModel.playerCollapsed
@@ -156,12 +166,25 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.app_bar_search -> false
+            R.id.app_bar_user_options -> {
+                mNavController.navigate(R.id.UserInfo)
+                true
+            }
             R.id.app_bar_settings -> {
                 mNavController.navigate(R.id.Settings)
                 true
             }
             else -> false
         }
+    }
+
+    fun reset() {
+        supportFragmentManager.commitNow {
+            supportFragmentManager.fragments.forEach {
+                remove(it)
+            }
+        }
+        recreate()
     }
 
     /**

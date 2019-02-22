@@ -1,0 +1,118 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="EnQ" parent="Theme.MaterialComponents">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryVariant">@color/primaryLightColor</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
+        <item name="colorOnPrimary">@color/primaryTextColor</item>
+        <item name="colorSecondary">@color/secondaryColor</item>
+        <item name="colorSecondaryVariant">@color/secondaryDarkColor</item>
+        <item name="colorOnSecondary">@color/secondaryTextColor</item>
+
+        <item name="colorAccent">@color/secondaryColor</item>
+
+        <item name="textAppearanceHeadline1">@style/TextAppearance.Enq.Headline1</item>
+        <item name="textAppearanceHeadline2">@style/TextAppearance.Enq.Headline2</item>
+        <item name="textAppearanceHeadline3">@style/TextAppearance.Enq.Headline3</item>
+        <item name="textAppearanceHeadline4">@style/TextAppearance.Enq.Headline4</item>
+        <item name="textAppearanceHeadline5">@style/TextAppearance.Enq.Headline5</item>
+        <item name="textAppearanceHeadline6">@style/TextAppearance.Enq.Headline6</item>
+        <item name="textAppearanceSubtitle1">@style/TextAppearance.Enq.Subtitle1</item>
+        <item name="textAppearanceSubtitle2">@style/TextAppearance.Enq.Subtitle2</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.Enq.Body1</item>
+        <item name="textAppearanceBody2">@style/TextAppearance.Enq.Body2</item>
+        <item name="textAppearanceCaption">@style/TextAppearance.Enq.Caption</item>
+        <item name="textAppearanceButton">@style/TextAppearance.Enq.Button</item>
+
+        <item name="bottomNavigationStyle">@style/Widget.EnQ.BottomNavigationView</item>
+    </style>
+
+    <!-- TYPOGRAPHY -->
+
+    <style name="TextAppearance.Enq.Headline1" parent="TextAppearance.MaterialComponents.Headline1">
+        <item name="fontFamily">@font/rubik_light</item>
+        <item name="android:fontFamily">@font/rubik_light</item>
+    </style>
+
+    <style name="TextAppearance.Enq.Headline2" parent="TextAppearance.MaterialComponents.Headline2">
+        <item name="fontFamily">@font/rubik_light</item>
+        <item name="android:fontFamily">@font/rubik_light</item>
+    </style>
+
+    <style name="TextAppearance.Enq.Headline3" parent="TextAppearance.MaterialComponents.Headline3">
+        <item name="fontFamily">@font/rubik_light</item>
+        <item name="android:fontFamily">@font/rubik_light</item>
+    </style>
+
+    <style name="TextAppearance.Enq.Headline4" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="fontFamily">@font/rubik_light</item>
+        <item name="android:fontFamily">@font/rubik_light</item>
+    </style>
+
+    <style name="TextAppearance.Enq.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="fontFamily">@font/rubik_medium</item>
+        <item name="android:fontFamily">@font/rubik_medium</item>
+    </style>
+
+    <style name="TextAppearance.Enq.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="fontFamily">@font/rubik_medium</item>
+        <item name="android:fontFamily">@font/rubik_medium</item>
+    </style>
+
+    <style name="TextAppearance.Enq.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">@font/rubik_regular</item>
+        <item name="android:fontFamily">@font/rubik_regular</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <style name="TextAppearance.Enq.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="fontFamily">@font/rubik_medium</item>
+        <item name="android:fontFamily">@font/rubik_medium</item>
+    </style>
+
+    <style name="TextAppearance.Enq.Body1" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="fontFamily">@font/rubik_regular</item>
+        <item name="android:fontFamily">@font/rubik_regular</item>
+    </style>
+
+    <style name="TextAppearance.Enq.Body2" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="fontFamily">@font/rubik_regular</item>
+        <item name="android:fontFamily">@font/rubik_regular</item>
+    </style>
+
+    <style name="TextAppearance.Enq.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="fontFamily">@font/rubik_medium</item>
+        <item name="android:fontFamily">@font/rubik_medium</item>
+    </style>
+
+    <style name="TextAppearance.Enq.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="fontFamily">@font/rubik_regular</item>
+        <item name="android:fontFamily">@font/rubik_regular</item>
+    </style>
+
+    <style name="TextAppearance.Enq.Overline" parent="TextAppearance.MaterialComponents.Overline">
+        <item name="fontFamily">@font/rubik_regular</item>
+        <item name="android:fontFamily">@font/rubik_regular</item>
+    </style>
+
+    <!-- COMPONENT STYLES -->
+
+    <style name="Widget.EnQ.BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView.Colored">
+        <item name="itemTextColor">@color/bottom_navigation</item>
+        <item name="itemIconTint">@color/bottom_navigation</item>
+        <item name="itemIconSize">22dp</item>
+    </style>
+
+    <style name="Widget.EnQ.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="colorPrimary">?attr/colorSecondary</item>
+    </style>
+
+    <style name="Divider">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">?attr/colorPrimaryVariant</item>
+    </style>
+
+</resources>

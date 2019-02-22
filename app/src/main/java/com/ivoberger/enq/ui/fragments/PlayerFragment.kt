@@ -15,23 +15,20 @@ import com.ivoberger.enq.persistence.GlideApp
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.MainActivity.Companion.favorites
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
-import com.ivoberger.enq.utils.changeFavoriteStatus
-import com.ivoberger.enq.utils.icon
-import com.ivoberger.enq.utils.toastShort
+import com.ivoberger.enq.utils.*
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.Permissions
 import com.ivoberger.jmusicbot.model.PlayerState
 import com.ivoberger.jmusicbot.model.PlayerStates
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.IconicsDrawable
-import kotlinx.android.synthetic.main.fragment_current_song.*
+import kotlinx.android.synthetic.main.fragment_player.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import splitties.resources.color
 import timber.log.Timber
 
-@ContentView(R.layout.fragment_current_song)
+@ContentView(R.layout.fragment_player)
 class PlayerFragment : Fragment() {
 
     companion object {
@@ -74,14 +71,14 @@ class PlayerFragment : Fragment() {
         super.onAttach(context)
         // pre-load drawables for player buttons
         mBackgroundScope.launch {
-            val color = color(R.color.white)
-            mPlayDrawable = context.icon(CommunityMaterial.Icon2.cmd_play).color(color)
-            mPauseDrawable = context.icon(CommunityMaterial.Icon2.cmd_pause).color(color)
-            mStoppedDrawable = context.icon(CommunityMaterial.Icon2.cmd_stop).color(color)
-            mSkipDrawable = context.icon(CommunityMaterial.Icon.cmd_fast_forward).color(color)
-            mErrorDrawable = context.icon(CommunityMaterial.Icon.cmd_alert_circle_outline).color(color)
-            mNotInFavoritesDrawable = context.icon(CommunityMaterial.Icon2.cmd_star_outline).color(color)
-            mInFavoritesDrawable = context.icon(CommunityMaterial.Icon2.cmd_star).color(color(R.color.favorites))
+            val color = context.onPrimaryColor()
+            mPlayDrawable = icon(CommunityMaterial.Icon2.cmd_play).color(color)
+            mPauseDrawable = icon(CommunityMaterial.Icon2.cmd_pause).color(color)
+            mStoppedDrawable = icon(CommunityMaterial.Icon2.cmd_stop).color(color)
+            mSkipDrawable = icon(CommunityMaterial.Icon.cmd_fast_forward).color(color)
+            mErrorDrawable = icon(CommunityMaterial.Icon.cmd_alert_circle_outline).color(color)
+            mNotInFavoritesDrawable = icon(CommunityMaterial.Icon2.cmd_star_outline).color(color)
+            mInFavoritesDrawable = icon(CommunityMaterial.Icon2.cmd_star).color(context.secondaryColor())
         }
     }
 
@@ -105,7 +102,7 @@ class PlayerFragment : Fragment() {
     }
 
     private fun changePlaybackState() = mBackgroundScope.launch {
-        if (!mViewModel.connected) return@launch
+        if (!JMusicBot.isConnected) return@launch
         if (mShowSkip) {
             try {
                 JMusicBot.skip()

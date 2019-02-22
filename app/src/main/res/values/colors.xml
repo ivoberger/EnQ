@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="white">@android:color/white</color>
-    <color name="black">@android:color/black</color>
-    <color name="colorPrimary">#212121</color>
-    <color name="colorPrimaryDark">#000a12</color>
-    <color name="colorAccent">#9ccc65</color>
-    <color name="backgroundDark">#101010</color>
-    <color name="background">@color/colorPrimary</color>
+    <color name="primaryColor">#212121</color>
+    <color name="primaryLightColor">#484848</color>
+    <color name="primaryDarkColor">#0F0F0F</color>
+    <color name="secondaryColor">#7cb342</color>
+    <color name="secondaryLightColor">#aee571</color>
+    <color name="secondaryDarkColor">#4b830d</color>
+    <color name="primaryTextColor">#FFFFFF</color>
+    <color name="secondaryTextColor">#000000</color>
 
-    <color name="favorites">#6b9b37</color>
-    <color name="enqueue">#6b9b37</color>
+    <!--<color name="white">@android:color/white</color>-->
+    <!--<color name="black">@android:color/black</color>-->
+    <!--<color name="colorPrimary">@color/md_grey_900</color>-->
+    <!--<color name="colorPrimaryDark">#000a12</color>-->
+
     <color name="delete">#e64a19</color>
 
     <color name="ic_launcher_background">#6b9b37</color>

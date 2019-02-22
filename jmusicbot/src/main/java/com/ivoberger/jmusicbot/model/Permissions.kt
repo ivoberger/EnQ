@@ -54,7 +54,7 @@ enum class Permissions(val label: String) {
                     Timber.e(e, "Unknown Permission: ${it.toUpperCase()}")
                 }
             }
-            Timber.d("Retrieved permissions from JWT claims: $permissions")
+            Timber.d("Retrieved permissions from jwt claims: $permissions")
             return permissions
         }
 

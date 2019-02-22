@@ -1,3 +1,5 @@
+v0.5.0:
+- Added user management options
 v0.4.2:
 - critical bugfix - the app works now..
 v0.4.1:
