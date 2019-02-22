@@ -23,7 +23,8 @@ object Libs {
 
     /**
      * http://developer.android.com/tools/extras/support-library.html */
-    const val core_ktx: String = "androidx.core:core-ktx:" + Versions.core_ktx
+    const val androidx_core_core_ktx: String = "androidx.core:core-ktx:" +
+            Versions.androidx_core_core_ktx
 
     /**
      * http://developer.android.com/tools/extras/support-library.html */
@@ -215,5 +216,6 @@ object Libs {
 
     /**
      * https://github.com/zTrap/Android-Iconics-Kt */
-    const val core_kt: String = "ru.ztrap.iconics:core-kt:" + Versions.core_kt
+    const val ru_ztrap_iconics_core_ktx: String = "ru.ztrap.iconics:core-ktx:" +
+            Versions.ru_ztrap_iconics_core_ktx
 }

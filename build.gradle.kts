@@ -27,12 +27,11 @@ allprojects {
     }
 }
 
-tasks.wrapper {
-    version = Versions.Gradle.runningVersion
-    distributionType = Wrapper.DistributionType.BIN
-}
-
 tasks {
+    wrapper {
+        version = Versions.Gradle.runningVersion
+        distributionType = Wrapper.DistributionType.BIN
+    }
     val clean by registering(Delete::class) {
         delete(buildDir)
         delete("app/build")
