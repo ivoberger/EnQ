@@ -46,6 +46,7 @@ android {
     lintOptions {
         isAbortOnError = false
     }
+    packagingOptions.exclude("META-INF/core-ktx_release.kotlin_module")
 }
 
 play {
