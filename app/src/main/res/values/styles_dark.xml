@@ -7,9 +7,24 @@
         <item name="colorPrimaryVariant">@color/primaryLightColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorOnPrimary">@color/primaryTextColor</item>
+
         <item name="colorSecondary">@color/secondaryColor</item>
         <item name="colorSecondaryVariant">@color/secondaryDarkColor</item>
         <item name="colorOnSecondary">@color/secondaryTextColor</item>
+
+        <item name="colorSurface">@color/primaryColor</item>
+        <item name="colorSurfaceDark">@color/primaryDarkColor</item>
+        <item name="colorOnSurface">@color/primaryTextColor</item>
+
+        <item name="android:colorBackground">@color/primaryDarkColor</item>
+        <item name="colorOnBackground">@color/primaryTextColor</item>
+
+        <item name="colorError">@color/errorColor</item>
+        <item name="colorOnError">@color/primaryTextColor</item>
+
+        <item name="colorFavorite">?colorSecondary</item>
+        <item name="colorEnQ">?colorSecondary</item>
+        <item name="colorDelete">@color/deleteColor</item>
 
         <item name="colorAccent">@color/secondaryColor</item>
 
@@ -26,6 +41,7 @@
         <item name="textAppearanceCaption">@style/TextAppearance.Enq.Caption</item>
         <item name="textAppearanceButton">@style/TextAppearance.Enq.Button</item>
 
+        <item name="materialButtonStyle">@style/Widget.EnQ.Button</item>
         <item name="bottomNavigationStyle">@style/Widget.EnQ.BottomNavigationView</item>
     </style>
 
@@ -103,6 +119,10 @@
         <item name="itemTextColor">@color/bottom_navigation</item>
         <item name="itemIconTint">@color/bottom_navigation</item>
         <item name="itemIconSize">22dp</item>
+    </style>
+
+    <style name="Widget.EnQ.Button" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">?colorPrimaryVariant</item>
     </style>
 
     <style name="Widget.EnQ.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
