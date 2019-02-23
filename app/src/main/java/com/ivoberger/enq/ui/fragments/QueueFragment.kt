@@ -62,19 +62,28 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
         savedInstanceState?.also { mFastItemAdapter.withSavedInstanceState(it, KEY_QUEUE) }
 
         val deleteDrawable =
-            context!!.icon(CommunityMaterial.Icon2.cmd_star).color(context!!.onSecondaryColor()).sizeDp(24)
+            context!!.icon(CommunityMaterial.Icon2.cmd_star).color(context!!.onPrimaryColor()).sizeDp(24)
         val favoritesDrawable =
-            context!!.icon(CommunityMaterial.Icon.cmd_delete).color(context!!.onSecondaryColor()).sizeDp(24)
+            context!!.icon(CommunityMaterial.Icon.cmd_delete).color(context!!.onPrimaryColor()).sizeDp(24)
         val userPermissions = JMusicBot.user!!.permissions
         val touchCallback = if (userPermissions.contains(Permissions.MOVE)) SimpleSwipeDragCallback(
             this, this,
-            deleteDrawable, ItemTouchHelper.LEFT, context!!.secondaryColor()
-        ) else SimpleSwipeCallback(this, deleteDrawable, ItemTouchHelper.LEFT, context!!.secondaryColor())
+            deleteDrawable, ItemTouchHelper.LEFT, context!!.attributeColor(R.attr.colorFavorite)
+        ) else SimpleSwipeCallback(
+            this,
+            deleteDrawable,
+            ItemTouchHelper.LEFT,
+            context!!.attributeColor(R.attr.colorDelete)
+        )
 
         if (userPermissions.contains(Permissions.SKIP)) if (touchCallback is SimpleSwipeCallback)
-            touchCallback.withBackgroundSwipeRight(color(R.color.delete)).withLeaveBehindSwipeRight(favoritesDrawable)
+            touchCallback.withBackgroundSwipeRight(color(R.color.deleteColor)).withLeaveBehindSwipeRight(
+                favoritesDrawable
+            )
         else if (touchCallback is SimpleSwipeDragCallback)
-            touchCallback.withBackgroundSwipeRight(color(R.color.delete)).withLeaveBehindSwipeRight(favoritesDrawable)
+            touchCallback.withBackgroundSwipeRight(color(R.color.deleteColor)).withLeaveBehindSwipeRight(
+                favoritesDrawable
+            )
 
         ItemTouchHelper(touchCallback).attachToRecyclerView(recycler_queue)
 
