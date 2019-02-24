@@ -1,17 +1,5 @@
+
+v0.5.1
+- Bugfix
 v0.5.0:
 - Added user management options
-v0.4.2:
-- critical bugfix - the app works now..
-v0.4.1:
-- fixes enqueue in suggestions and search
-v0.4.0:
-- Compatibility with JMusicBot API >= v0.10
-- BREAKS compatibility with all earlier versions
-- Controls improvement for suggestions and favorites
-- Bugfixes
-v0.3.0:
-- Navigation improvements for more consistent behavior
-- Only Allow Move, Skip, Dislike if user has the corresponding rights
-- Loading indicator for search an suggestions
-- New icon!
-- Bugfixes & Performance improvements

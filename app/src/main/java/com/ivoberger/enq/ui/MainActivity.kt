@@ -23,13 +23,13 @@ import com.ivoberger.enq.ui.viewmodel.MainViewModel
 import com.ivoberger.enq.utils.*
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.Song
+import com.ivoberger.timbersentry.SentryTree
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.LibsBuilder
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.typeface.IIcon
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
-import me.iberger.timbersentry.SentryTree
 import splitties.resources.colorSL
 import timber.log.Timber
 

@@ -23,7 +23,7 @@ internal interface MusicBotAPI {
     @POST(URL_USER)
     fun registerUser(@Body credentials: AuthTypes.Register): Deferred<Response<String>>
 
-    @GET("jwt")
+    @GET("token")
     fun loginUser(@Header(KEY_AUTHORIZATION) loginCredentials: String): Deferred<Response<String>>
 
     @GET(URL_USER)

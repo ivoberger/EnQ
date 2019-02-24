@@ -73,11 +73,11 @@ class UserInfoFragment : Fragment() {
             }
             btn_logout.onClick { logout() }
             btn_delete_user.onClick {
-                toast(R.string.msg_function_unsupported)
-//                mBackgroundScope.launch {
-//                    JMusicBot.deleteUser()
-//                    logout()
-//                }
+                //                toast(R.string.msg_function_unsupported)
+                mBackgroundScope.launch {
+                    JMusicBot.deleteUser()
+                    logout()
+                }
             }
         }
     }
