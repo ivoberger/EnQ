@@ -75,8 +75,13 @@ class UserInfoFragment : Fragment() {
             btn_delete_user.onClick {
                 //                toast(R.string.msg_function_unsupported)
                 mBackgroundScope.launch {
-                    JMusicBot.deleteUser()
-                    logout()
+                    try {
+                        JMusicBot.deleteUser()
+                        logout()
+                    } catch (e: Exception) {
+                        Timber.e(e, "Deletion failed")
+                        withContext(mMainScope.coroutineContext) { toast(R.string.msg_server_error) }
+                    }
                 }
             }
         }

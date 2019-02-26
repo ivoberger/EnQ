@@ -178,7 +178,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun reset() {
+    fun reset() = mainScope.launch {
         supportFragmentManager.commitNow {
             supportFragmentManager.fragments.forEach {
                 remove(it)

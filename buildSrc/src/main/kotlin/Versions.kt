@@ -33,7 +33,7 @@ object Versions {
 
     const val material: String = "1.1.0-alpha01"
 
-    const val timbersentry: String = "0.3.0" // available: "0.3.0"
+    const val timbersentry: String = "0.3.0"
 
     const val retrofit2_kotlin_coroutines_adapter: String = "0.9.2"
 
@@ -87,7 +87,7 @@ object Versions {
 
         const val currentVersion: String = "5.2.1"
 
-        const val nightlyVersion: String = "5.4-20190224000056+0000"
+        const val nightlyVersion: String = "5.4-20190226000044+0000"
 
         const val releaseCandidate: String = ""
     }
