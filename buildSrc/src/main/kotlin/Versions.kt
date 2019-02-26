@@ -23,7 +23,7 @@ object Versions {
 
     const val com_android_tools_build_gradle: String = "3.5.0-alpha03"
 
-    const val lint_gradle: String = "26.5.0-alpha04"
+    const val lint_gradle: String = "26.5.0-alpha05"
 
     const val jwtdecode: String = "1.2.0"
 
@@ -33,7 +33,7 @@ object Versions {
 
     const val material: String = "1.1.0-alpha01"
 
-    const val timbersentry: String = "0.2.2"
+    const val timbersentry: String = "0.3.0"
 
     const val retrofit2_kotlin_coroutines_adapter: String = "0.9.2"
 
@@ -87,7 +87,7 @@ object Versions {
 
         const val currentVersion: String = "5.2.1"
 
-        const val nightlyVersion: String = "5.4-20190222000101+0000"
+        const val nightlyVersion: String = "5.4-20190226000044+0000"
 
         const val releaseCandidate: String = ""
     }

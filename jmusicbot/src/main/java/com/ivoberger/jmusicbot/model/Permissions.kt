@@ -42,7 +42,13 @@ enum class Permissions(val label: String) {
      * Songs enqueued by users without this permission do not affect suggestions.
      */
     @Json(name = "alter_suggestions")
-    ALTER_SUGGESTIONS("alter_suggestions");
+    ALTER_SUGGESTIONS("alter_suggestions"),
+
+    /**
+     * Songs enqueued by users without this permission do not affect suggestions.
+     */
+    @Json(name = "change_volume")
+    CHANGE_VOLUME("change_volume");
 
     companion object {
         fun fromClaims(claims: Map<String, Claim>): MutableList<Permissions> {
@@ -54,7 +60,7 @@ enum class Permissions(val label: String) {
                     Timber.e(e, "Unknown Permission: ${it.toUpperCase()}")
                 }
             }
-            Timber.d("Retrieved permissions from jwt claims: $permissions")
+            Timber.d("Retrieved permissions from token claims: $permissions")
             return permissions
         }
 

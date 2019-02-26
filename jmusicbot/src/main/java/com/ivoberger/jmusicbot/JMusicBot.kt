@@ -159,7 +159,7 @@ object JMusicBot {
 
     private suspend fun tokenValid(): Boolean {
         if (authToken == null) {
-            Timber.d("Invalid Token: No jwt stored")
+            Timber.d("Invalid Token: No token stored")
             return false
         }
         try {
@@ -252,7 +252,7 @@ object JMusicBot {
     suspend fun deleteUser() {
         state.connectionCheck()
         Timber.d("Deleting user ${user?.name}")
-        authToken ?: throw IllegalStateException("Auth jwt is null")
+        authToken ?: throw IllegalStateException("Auth token is null")
         mApiClient.deleteUser().process()
         user = null
     }

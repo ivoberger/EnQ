@@ -13,6 +13,7 @@ import okhttp3.Route
 import timber.log.Timber
 
 class TokenAuthenticator : Authenticator {
+
     override fun authenticate(route: Route?, response: Response): Request? = runBlocking {
         Timber.d("Re-authorizing")
         var auth: String? = null
@@ -20,16 +21,21 @@ class TokenAuthenticator : Authenticator {
             val authExpectation = JMusicBot.mMoshi.adapter(AuthExpectation::class.java).fromJson(String(body.bytes()))
             Timber.d("AuthExpectation: $authExpectation")
             auth = when (authExpectation?.format) {
-                AuthType.BASIC -> JMusicBot.user?.let { AuthTypes.Basic(it).toAuthHeader() }
+                AuthType.BASIC -> {
+                    Timber.d("BASIC Auth")
+                    JMusicBot.user?.let { AuthTypes.Basic(it).toAuthHeader() }
+                }
                 AuthType.TOKEN -> {
+                    Timber.d("TOKEN Auth")
                     JMusicBot.authorize()
                     JMusicBot.authToken?.toAuthHeader()
                 }
                 else -> null
             }
         }
+        val origRequest = response.request()
 
-        return@runBlocking response.request().newBuilder()
+        return@runBlocking if (origRequest.header(KEY_AUTHORIZATION) == auth) null else origRequest.newBuilder()
             .header(KEY_AUTHORIZATION, auth ?: "")
             .build()
     }
