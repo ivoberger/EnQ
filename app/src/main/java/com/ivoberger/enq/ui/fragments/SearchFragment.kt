@@ -20,7 +20,7 @@ import timber.log.Timber
 @ContentView(R.layout.fragment_results)
 class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
 
-    private lateinit var mSearchView: SearchView
+    private val mSearchView: SearchView by lazy { (activity as MainActivity).searchView }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,9 +32,6 @@ class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
                 if (mProviderPlugins.await()!!.contains(it)) mSelectedPlugin = it
             }
         }
-
-        mSearchView =
-            (activity as MainActivity).optionsMenu.findItem(R.id.app_bar_search).actionView as SearchView
 
         mSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             private var oldText = ""
@@ -49,6 +46,7 @@ class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
             override fun onQueryTextChange(newText: String?): Boolean {
                 if (newText == oldText) return true
                 newText?.also { oldText = it }
+                // debounce
                 mBackgroundScope.launch {
                     delay(300)
                     if (oldText != newText) return@launch

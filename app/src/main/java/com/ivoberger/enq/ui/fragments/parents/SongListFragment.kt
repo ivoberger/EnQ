@@ -22,6 +22,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import splitties.resources.str
 
 @ContentView(R.layout.fragment_queue)
 abstract class SongListFragment<T : SongItem> : Fragment() {
@@ -48,20 +49,23 @@ abstract class SongListFragment<T : SongItem> : Fragment() {
         fastAdapter.onClickListener = object : OnClickListener<T> {
             override fun onClick(v: View?, adapter: IAdapter<T>, item: T, position: Int): Boolean {
                 if (!JMusicBot.isConnected) return false
-                mBackgroundScope.launch {
-                    JMusicBot.enqueue(item.model)
-                    withContext(Dispatchers.Main) {
-                        if (isRemoveAfterEnQ) songAdapter.remove(position)
-                        context!!.toastShort(
-                            context!!.getString(
-                                R.string.msg_enqueued,
-                                item.model.title
-                            )
-                        )
-                    }
-                }
-                return true
+                return onEntryClicked(item, position)
             }
         }
+    }
+
+    fun enqueueEntry(item: T, position: Int) = mBackgroundScope.launch {
+        JMusicBot.enqueue(item.model)
+        withContext(Dispatchers.Main) {
+            if (isRemoveAfterEnQ) songAdapter.remove(position)
+            context!!.toastShort(
+                context!!.str(R.string.msg_enqueued, item.model.title)
+            )
+        }
+    }
+
+    open fun onEntryClicked(item: T, position: Int): Boolean {
+        enqueueEntry(item, position)
+        return true
     }
 }

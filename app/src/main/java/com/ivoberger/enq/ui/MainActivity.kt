@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         lateinit var config: Configuration
     }
 
-    lateinit var optionsMenu: Menu
+    lateinit var searchView: SearchView
 
     val mainScope = CoroutineScope(Dispatchers.Main)
     private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
@@ -115,8 +115,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.options_main, menu)
         // save menu for use in SearchFragment
-        optionsMenu = menu
-        val searchView = menu.findItem(R.id.app_bar_search).actionView as SearchView
+        searchView = menu.findItem(R.id.app_bar_search).actionView as SearchView
 
         var playerCollapse = mViewModel.playerCollapsed
         // set listener to iconify the SearchView when back is pressed
@@ -176,6 +175,13 @@ class MainActivity : AppCompatActivity() {
             }
             else -> false
         }
+    }
+
+    fun search(query: String) = mainScope.launch {
+        searchView.isIconified = false
+        // give search fragment time to setup
+        delay(200)
+        searchView.setQuery(query, false)
     }
 
     fun reset() = mainScope.launch {
