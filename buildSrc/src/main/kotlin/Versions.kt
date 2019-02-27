@@ -21,7 +21,7 @@ object Versions {
 
     const val recyclerview: String = "1.1.0-alpha02"
 
-    const val com_android_tools_build_gradle: String = "3.5.0-alpha05"
+    const val com_android_tools_build_gradle: String = "3.5.0-alpha03"
 
     const val lint_gradle: String = "26.5.0-alpha05"
 
@@ -40,8 +40,6 @@ object Versions {
     const val timber: String = "4.7.1"
 
     const val com_louiscad_splitties: String = "3.0.0-alpha03"
-
-    const val aboutlibraries: String = "6.2.3"
 
     const val community_material_typeface: String = "3.1.0-rc02"
 
@@ -87,7 +85,7 @@ object Versions {
 
         const val currentVersion: String = "5.2.1"
 
-        const val nightlyVersion: String = "5.4-20190226000044+0000"
+        const val nightlyVersion: String = "5.4-20190227001633+0000"
 
         const val releaseCandidate: String = ""
     }

@@ -98,7 +98,6 @@ dependencies {
     implementation(Libs.fastadapter_extensions_drag)
     implementation(Libs.fastadapter_extensions_swipe)
     implementation(Libs.fastadapter_extensions_diff)
-    implementation(Libs.aboutlibraries)
 
     implementation(Libs.iconics_core)
     implementation(Libs.community_material_typeface)

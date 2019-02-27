@@ -2,10 +2,12 @@ package com.ivoberger.enq.ui.listener
 
 import com.ivoberger.enq.R
 import com.ivoberger.enq.ui.MainActivity
+import com.ivoberger.enq.utils.attributeColor
 import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import splitties.views.backgroundColor
 
 class ConnectionListener(private val mainActivity: MainActivity) : ConnectionChangeListener {
     override fun onConnectionLost(e: Exception?) {
@@ -16,7 +18,7 @@ class ConnectionListener(private val mainActivity: MainActivity) : ConnectionCha
 
     override fun onConnectionRecovered() {
         mainActivity.mainScope.launch(Dispatchers.Main) {
-            mainActivity.main_bottom_navigation.setBackgroundResource(R.color.primaryDarkColor)
+            mainActivity.main_bottom_navigation.backgroundColor = mainActivity.attributeColor(R.attr.colorPrimary)
         }
     }
 }

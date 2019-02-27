@@ -2,7 +2,6 @@
 -keep class **.R$* {
     <fields>;
 }
-
 #### MOSHI ####
 
 

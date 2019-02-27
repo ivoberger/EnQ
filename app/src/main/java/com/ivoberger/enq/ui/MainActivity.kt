@@ -24,8 +24,6 @@ import com.ivoberger.enq.utils.*
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.Song
 import com.ivoberger.timbersentry.SentryTree
-import com.mikepenz.aboutlibraries.Libs
-import com.mikepenz.aboutlibraries.LibsBuilder
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.typeface.IIcon
 import kotlinx.android.synthetic.main.activity_main.*
@@ -150,17 +148,7 @@ class MainActivity : AppCompatActivity() {
         item ?: return false
         return when (item.itemId) {
             R.id.app_bar_about -> {
-                LibsBuilder().apply {
-                    activityStyle = Libs.ActivityStyle.DARK
-                    aboutAppName = getString(R.string.app_name)
-                    aboutShowIcon = true
-                    showVersion = true
-                    aboutShowVersionName = true
-                    aboutShowVersionCode = false
-                    aboutDescription = "Collaborative DJ-ing"
-                    activityTitle = getString(R.string.nav_about)
-                    showLicense = true
-                }.start(this)
+                mNavController.navigate(R.id.About)
                 true
             }
 
