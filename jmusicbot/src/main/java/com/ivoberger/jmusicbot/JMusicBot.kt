@@ -101,10 +101,10 @@ object JMusicBot {
             }
         }
 
-    fun discoverHost() = GlobalScope.launch {
+    fun discoverHost() {
         Timber.d("Discovering host")
         state = MusicBotState.CONNECTING
-        state.job = launch {
+        state.job = GlobalScope.launch {
             baseUrl = mWifiManager?.discoverHost()
             state = if (baseUrl != null) {
                 Timber.d("Found host: $baseUrl")
@@ -117,9 +117,12 @@ object JMusicBot {
 
     }
 
-    suspend fun recoverConnection() {
+    suspend fun recoverConnection() = GlobalScope.launch {
         Timber.d("Reconnecting")
-        discoverHost()
+        while (!state.hasServer()) {
+            discoverHost()
+            state.job?.join()
+        }
         authorize()
     }
 
