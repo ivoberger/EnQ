@@ -38,13 +38,14 @@
         android:id="@+id/txt_permissions"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="40dp"
         android:textAlignment="center"
         android:textAppearance="?textAppearanceBody2"
         app:layout_constraintBottom_toTopOf="@id/input_password"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/lbl_permissions"
-        app:layout_marginHorizontal="40dp" />
+        tools:ignore="UnusedAttribute" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/input_password"
