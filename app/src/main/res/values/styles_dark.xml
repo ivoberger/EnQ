@@ -126,13 +126,13 @@
     </style>
 
     <style name="Widget.EnQ.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
-        <item name="colorPrimary">?attr/colorSecondary</item>
+        <item name="colorPrimary">?colorSecondary</item>
     </style>
 
     <style name="Divider">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">1dp</item>
-        <item name="android:background">?attr/colorPrimaryVariant</item>
+        <item name="android:background">?colorPrimaryVariant</item>
     </style>
 
 </resources>

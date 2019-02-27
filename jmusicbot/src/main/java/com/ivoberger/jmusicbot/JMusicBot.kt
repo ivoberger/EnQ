@@ -325,10 +325,8 @@ object JMusicBot {
     }
 
     fun stopQueueUpdates() {
-        if (!mQueue.hasObservers()) {
-            mQueueUpdateTimer?.cancel()
-            mQueueUpdateTimer = null
-        }
+        mQueueUpdateTimer?.cancel()
+        mQueueUpdateTimer = null
     }
 
     fun getPlayerState(period: Long = 500): LiveData<PlayerState> {
@@ -341,10 +339,8 @@ object JMusicBot {
     }
 
     fun stopPlayerUpdates() {
-        if (!mPlayerState.hasObservers()) {
-            mPlayerUpdateTimer?.cancel()
-            mPlayerUpdateTimer = null
-        }
+        mPlayerUpdateTimer?.cancel()
+        mPlayerUpdateTimer = null
     }
 
     private fun updateQueue(newQueue: List<QueueEntry>? = null) = GlobalScope.launch {

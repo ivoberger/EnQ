@@ -48,4 +48,5 @@
     <string name="msg_error_password_change">Error changing the password</string>
     <string name="msg_permissions_reloaded">Permissions successfully reloaded</string>
     <string name="msg_provider_not_found">Provider was not found, searchin song on existing providers</string>
+    <string name="lbl_permissions">Permissions:</string>
 </resources>
