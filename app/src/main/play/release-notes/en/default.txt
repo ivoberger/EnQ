@@ -1,3 +1,7 @@
+v0.5.3
+- Improved search
+- updated logo
+- Bugfixes
 v0.5.2
 - fixed bug where app would crash when trying to enq song from invalid provider
 v0.5.1
