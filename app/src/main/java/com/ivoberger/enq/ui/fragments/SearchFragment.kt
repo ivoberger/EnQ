@@ -34,23 +34,24 @@ class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
         }
 
         mSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            private var oldText = ""
+            private var oldQuery = ""
             override fun onQueryTextSubmit(query: String?): Boolean {
+                if (query == oldQuery) return true
                 query?.also {
-                    oldText = it
+                    oldQuery = it
                     search(it)
                 }
                 return true
             }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                if (newText == oldText) return true
-                newText?.also { oldText = it }
+            override fun onQueryTextChange(newQuery: String?): Boolean {
+                if (newQuery == oldQuery) return true
+                newQuery?.also { oldQuery = it }
                 // debounce
                 mBackgroundScope.launch {
                     delay(300)
-                    if (oldText != newText) return@launch
-                    search(oldText)
+                    if (oldQuery != newQuery) return@launch
+                    search(oldQuery)
                 }
                 return true
             }
@@ -69,8 +70,12 @@ class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
 
     fun search(query: String) {
         mBackgroundScope.launch {
-            (mFragmentPagerAdapter.await() as SearchFragmentPager).search(query)
+            if (query.isNotBlank()) (mFragmentPagerAdapter.await() as SearchFragmentPager).search(query)
         }
+    }
+
+    override fun onTabSelected(position: Int) {
+        mBackgroundScope.launch { mFragmentPagerAdapter.await().onTabSelected(position) }
     }
 
     override fun onConnectionLost(e: Exception?) {
@@ -88,12 +93,21 @@ class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
     inner class SearchFragmentPager(fm: FragmentManager, provider: List<MusicBotPlugin>) :
         TabbedResultsFragment.SongListFragmentPager(fm, provider) {
 
-        override fun getItem(position: Int): Fragment =
-            SearchResultsFragment.newInstance(provider[position].id)
+        override fun getItem(position: Int): Fragment {
+            val fragment = SearchResultsFragment.newInstance(provider[position].id)
+            resultFragments.add(position, fragment)
+            return fragment
+        }
 
         fun search(query: String) {
             Timber.d("Searching for $query")
-            resultFragments.forEach { (it as SearchResultsFragment).search(query) }
+            resultFragments.forEach { (it as SearchResultsFragment).setQuery(query) }
+            (resultFragments[view_pager.currentItem] as SearchResultsFragment).startSearch()
+        }
+
+        override fun onTabSelected(position: Int) {
+            super.onTabSelected(position)
+            (resultFragments[position] as SearchResultsFragment).startSearch()
         }
     }
 }

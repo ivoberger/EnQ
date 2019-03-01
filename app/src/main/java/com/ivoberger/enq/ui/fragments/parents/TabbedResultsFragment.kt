@@ -47,6 +47,8 @@ abstract class TabbedResultsFragment : Fragment(), ViewPager.OnPageChangeListene
 
     abstract fun initializeTabs()
 
+    open fun onTabSelected(position: Int) {}
+
     override fun onConnectionLost(e: Exception?) {
         view_pager.adapter = null
     }
@@ -65,14 +67,13 @@ abstract class TabbedResultsFragment : Fragment(), ViewPager.OnPageChangeListene
     }
 
     override fun onPageSelected(position: Int) {
+        onTabSelected(position)
         mBackgroundScope.launch { mSelectedPlugin = mProviderPlugins.await()?.get(position) }
     }
 
     abstract inner class SongListFragmentPager(
-        fm: FragmentManager,
-        val provider: List<MusicBotPlugin>
-    ) :
-        FragmentStatePagerAdapter(fm) {
+        fm: FragmentManager, val provider: List<MusicBotPlugin>
+    ) : FragmentStatePagerAdapter(fm) {
 
         val resultFragments: MutableList<ResultsFragment> = mutableListOf()
 
@@ -82,8 +83,10 @@ abstract class TabbedResultsFragment : Fragment(), ViewPager.OnPageChangeListene
 
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
             val currentFragment = super.instantiateItem(container, position) as ResultsFragment
-            resultFragments.add(currentFragment)
+            resultFragments.add(position, currentFragment)
             return currentFragment
         }
+
+        open fun onTabSelected(position: Int) {}
     }
 }

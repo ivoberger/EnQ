@@ -5,7 +5,7 @@
  *
  * YOU are responsible for updating manually the dependency version. */
 object Versions {
-    const val android_arch_navigation: String = "1.0.0-rc01"
+    const val android_arch_navigation: String = "1.0.0-rc02"
 
     const val appcompat: String = "1.1.0-alpha02"
 
@@ -20,6 +20,8 @@ object Versions {
     const val preference_ktx: String = "1.1.0-alpha03"
 
     const val recyclerview: String = "1.1.0-alpha02"
+
+    const val viewpager2: String = "1.0.0-alpha01"
 
     const val com_android_tools_build_gradle: String = "3.5.0-alpha03"
 
@@ -85,7 +87,7 @@ object Versions {
 
         const val currentVersion: String = "5.2.1"
 
-        const val nightlyVersion: String = "5.4-20190227001633+0000"
+        const val nightlyVersion: String = "5.4-20190301000048+0000"
 
         const val releaseCandidate: String = ""
     }
