@@ -37,10 +37,9 @@ open class ResultsFragment : SongListFragment<ResultItem>() {
         recycler_queue.adapter = fastAdapter
     }
 
-    fun displayResults(results: List<Song>?) =
-        mMainScope.launch {
-            loadingHeader.clear()
-            results ?: return@launch
-            songAdapter.set(results)
-        }
+    fun displayResults(results: List<Song>?) = mMainScope.launch {
+        loadingHeader.clear()
+        results ?: return@launch
+        songAdapter.set(results)
+    }
 }

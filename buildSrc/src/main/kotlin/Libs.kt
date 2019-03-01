@@ -44,6 +44,8 @@ object Libs {
      * http://developer.android.com/tools/extras/support-library.html */
     const val recyclerview: String = "androidx.recyclerview:recyclerview:" + Versions.recyclerview
 
+    const val viewpager2: String = "androidx.viewpager2:viewpager2:" + Versions.viewpager2
+
     /**
      * https://developer.android.com/studio */
     const val com_android_tools_build_gradle: String = "com.android.tools.build:gradle:" +
@@ -118,10 +120,6 @@ object Libs {
      * https://github.com/LouisCAD/Splitties */
     const val splitties_views_appcompat: String =
             "com.louiscad.splitties:splitties-views-appcompat:" + Versions.com_louiscad_splitties
-
-    /**
-     * https://github.com/mikepenz/AboutLibraries */
-    const val aboutlibraries: String = "com.mikepenz:aboutlibraries:" + Versions.aboutlibraries
 
     /**
      * https://github.com/mikepenz/Android-Iconics */

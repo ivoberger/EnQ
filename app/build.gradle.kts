@@ -14,7 +14,7 @@ android {
         minSdkVersion(21)
         targetSdkVersion(28)
         versionCode = 2
-        versionName = "0.5.2"
+        versionName = "0.5.3"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -70,6 +70,7 @@ dependencies {
     // appcompat, arch components etc.
     implementation(Libs.appcompat)
     implementation(Libs.recyclerview)
+    implementation(Libs.viewpager2)
     implementation(Libs.lifecycle_extensions)
     implementation(Libs.preference_ktx)
     implementation(Libs.navigation_fragment_ktx)
@@ -98,7 +99,6 @@ dependencies {
     implementation(Libs.fastadapter_extensions_drag)
     implementation(Libs.fastadapter_extensions_swipe)
     implementation(Libs.fastadapter_extensions_diff)
-    implementation(Libs.aboutlibraries)
 
     implementation(Libs.iconics_core)
     implementation(Libs.community_material_typeface)

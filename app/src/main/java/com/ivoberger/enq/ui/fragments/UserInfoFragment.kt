@@ -6,10 +6,8 @@ import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.annotation.ContentView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
 import com.ivoberger.enq.R
 import com.ivoberger.enq.ui.MainActivity
-import com.ivoberger.enq.ui.viewmodel.UserInfoViewModel
 import com.ivoberger.jmusicbot.JMusicBot
 import kotlinx.android.synthetic.main.fragment_user_info.*
 import kotlinx.coroutines.CoroutineScope
@@ -29,16 +27,15 @@ class UserInfoFragment : Fragment() {
     val mMainScope = CoroutineScope(Dispatchers.Main)
     val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
-    private val mUserViewModel by lazy { ViewModelProviders.of(this).get(UserInfoViewModel::class.java) }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mUserViewModel.user?.let {
+        JMusicBot.user?.let {
             txt_username.text = it.name
             if (it.password != null) {
                 btn_change_password.text = str(R.string.btn_change_password)
                 input_password.hint = str(R.string.hint_new_password)
             }
+            txt_permissions.text = it.permissions.toString()
             btn_change_password.onClick {
                 inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
                 val input = input_password.editText?.text?.toString()
@@ -67,7 +64,11 @@ class UserInfoFragment : Fragment() {
                 if (it.password != null) {
                     mBackgroundScope.launch {
                         JMusicBot.reloadPermissions()
-                        withContext(mMainScope.coroutineContext) { toast(R.string.msg_permissions_reloaded) }
+                        withContext(mMainScope.coroutineContext) {
+                            toast(R.string.msg_permissions_reloaded)
+                            txt_permissions.text = JMusicBot.user?.permissions.toString()
+                        }
+
                     }
                 } else toast(R.string.msg_set_password_needed)
             }

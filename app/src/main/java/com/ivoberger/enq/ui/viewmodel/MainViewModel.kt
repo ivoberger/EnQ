@@ -22,6 +22,10 @@ class MainViewModel : ViewModel(), ConnectionChangeListener {
     val playerState: LiveData<PlayerState> by lazy { JMusicBot.getPlayerState() }
     val queue: LiveData<List<QueueEntry>>by lazy { JMusicBot.getQueue() }
 
+    init {
+        JMusicBot.connectionChangeListeners.add(this)
+    }
+
     override fun onConnectionLost(e: Exception?) {
         mBackgroundScope.launch {
             Timber.w(e)
@@ -36,5 +40,10 @@ class MainViewModel : ViewModel(), ConnectionChangeListener {
             JMusicBot.startPlayerUpdates()
             JMusicBot.startQueueUpdates()
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        JMusicBot.connectionChangeListeners.remove(this)
     }
 }
