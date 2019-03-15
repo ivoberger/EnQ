@@ -7,27 +7,27 @@ import kotlin.String
  *
  * YOU are responsible for updating manually the dependency version. */
 object Versions {
-    const val android_arch_navigation: String = "1.0.0-rc02" 
-
-    const val appcompat: String = "1.1.0-alpha02" 
+    const val appcompat: String = "1.1.0-alpha03" 
 
     const val constraintlayout: String = "2.0.0-alpha2" 
 
-    const val androidx_core_core_ktx: String = "1.0.1" 
+    const val androidx_core_core_ktx: String = "1.1.0-alpha05" 
 
     const val fragment_ktx: String = "1.1.0-alpha04" 
 
-    const val lifecycle_extensions: String = "2.0.0" 
+    const val lifecycle_extensions: String = "2.1.0-alpha03" 
 
-    const val preference_ktx: String = "1.1.0-alpha03" 
+    const val androidx_navigation: String = "2.0.0" 
 
-    const val recyclerview: String = "1.1.0-alpha02" 
+    const val preference_ktx: String = "1.1.0-alpha04" 
 
-    const val viewpager2: String = "1.0.0-alpha01" 
+    const val recyclerview: String = "1.1.0-alpha03" 
 
-    const val com_android_tools_build_gradle: String = "3.5.0-alpha06" 
+    const val viewpager2: String = "1.0.0-alpha02" 
 
-    const val lint_gradle: String = "26.5.0-alpha06" 
+    const val com_android_tools_build_gradle: String = "3.5.0-alpha07" 
+
+    const val lint_gradle: String = "26.5.0-alpha07" 
 
     const val jwtdecode: String = "1.2.0" 
 
@@ -63,7 +63,7 @@ object Versions {
 
     const val com_squareup_moshi: String = "1.8.0" 
 
-    const val okhttp: String = "3.13.1" 
+    const val okhttp: String = "3.14.0" 
 
     const val okio: String = "2.2.2" 
 
@@ -71,7 +71,7 @@ object Versions {
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.3.2" 
 
-    const val sentry_android_gradle_plugin: String = "1.7.21" 
+    const val sentry_android_gradle_plugin: String = "1.7.22" 
 
     const val org_jetbrains_kotlin: String = "1.3.21" 
 
@@ -89,8 +89,8 @@ object Versions {
 
         const val currentVersion: String = "5.2.1"
 
-        const val nightlyVersion: String = "5.4-20190310000057+0000"
+        const val nightlyVersion: String = "5.4-20190315000123+0000"
 
-        const val releaseCandidate: String = "5.3-rc-1"
+        const val releaseCandidate: String = "5.3-rc-3"
     }
 }
