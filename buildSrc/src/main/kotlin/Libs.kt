@@ -6,12 +6,6 @@ import kotlin.String
  * Update this file with
  *   `$ ./gradlew buildSrcVersions` */
 object Libs {
-    const val navigation_fragment_ktx: String = "android.arch.navigation:navigation-fragment-ktx:" +
-            Versions.android_arch_navigation
-
-    const val navigation_ui_ktx: String = "android.arch.navigation:navigation-ui-ktx:" +
-            Versions.android_arch_navigation
-
     /**
      * http://developer.android.com/tools/extras/support-library.html */
     const val appcompat: String = "androidx.appcompat:appcompat:" + Versions.appcompat
@@ -36,6 +30,16 @@ object Libs {
             Versions.lifecycle_extensions
 
     /**
+     * https://developer.android.com/topic/libraries/architecture/index.html */
+    const val navigation_fragment_ktx: String = "androidx.navigation:navigation-fragment-ktx:" +
+            Versions.androidx_navigation
+
+    /**
+     * https://developer.android.com/topic/libraries/architecture/index.html */
+    const val navigation_ui_ktx: String = "androidx.navigation:navigation-ui-ktx:" +
+            Versions.androidx_navigation
+
+    /**
      * http://developer.android.com/tools/extras/support-library.html */
     const val preference_ktx: String = "androidx.preference:preference-ktx:" +
             Versions.preference_ktx
@@ -43,8 +47,6 @@ object Libs {
     /**
      * http://developer.android.com/tools/extras/support-library.html */
     const val recyclerview: String = "androidx.recyclerview:recyclerview:" + Versions.recyclerview
-
-    const val viewpager2: String = "androidx.viewpager2:viewpager2:" + Versions.viewpager2
 
     /**
      * https://developer.android.com/studio */

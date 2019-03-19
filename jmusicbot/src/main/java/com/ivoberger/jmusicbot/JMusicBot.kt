@@ -272,9 +272,9 @@ object JMusicBot {
         updateQueue(mApiClient.dequeue(song.id, song.provider.id).process())
     }
 
-    suspend fun moveEntry(entry: QueueEntry, newPosition: Int) {
+    suspend fun moveEntry(entry: QueueEntry, providerId: String, songId: String, newPosition: Int) {
         state.connectionCheck()
-        updateQueue(mApiClient.moveEntry(entry, newPosition).process())
+        updateQueue(mApiClient.moveEntry(entry, providerId, songId, newPosition).process())
     }
 
     suspend fun search(providerId: String, query: String): List<Song> {

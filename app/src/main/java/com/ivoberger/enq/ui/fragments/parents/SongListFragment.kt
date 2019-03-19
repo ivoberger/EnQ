@@ -14,9 +14,7 @@ import com.ivoberger.enq.utils.toastShort
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.Song
 import com.mikepenz.fastadapter.FastAdapter
-import com.mikepenz.fastadapter.IAdapter
 import com.mikepenz.fastadapter.adapters.ModelAdapter
-import com.mikepenz.fastadapter.listeners.OnClickListener
 import kotlinx.android.synthetic.main.fragment_queue.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,11 +44,9 @@ abstract class SongListFragment<T : SongItem> : Fragment() {
         recycler_queue.layoutManager = LinearLayoutManager(context)
         recycler_queue.adapter = fastAdapter
 
-        fastAdapter.onClickListener = object : OnClickListener<T> {
-            override fun onClick(v: View?, adapter: IAdapter<T>, item: T, position: Int): Boolean {
-                if (!JMusicBot.isConnected) return false
-                return onEntryClicked(item, position)
-            }
+        fastAdapter.onClickListener = { _, _, item: T, position: Int ->
+            if (!JMusicBot.isConnected) false
+            else onEntryClicked(item, position)
         }
     }
 

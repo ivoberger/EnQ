@@ -1,3 +1,6 @@
+v0.5.4
+- implements API v0.11.0
+- fixes bug with changing the queue order
 v0.5.3
 - Improved search
 - updated logo
