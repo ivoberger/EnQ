@@ -8,7 +8,6 @@ import com.ivoberger.enq.R
 import com.ivoberger.enq.ui.items.ResultItem
 import com.ivoberger.jmusicbot.model.Song
 import com.mikepenz.fastadapter.FastAdapter
-import com.mikepenz.fastadapter.IInterceptor
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.adapters.ModelAdapter
 import com.mikepenz.fastadapter.ui.items.ProgressItem
@@ -20,9 +19,7 @@ open class ResultsFragment : SongListFragment<ResultItem>() {
 
     val loadingHeader: ItemAdapter<ProgressItem> by lazy { ItemAdapter<ProgressItem>() }
     override val songAdapter: ModelAdapter<Song, ResultItem> by lazy {
-        ModelAdapter(object : IInterceptor<Song, ResultItem> {
-            override fun intercept(element: Song): ResultItem? = ResultItem(element)
-        })
+        ModelAdapter { element: Song -> ResultItem(element) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

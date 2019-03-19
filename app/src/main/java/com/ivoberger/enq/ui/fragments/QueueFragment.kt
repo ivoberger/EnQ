@@ -19,11 +19,9 @@ import com.ivoberger.jmusicbot.exceptions.AuthException
 import com.ivoberger.jmusicbot.model.Permissions
 import com.ivoberger.jmusicbot.model.QueueEntry
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
-import com.mikepenz.fastadapter.IAdapter
 import com.mikepenz.fastadapter.adapters.FastItemAdapter
 import com.mikepenz.fastadapter.diff.FastAdapterDiffUtil
 import com.mikepenz.fastadapter.drag.ItemTouchCallback
-import com.mikepenz.fastadapter.listeners.OnLongClickListener
 import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
 import com.mikepenz.fastadapter.swipe_drag.SimpleSwipeDragCallback
 import com.mikepenz.fastadapter.utils.DragDropUtil
@@ -87,12 +85,11 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
 
         ItemTouchHelper(touchCallback).attachToRecyclerView(recycler_queue)
 
-        mFastItemAdapter.onLongClickListener = object : OnLongClickListener<QueueItem> {
-            override fun onLongClick(v: View, adapter: IAdapter<QueueItem>, item: QueueItem, position: Int): Boolean {
-                mViewModel.queue.removeObservers(this@QueueFragment)
-                return true
-            }
+        mFastItemAdapter.onLongClickListener = { _, _, _, _ ->
+            mViewModel.queue.removeObservers(this@QueueFragment)
+            true
         }
+
     }
 
     private fun updateQueue(newQueue: List<QueueEntry>) = mBackgroundScope.launch {

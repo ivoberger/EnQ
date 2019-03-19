@@ -12,7 +12,6 @@ import com.ivoberger.enq.utils.*
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.Song
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
-import com.mikepenz.fastadapter.IInterceptor
 import com.mikepenz.fastadapter.adapters.ModelAdapter
 import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
 import kotlinx.android.synthetic.main.fragment_queue.*
@@ -24,9 +23,7 @@ import splitties.toast.toast
 class FavoritesFragment : SongListFragment<SongItem>(), SimpleSwipeCallback.ItemSwipeCallback {
 
     override val songAdapter: ModelAdapter<Song, SongItem> by lazy {
-        ModelAdapter(object : IInterceptor<Song, SongItem> {
-            override fun intercept(element: Song): SongItem? = SongItem(element)
-        })
+        ModelAdapter { element: Song -> SongItem(element) }
     }
     override val isRemoveAfterEnQ = false
 

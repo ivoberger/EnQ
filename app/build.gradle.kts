@@ -70,7 +70,6 @@ dependencies {
     // appcompat, arch components etc.
     implementation(Libs.appcompat)
     implementation(Libs.recyclerview)
-    implementation(Libs.viewpager2)
     implementation(Libs.lifecycle_extensions)
     implementation(Libs.preference_ktx)
     implementation(Libs.navigation_fragment_ktx)
