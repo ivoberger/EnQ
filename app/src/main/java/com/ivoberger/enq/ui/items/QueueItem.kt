@@ -21,6 +21,7 @@ class QueueItem(
 ) :
     ModelAbstractItem<QueueEntry, QueueItem.ViewHolder>(queueEntry), IDraggable {
 
+    override var identifier: Long = song.id.hashCode().toLong()
     override val type: Int = R.id.queue_entry
     override val layoutRes: Int = R.layout.adapter_queue_entry
     override fun getViewHolder(v: View) = ViewHolder(v)

@@ -11,6 +11,7 @@ import com.mikepenz.fastadapter.items.ModelAbstractItem
 
 open class SongItem(song: Song) : ModelAbstractItem<Song, SongItem.ViewHolder>(song) {
 
+    override var identifier: Long = song.id.hashCode().toLong()
     override val type: Int = R.id.queue_entry
     override val layoutRes: Int = R.layout.adapter_queue_entry
     override fun getViewHolder(v: View) = ViewHolder(v)

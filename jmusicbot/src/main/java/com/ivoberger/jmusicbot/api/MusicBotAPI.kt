@@ -48,7 +48,11 @@ internal interface MusicBotAPI {
     fun enqueue(@Query(KEY_SONG_ID) songId: String, @Query(KEY_PROVIDER_ID) providerId: String): Deferred<Response<List<QueueEntry>>>
 
     @PUT("$URL_PLAYER/$URL_QUEUE/order")
-    fun moveEntry(@Body entry: QueueEntry, @Query("index") index: Int): Deferred<Response<List<QueueEntry>>>
+    fun moveEntry(
+        @Body entry: QueueEntry, @Query("providerId") providerId: String, @Query("songId") songId: String, @Query(
+            "index"
+        ) index: Int
+    ): Deferred<Response<List<QueueEntry>>>
 
     @GET("$URL_PLAYER/$URL_QUEUE")
     fun getQueue(): Deferred<Response<List<QueueEntry>>>

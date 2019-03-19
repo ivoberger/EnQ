@@ -142,7 +142,7 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
             val entry = mFastItemAdapter.getAdapterItem(newPosition).model
             Timber.d("Moved ${entry.song.title} from $oldPosition to $newPosition")
             try {
-                JMusicBot.moveEntry(entry, newPosition)
+                JMusicBot.moveEntry(entry, entry.song.provider.id, entry.song.id, newPosition)
             } catch (e: Exception) {
                 Timber.e(e)
                 mMainScope.launch {
