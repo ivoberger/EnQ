@@ -2,9 +2,7 @@ package com.ivoberger.enq.ui.fragments.parents
 
 import android.os.Bundle
 import android.view.View
-import androidx.annotation.ContentView
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.ivoberger.enq.R
 import com.ivoberger.enq.ui.items.ResultItem
 import com.ivoberger.jmusicbot.model.Song
 import com.mikepenz.fastadapter.FastAdapter
@@ -14,7 +12,6 @@ import com.mikepenz.fastadapter.ui.items.ProgressItem
 import kotlinx.android.synthetic.main.fragment_queue.*
 import kotlinx.coroutines.launch
 
-@ContentView(R.layout.fragment_queue)
 open class ResultsFragment : SongListFragment<ResultItem>() {
 
     val loadingHeader: ItemAdapter<ProgressItem> by lazy { ItemAdapter<ProgressItem>() }

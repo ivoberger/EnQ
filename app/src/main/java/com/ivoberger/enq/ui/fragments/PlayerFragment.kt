@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import androidx.annotation.ContentView
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -28,8 +27,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-@ContentView(R.layout.fragment_player)
-class PlayerFragment : Fragment() {
+
+class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     companion object {
         fun newInstance(): PlayerFragment = PlayerFragment()

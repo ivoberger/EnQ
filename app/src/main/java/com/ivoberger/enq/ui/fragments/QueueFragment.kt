@@ -2,7 +2,6 @@ package com.ivoberger.enq.ui.fragments
 
 import android.os.Bundle
 import android.view.View
-import androidx.annotation.ContentView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -33,8 +32,7 @@ import kotlinx.coroutines.withContext
 import splitties.resources.color
 import timber.log.Timber
 
-@ContentView(R.layout.fragment_queue)
-class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTouchCallback {
+class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.ItemSwipeCallback, ItemTouchCallback {
     companion object {
         fun newInstance() = QueueFragment()
     }

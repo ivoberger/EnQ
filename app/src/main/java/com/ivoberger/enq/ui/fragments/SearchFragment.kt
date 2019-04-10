@@ -2,10 +2,8 @@ package com.ivoberger.enq.ui.fragments
 
 import android.os.Bundle
 import android.widget.SearchView
-import androidx.annotation.ContentView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import com.ivoberger.enq.R
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.fragments.parents.TabbedResultsFragment
 import com.ivoberger.jmusicbot.JMusicBot
@@ -17,7 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-@ContentView(R.layout.fragment_results)
+
 class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
 
     private val mSearchView: SearchView by lazy { (activity as MainActivity).searchView }

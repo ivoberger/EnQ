@@ -3,7 +3,6 @@ package com.ivoberger.enq.ui.fragments.parents
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.ContentView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
@@ -17,8 +16,8 @@ import kotlinx.android.synthetic.main.fragment_results.*
 import kotlinx.coroutines.*
 import timber.log.Timber
 
-@ContentView(R.layout.fragment_results)
-abstract class TabbedResultsFragment : Fragment(), ViewPager.OnPageChangeListener,
+
+abstract class TabbedResultsFragment : Fragment(R.layout.fragment_results), ViewPager.OnPageChangeListener,
     ConnectionChangeListener {
     val mMainScope = CoroutineScope(Dispatchers.Main)
 

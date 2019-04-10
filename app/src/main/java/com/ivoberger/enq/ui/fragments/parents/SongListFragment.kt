@@ -2,7 +2,6 @@ package com.ivoberger.enq.ui.fragments.parents
 
 import android.os.Bundle
 import android.view.View
-import androidx.annotation.ContentView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,8 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import splitties.resources.str
 
-@ContentView(R.layout.fragment_queue)
-abstract class SongListFragment<T : SongItem> : Fragment() {
+abstract class SongListFragment<T : SongItem> : Fragment(R.layout.fragment_queue) {
 
     val mMainScope = CoroutineScope(Dispatchers.Main)
     val mBackgroundScope = CoroutineScope(Dispatchers.IO)

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
-import androidx.annotation.ContentView
 import androidx.fragment.app.Fragment
 import com.ivoberger.enq.R
 import com.ivoberger.enq.ui.MainActivity
@@ -21,8 +20,7 @@ import splitties.views.onClick
 import timber.log.Timber
 
 
-@ContentView(R.layout.fragment_user_info)
-class UserInfoFragment : Fragment() {
+class UserInfoFragment : Fragment(R.layout.fragment_user_info) {
 
     val mMainScope = CoroutineScope(Dispatchers.Main)
     val mBackgroundScope = CoroutineScope(Dispatchers.IO)

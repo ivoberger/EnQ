@@ -2,7 +2,6 @@ package com.ivoberger.enq.ui.fragments
 
 import android.os.Bundle
 import android.view.View
-import androidx.annotation.ContentView
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.ivoberger.enq.R
 import com.ivoberger.enq.ui.MainActivity
@@ -19,7 +18,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import splitties.toast.toast
 
-@ContentView(R.layout.fragment_queue)
 class FavoritesFragment : SongListFragment<SongItem>(), SimpleSwipeCallback.ItemSwipeCallback {
 
     override val songAdapter: ModelAdapter<Song, SongItem> by lazy {
