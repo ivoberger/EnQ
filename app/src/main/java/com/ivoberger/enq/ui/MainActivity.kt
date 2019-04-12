@@ -23,7 +23,6 @@ import com.ivoberger.enq.ui.viewmodel.MainViewModel
 import com.ivoberger.enq.utils.*
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.Song
-import com.ivoberger.timbersentry.SentryTree
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.typeface.IIcon
 import kotlinx.android.synthetic.main.activity_main.*
@@ -59,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         mBackgroundScope.launch {
             // logging
             if (!mTreePlanted) {
-                Timber.plant(if (BuildConfig.DEBUG) EnQDebugTree() else SentryTree(context = this@MainActivity))
+                Timber.plant(if (BuildConfig.DEBUG) EnQDebugTree() else FirebaseTree())
                 mTreePlanted = true
             }
             // saved data

@@ -21,11 +21,15 @@ object Versions {
 
     const val recyclerview: String = "1.1.0-alpha04"
 
-    const val com_android_tools_build_gradle: String = "3.5.0-alpha09"
+    const val aapt2: String = "3.5.0-alpha10-5342889"
 
-    const val lint_gradle: String = "26.5.0-alpha09"
+    const val com_android_tools_build_gradle: String = "3.5.0-alpha10"
+
+    const val lint_gradle: String = "26.5.0-alpha10"
 
     const val jwtdecode: String = "1.2.0"
+
+    const val crashlytics: String = "2.9.9"
 
     const val com_github_bumptech_glide: String = "4.9.0"
 
@@ -33,7 +37,9 @@ object Versions {
 
     const val material: String = "1.1.0-alpha01"
 
-    const val timbersentry: String = "0.3.0"
+    const val firebase_core: String = "16.0.8"
+
+    const val google_services: String = "4.2.0"
 
     const val retrofit2_kotlin_coroutines_adapter: String = "0.9.2"
 
@@ -67,9 +73,9 @@ object Versions {
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.3.2"
 
-    const val sentry_android_gradle_plugin: String = "1.7.22"
+    const val io_fabric_tools_gradle: String = "1.28.1"
 
-    const val org_jetbrains_kotlin: String = "1.3.21"
+    const val org_jetbrains_kotlin: String = "1.3.30"
 
     const val kotlinx_coroutines_android: String = "1.1.1"
 
@@ -85,7 +91,7 @@ object Versions {
 
         const val currentVersion: String = "5.3.1"
 
-        const val nightlyVersion: String = "5.5-20190410000104+0000"
+        const val nightlyVersion: String = "5.5-20190412000044+0000"
 
         const val releaseCandidate: String = "5.4-rc-1"
     }

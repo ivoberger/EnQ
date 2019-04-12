@@ -3,8 +3,9 @@ plugins {
     kotlin("android")
     kotlin("android.extensions")
     kotlin("kapt")
-    id("com.github.triplet.play") version Versions.com_github_triplet_play_gradle_plugin
-    id("io.sentry.android.gradle")
+    id("com.google.gms.google-services")
+    id("io.fabric")
+    id("com.github.triplet.play")
 }
 
 android {
@@ -30,8 +31,9 @@ android {
     }
     buildTypes {
         getByName("debug") {
-            applicationIdSuffix = ".debug"
+            //            applicationIdSuffix = ".debug"
             versionNameSuffix = " (debug)"
+            ext["enableCrashlytics"] = false
         }
         getByName("release") {
             isMinifyEnabled = true
@@ -56,11 +58,6 @@ play {
     resolutionStrategy = "auto"
 }
 
-sentry {
-    autoProguardConfig = true
-    autoUpload = true
-}
-
 dependencies {
     // Kotlin (extensions)
     implementation(Libs.kotlin_stdlib_jdk8)
@@ -80,7 +77,9 @@ dependencies {
     implementation(project(":jmusicbot"))
 
     // utils
-    implementation(Libs.timbersentry)
+    implementation(Libs.timber)
+    implementation(Libs.firebase_core)
+    implementation(Libs.crashlytics)
 
     implementation(Libs.glide)
     kapt(Libs.com_github_bumptech_glide_compiler)

@@ -2,16 +2,14 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven(url = "https://maven.fabric.io/public")
     }
     dependencies {
         classpath(Libs.com_android_tools_build_gradle)
         classpath(Libs.kotlin_gradle_plugin)
-        classpath(Libs.sentry_android_gradle_plugin)
-    }
-    configurations.all {
-        resolutionStrategy {
-            force("net.sf.proguard:proguard-gradle:6.1.0beta2")
-        }
+        classpath(Libs.google_services)
+        classpath(Libs.com_github_triplet_play_gradle_plugin)
+        classpath("io.fabric.tools:gradle:1.28.1")
     }
 }
 
