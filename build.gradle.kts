@@ -1,4 +1,6 @@
 buildscript {
+    var kotlin_version: String by extra
+    kotlin_version = "1.3.30"
     repositories {
         google()
         jcenter()
@@ -9,7 +11,7 @@ buildscript {
         classpath(Libs.kotlin_gradle_plugin)
         classpath(Libs.google_services)
         classpath(Libs.com_github_triplet_play_gradle_plugin)
-        classpath("io.fabric.tools:gradle:1.28.1")
+        classpath(Libs.io_fabric_tools_gradle)
     }
 }
 
@@ -25,10 +27,18 @@ allprojects {
     }
 }
 
+//subprojects {
+//    pluginManager.withPlugin("kotlin-kapt") {
+//        configure<KaptExtension> {
+//            useBuildCache = true
+//        }
+//    }
+//}
+
 tasks {
     wrapper {
         version = Versions.Gradle.runningVersion
-        distributionType = Wrapper.DistributionType.BIN
+        distributionType = Wrapper.DistributionType.ALL
     }
     val clean by registering(Delete::class) {
         delete(buildDir)

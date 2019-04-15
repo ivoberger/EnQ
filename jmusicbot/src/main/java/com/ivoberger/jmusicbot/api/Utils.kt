@@ -15,7 +15,7 @@ import java.net.InetAddress
 import java.net.MulticastSocket
 
 private const val GROUP_ADDRESS = "224.0.0.142"
-private const val PORT = 42945
+internal const val PORT = 42945
 private const val LOCK_TAG = "enq_broadcast"
 
 internal fun WifiManager.discoverHost(): String? {
@@ -31,7 +31,7 @@ internal fun WifiManager.discoverHost(): String? {
             socket.broadcast = true
             socket.receive(packet)
             socket.leaveGroup(groupAddress)
-            "http://${packet.address.hostAddress}:$PORT"
+            packet.address.hostAddress
         }
     } catch (e: IOException) {
         null
@@ -40,7 +40,7 @@ internal fun WifiManager.discoverHost(): String? {
     }
 }
 
-internal fun OkHttpClient.withToken(token: AuthTypes.Token) = newBuilder().addInterceptor { chain ->
+internal fun OkHttpClient.Builder.withToken(token: AuthTypes.Token) = addInterceptor { chain ->
     chain.proceed(chain.request().newBuilder().header(KEY_AUTHORIZATION, token.toAuthHeader()).build())
 }.authenticator(TokenAuthenticator()).build()
 

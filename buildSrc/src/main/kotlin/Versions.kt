@@ -37,6 +37,8 @@ object Versions {
 
     const val material: String = "1.1.0-alpha01"
 
+    const val com_google_dagger: String = "2.22.1"
+
     const val firebase_core: String = "16.0.8"
 
     const val google_services: String = "4.2.0"
@@ -45,7 +47,7 @@ object Versions {
 
     const val timber: String = "4.7.1"
 
-    const val com_louiscad_splitties: String = "3.0.0-alpha03"
+    const val com_louiscad_splitties: String = "3.0.0-alpha04"
 
     const val community_material_typeface: String = "3.5.95.1"
 
@@ -61,7 +63,7 @@ object Versions {
 
     const val fastadapter: String = "4.0.0-rc03"
 
-    const val iconics_core: String = "3.2.2" // available: "4.0.0-b1"
+    const val iconics_core: String = "3.2.5" // available: "4.0.0-b1"
 
     const val com_squareup_moshi: String = "1.8.0"
 
@@ -77,7 +79,7 @@ object Versions {
 
     const val org_jetbrains_kotlin: String = "1.3.30"
 
-    const val kotlinx_coroutines_android: String = "1.1.1"
+    const val kotlinx_coroutines_android: String = "1.2.0"
 
     const val ru_ztrap_iconics_core_ktx: String = "1.0.3"
 
@@ -91,7 +93,7 @@ object Versions {
 
         const val currentVersion: String = "5.3.1"
 
-        const val nightlyVersion: String = "5.5-20190412000044+0000"
+        const val nightlyVersion: String = "5.5-20190414000043+0000"
 
         const val releaseCandidate: String = "5.4-rc-1"
     }

@@ -84,6 +84,20 @@ object Libs {
      * http://developer.android.com/tools/extras/support-library.html */
     const val material: String = "com.google.android.material:material:" + Versions.material
 
+    /**
+     * https://github.com/google/dagger */
+    const val dagger_compiler: String = "com.google.dagger:dagger-compiler:" +
+            Versions.com_google_dagger
+
+    /**
+     * https://github.com/google/dagger */
+    const val dagger_producers: String = "com.google.dagger:dagger-producers:" +
+            Versions.com_google_dagger
+
+    /**
+     * https://github.com/google/dagger */
+    const val dagger: String = "com.google.dagger:dagger:" + Versions.com_google_dagger
+
     const val firebase_core: String = "com.google.firebase:firebase-core:" + Versions.firebase_core
 
     /**

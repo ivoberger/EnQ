@@ -18,7 +18,8 @@ class TokenAuthenticator : Authenticator {
         Timber.d("Re-authorizing")
         var auth: String? = null
         response.body()?.let { body ->
-            val authExpectation = JMusicBot.mMoshi.adapter(AuthExpectation::class.java).fromJson(String(body.bytes()))
+            val authExpectation =
+                JMusicBot.mBaseComponent.moshi.adapter(AuthExpectation::class.java).fromJson(String(body.bytes()))
             Timber.d("AuthExpectation: $authExpectation")
             auth = when (authExpectation?.format) {
                 AuthType.BASIC -> {

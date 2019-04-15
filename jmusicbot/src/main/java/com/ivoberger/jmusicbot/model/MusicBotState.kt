@@ -3,7 +3,7 @@ package com.ivoberger.jmusicbot.model
 import kotlinx.coroutines.Job
 
 /**
- * Possible states for the music bot client to be in
+ * Possible states for the musicBotService bot client to be in
  * DISCONNECTED: Client has no server connection
  * CONNECTING: client is trying to find a server
  * NEEDS_AUTH: Client has found a server but needs login/new auth token

@@ -12,7 +12,7 @@ private const val URL_SUGGEST = "suggester"
 private const val URL_PROVIDER = "provider"
 private const val URL_QUEUE = "queue"
 
-internal interface MusicBotAPI {
+internal interface MusicBotService {
     // User operations
     @PUT(URL_USER)
     fun changePassword(@Body newPassword: AuthTypes.PasswordChange): Deferred<Response<String>>

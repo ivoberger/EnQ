@@ -1,8 +1,8 @@
 plugins {
     id("com.android.library")
-    id("kotlin-android-extensions")
-    id("kotlin-android")
-    id("kotlin-kapt")
+    kotlin("android")
+    kotlin("android.extensions")
+    kotlin("kapt")
 }
 
 android {
@@ -30,11 +30,15 @@ dependencies {
 
     implementation(Libs.timber)
 
+    kapt(Libs.dagger_compiler)
+    implementation(Libs.dagger)
+
     implementation(Libs.splitties_systemservices)
     implementation(Libs.splitties_preferences)
     implementation(Libs.jwtdecode)
 
     implementation(Libs.okhttp)
+    implementation("com.squareup.okhttp3:logging-interceptor:${Versions.okhttp}")
     implementation(Libs.retrofit)
     implementation(Libs.retrofit2_kotlin_coroutines_adapter)
     implementation(Libs.converter_moshi)

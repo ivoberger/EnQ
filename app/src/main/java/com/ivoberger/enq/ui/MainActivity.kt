@@ -56,9 +56,9 @@ class MainActivity : AppCompatActivity() {
 
         // general setup
         mBackgroundScope.launch {
-            // logging
+            // logging (and crash reporting)
             if (!mTreePlanted) {
-                Timber.plant(if (BuildConfig.DEBUG) EnQDebugTree() else FirebaseTree())
+                Timber.plant(if (BuildConfig.DEBUG) EnQDebugTree() else FirebaseTree(this@MainActivity))
                 mTreePlanted = true
             }
             // saved data

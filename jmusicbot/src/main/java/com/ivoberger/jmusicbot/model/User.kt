@@ -34,7 +34,7 @@ class User(
         }
 
     companion object {
-        private val mUserAdapter by lazy { JMusicBot.mMoshi.adapter<User>(User::class.java) }
+        private val mUserAdapter by lazy { JMusicBot.mBaseComponent.moshi.adapter<User>(User::class.java) }
         fun fromString(serializedUser: String) = mUserAdapter.fromJson(serializedUser)
 
         fun load(sharedPreferences: SharedPreferences, moshi: Moshi = Moshi.Builder().build()): User? {
