@@ -20,6 +20,7 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
+    packagingOptions.pickFirst("META-INF/atomicfu.kotlin_module")
 }
 
 dependencies {

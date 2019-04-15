@@ -48,7 +48,7 @@ android {
     lintOptions {
         isAbortOnError = false
     }
-    packagingOptions.exclude("META-INF/core-ktx_release.kotlin_module")
+    packagingOptions.pickFirsts = setOf("META-INF/core-ktx_release.kotlin_module", "META-INF/atomicfu.kotlin_module")
 }
 
 play {
