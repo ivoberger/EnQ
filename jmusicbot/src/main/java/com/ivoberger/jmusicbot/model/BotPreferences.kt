@@ -12,9 +12,9 @@ internal object BotPreferences : Preferences(KEY_PREFERENCES) {
         }
     private var serializedUser: String? by stringOrNullPref()
 
-    var authToken: AuthTypes.Token? = null
+    var authToken: Auth.Token? = null
         get() {
-            return mAuthToken?.let { AuthTypes.Token(it) }
+            return mAuthToken?.let { Auth.Token(it) }
         }
         set(value) {
             field = value

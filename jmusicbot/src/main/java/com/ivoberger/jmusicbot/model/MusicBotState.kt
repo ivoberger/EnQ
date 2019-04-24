@@ -27,3 +27,25 @@ enum class MusicBotState {
         check(isConnected()) { "Client needs authorization" }
     }
 }
+
+sealed class State {
+    object Disconnected : State()
+    object AuthRequired : State()
+    object Connecting : State()
+    object Connected : State()
+}
+
+sealed class Event {
+    object OnServerFound : Event()
+    object OnGotCredentials : Event()
+    object OnAuthorize : Event()
+    object OnAuthExpired : Event()
+    object OnDisconnect : Event()
+}
+
+sealed class SideEffect {
+    object LogMelted : SideEffect()
+    object LogFrozen : SideEffect()
+    object LogVaporized : SideEffect()
+    object LogCondensed : SideEffect()
+}

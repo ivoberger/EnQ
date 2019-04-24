@@ -4,7 +4,7 @@ import android.net.wifi.WifiManager
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.KEY_AUTHORIZATION
 import com.ivoberger.jmusicbot.exceptions.*
-import com.ivoberger.jmusicbot.model.AuthTypes
+import com.ivoberger.jmusicbot.model.Auth
 import kotlinx.coroutines.Deferred
 import okhttp3.OkHttpClient
 import retrofit2.Response
@@ -40,7 +40,7 @@ internal fun WifiManager.discoverHost(): String? {
     }
 }
 
-internal fun OkHttpClient.Builder.withToken(token: AuthTypes.Token) = addInterceptor { chain ->
+internal fun OkHttpClient.Builder.withToken(token: Auth.Token) = addInterceptor { chain ->
     chain.proceed(chain.request().newBuilder().header(KEY_AUTHORIZATION, token.toAuthHeader()).build())
 }.authenticator(TokenAuthenticator()).build()
 

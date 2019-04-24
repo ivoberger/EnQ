@@ -12,6 +12,7 @@ import com.ivoberger.jmusicbot.di.DaggerBaseComponent
 import com.ivoberger.jmusicbot.exceptions.*
 import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
 import com.ivoberger.jmusicbot.model.*
+import com.tinder.StateMachine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -24,14 +25,63 @@ import kotlin.concurrent.timer
 
 
 object JMusicBot {
+
+    private val stateMachine = StateMachine.create<State, Event, SideEffect> {
+        initialState(State.Disconnected)
+        state<State.Disconnected> {
+            on<Event.OnServerFound> { transitionTo(State.AuthRequired) }
+        }
+        state<State.AuthRequired> {
+            on<Event.OnGotCredentials> { transitionTo(State.Connecting) }
+            on<Event.OnDisconnect> { transitionTo(State.Disconnected) }
+        }
+        state<State.Connecting> {
+            on<Event.OnAuthorize> { transitionTo(State.Connected) }
+            on<Event.OnDisconnect> { transitionTo(State.Disconnected) }
+        }
+        state<State.Connected> {
+            on<Event.OnAuthExpired> { transitionTo(State.AuthRequired) }
+            on<Event.OnDisconnect> { transitionTo(State.Disconnected) }
+        }
+        onTransition {
+            val validTransition = it as? StateMachine.Transition.Valid
+            val invalidTransition = it as? StateMachine.Transition.Invalid
+            validTransition?.let { trans ->
+                Timber.d("State transition from ${trans.fromState} to ${trans.toState} by ${trans.event}")
+            }
+            invalidTransition?.let { trans ->
+                Timber.d("Attempted state transition from ${trans.fromState} by ${trans.event}")
+            }
+        }
+    }
+
+    val newState: State
+        get() = stateMachine.state
+
+    private val isDisconnected
+        get() = newState == State.Disconnected
+    private val isAuthRequired
+        get() = newState == State.AuthRequired
+    private val isConnecting
+        get() = newState == State.Connecting
+
+    var isConnected: Boolean = false
+        get() = newState == State.Connected
+        set(value) {
+            field = value
+            if (value) connectionChangeListeners.forEach { it.onConnectionRecovered() }
+            if (!value) {
+                connectionChangeListeners.forEach { it.onConnectionLost() }
+                state = MusicBotState.DISCONNECTED
+            }
+        }
+
     var state: MusicBotState = MusicBotState.DISCONNECTED
         set(newState) {
             Timber.d("State changed from $field to $newState")
             if (newState == MusicBotState.NEEDS_AUTH || newState == MusicBotState.DISCONNECTED) {
                 stopQueueUpdates()
                 stopPlayerUpdates()
-//                mOkHttpClient = getDefaultOkHttpClient()
-//                mRetrofit = getDefaultRetrofitClient(mOkHttpClient, baseUrl)
             }
             if (newState == MusicBotState.CONNECTED) isConnected = true
             field = newState
@@ -41,10 +91,6 @@ object JMusicBot {
         DaggerBaseComponent.builder().baseModule(BaseModule(HttpLoggingInterceptor.Level.BODY)).build()
 
     private val mWifiManager: WifiManager = mBaseComponent.wifiManager
-
-    init {
-
-    }
 
     private var baseUrl: String? = null
         set(value) {
@@ -56,16 +102,7 @@ object JMusicBot {
     private lateinit var mServiceClient: MusicBotService
 
     val connectionChangeListeners: MutableList<ConnectionChangeListener> = mutableListOf()
-    var isConnected: Boolean = false
-        get() = state.isConnected()
-        set(value) {
-            field = value
-            if (value) connectionChangeListeners.forEach { it.onConnectionRecovered() }
-            if (!value) {
-                connectionChangeListeners.forEach { it.onConnectionLost() }
-                state = MusicBotState.DISCONNECTED
-            }
-        }
+
 
     private val mQueue: MutableLiveData<List<QueueEntry>> = MutableLiveData()
     private val mPlayerState: MutableLiveData<PlayerState> = MutableLiveData()
@@ -81,7 +118,7 @@ object JMusicBot {
             if (value == null) authToken = null
         }
 
-    var authToken: AuthTypes.Token? = BotPreferences.authToken
+    var authToken: Auth.Token? = BotPreferences.authToken
         get() = BotPreferences.authToken
         set(value) {
             Timber.d("Setting Token to $value")
@@ -111,7 +148,7 @@ object JMusicBot {
 
     }
 
-    suspend fun recoverConnection() = GlobalScope.launch {
+    suspend fun recoverConnection() {
         Timber.d("Reconnecting")
         while (!state.hasServer()) {
             discoverHost()
@@ -127,7 +164,7 @@ object JMusicBot {
         IllegalStateException::class
     )
     suspend fun authorize(userName: String? = null, password: String? = null) {
-        state.serverCheck()
+        check(newState == State.Connected)
         Timber.d("Starting authorization")
         if (tokenValid()) return
         if (userName == null && user == null) throw IllegalStateException("No username stored or supplied")
@@ -193,14 +230,14 @@ object JMusicBot {
         val credentials = when {
             (!userName.isNullOrBlank()) -> {
                 user = User(userName)
-                AuthTypes.Register(userName)
+                Auth.Register(userName)
             }
-            user != null -> AuthTypes.Register(user!!)
+            user != null -> Auth.Register(user!!)
             else -> throw IllegalStateException("No username stored or supplied")
         }
         val token = mServiceClient.registerUser(credentials).process()!!
         Timber.d("Registered $user")
-        authToken = AuthTypes.Token(token)
+        authToken = Auth.Token(token)
     }
 
     @Throws(
@@ -216,21 +253,21 @@ object JMusicBot {
         val credentials = when {
             (!(userName.isNullOrBlank() || password.isNullOrBlank())) -> {
                 user = User(userName, password)
-                AuthTypes.Basic(userName, password).toAuthHeader()
+                Auth.Basic(userName, password).toAuthHeader()
             }
-            user != null -> AuthTypes.Basic(user!!).toAuthHeader()
+            user != null -> Auth.Basic(user!!).toAuthHeader()
             else -> throw IllegalStateException("No user stored or supplied")
         }
-        Timber.d("AuthTypes: $credentials")
+        Timber.d("Auth: $credentials")
         val token = mServiceClient.loginUser(credentials).process()!!
         Timber.d("Logged in $user")
-        authToken = AuthTypes.Token(token)
+        authToken = Auth.Token(token)
     }
 
     @Throws(InvalidParametersException::class, AuthException::class)
     suspend fun changePassword(newPassword: String) {
         state.connectionCheck()
-        authToken = AuthTypes.Token(mServiceClient.changePassword(AuthTypes.PasswordChange((newPassword))).process()!!)
+        authToken = Auth.Token(mServiceClient.changePassword(Auth.PasswordChange((newPassword))).process()!!)
         authToken?.also { user?.password = newPassword }
     }
 

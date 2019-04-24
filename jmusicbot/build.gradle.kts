@@ -30,6 +30,7 @@ dependencies {
     implementation(Libs.lifecycle_extensions)
 
     implementation(Libs.timber)
+    implementation(Libs.statemachine)
 
     kapt(Libs.dagger_compiler)
     implementation(Libs.dagger)
@@ -39,10 +40,13 @@ dependencies {
     implementation(Libs.jwtdecode)
 
     implementation(Libs.okhttp)
-    implementation("com.squareup.okhttp3:logging-interceptor:${Versions.okhttp}")
+    implementation(Libs.logging_interceptor)
     implementation(Libs.retrofit)
     implementation(Libs.retrofit2_kotlin_coroutines_adapter)
     implementation(Libs.converter_moshi)
     implementation(Libs.moshi)
     kapt(Libs.moshi_kotlin_codegen)
+
+    implementation(Libs.assertj_core)
+
 }

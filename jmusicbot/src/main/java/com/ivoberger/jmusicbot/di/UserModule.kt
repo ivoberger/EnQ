@@ -2,7 +2,7 @@ package com.ivoberger.jmusicbot.di
 
 import com.ivoberger.jmusicbot.api.MusicBotService
 import com.ivoberger.jmusicbot.api.withToken
-import com.ivoberger.jmusicbot.model.AuthTypes
+import com.ivoberger.jmusicbot.model.Auth
 import com.ivoberger.jmusicbot.model.User
 import dagger.Module
 import dagger.Provides
@@ -11,12 +11,12 @@ import retrofit2.Retrofit
 import javax.inject.Named
 
 @Module
-internal class UserModule(private val mUser: User, private val mAuthToken: AuthTypes.Token) {
+internal class UserModule(private val mUser: User, private val mAuthToken: Auth.Token) {
     @Provides
     fun user(): User = mUser
 
     @Provides
-    fun authToken(): AuthTypes.Token = mAuthToken
+    fun authToken(): Auth.Token = mAuthToken
 
     @Provides
     @Named(NameKeys.RETROFIT_AUTHENTICATED)
@@ -27,7 +27,7 @@ internal class UserModule(private val mUser: User, private val mAuthToken: AuthT
 
     @Provides
     @Named(NameKeys.OKHTTP_AUTHENTICATED)
-    fun okHttpClient(okHttpClientBuilder: OkHttpClient.Builder, authToken: AuthTypes.Token) =
+    fun okHttpClient(okHttpClientBuilder: OkHttpClient.Builder, authToken: Auth.Token) =
         okHttpClientBuilder.withToken(authToken)
 
     @Provides

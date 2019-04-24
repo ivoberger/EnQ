@@ -76,6 +76,10 @@ object Libs {
     const val glide: String = "com.github.bumptech.glide:glide:" +
             Versions.com_github_bumptech_glide
 
+    /**
+     * https://github.com/Tinder/StateMachine */
+    const val statemachine: String = "com.github.tinder:statemachine:" + Versions.statemachine
+
     const val com_github_triplet_play_gradle_plugin: String =
         "com.github.triplet.play:com.github.triplet.play.gradle.plugin:" +
                 Versions.com_github_triplet_play_gradle_plugin
@@ -87,11 +91,6 @@ object Libs {
     /**
      * https://github.com/google/dagger */
     const val dagger_compiler: String = "com.google.dagger:dagger-compiler:" +
-            Versions.com_google_dagger
-
-    /**
-     * https://github.com/google/dagger */
-    const val dagger_producers: String = "com.google.dagger:dagger-producers:" +
             Versions.com_google_dagger
 
     /**
@@ -183,7 +182,12 @@ object Libs {
 
     /**
      * https://github.com/square/okhttp */
-    const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.okhttp
+    const val logging_interceptor: String = "com.squareup.okhttp3:logging-interceptor:" +
+            Versions.com_squareup_okhttp3
+
+    /**
+     * https://github.com/square/okhttp */
+    const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.com_squareup_okhttp3
 
     /**
      * https://github.com/square/okio/ */
@@ -205,6 +209,10 @@ object Libs {
 
     const val io_fabric_tools_gradle: String = "io.fabric.tools:gradle:" +
             Versions.io_fabric_tools_gradle
+
+    /**
+     * http://assertj.org */
+    const val assertj_core: String = "org.assertj:assertj-core:" + Versions.assertj_core
 
     /**
      * https://kotlinlang.org/ */

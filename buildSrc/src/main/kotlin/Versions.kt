@@ -21,17 +21,19 @@ object Versions {
 
     const val recyclerview: String = "1.1.0-alpha04"
 
-    const val aapt2: String = "3.5.0-alpha10-5342889"
+    const val aapt2: String = "3.5.0-alpha12-5342889"
 
-    const val com_android_tools_build_gradle: String = "3.5.0-alpha10"
+    const val com_android_tools_build_gradle: String = "3.5.0-alpha12"
 
-    const val lint_gradle: String = "26.5.0-alpha10"
+    const val lint_gradle: String = "26.5.0-alpha12"
 
-    const val jwtdecode: String = "1.2.0"
+    const val jwtdecode: String = "1.3.0"
 
     const val crashlytics: String = "2.9.9"
 
     const val com_github_bumptech_glide: String = "4.9.0"
+
+    const val statemachine: String = "0.1.2"
 
     const val com_github_triplet_play_gradle_plugin: String = "2.2.0"
 
@@ -51,23 +53,23 @@ object Versions {
 
     const val community_material_typeface: String = "3.5.95.1"
 
-    const val fastadapter_extensions_diff: String = "4.0.0-rc03"
+    const val fastadapter_extensions_diff: String = "4.0.0-rc04"
 
-    const val fastadapter_extensions_drag: String = "4.0.0-rc03"
+    const val fastadapter_extensions_drag: String = "4.0.0-rc04"
 
-    const val fastadapter_extensions_swipe: String = "4.0.0-rc03"
+    const val fastadapter_extensions_swipe: String = "4.0.0-rc04"
 
-    const val fastadapter_extensions_ui: String = "4.0.0-rc03"
+    const val fastadapter_extensions_ui: String = "4.0.0-rc04"
 
-    const val fastadapter_extensions_utils: String = "4.0.0-rc03"
+    const val fastadapter_extensions_utils: String = "4.0.0-rc04"
 
-    const val fastadapter: String = "4.0.0-rc03"
+    const val fastadapter: String = "4.0.0-rc04"
 
     const val iconics_core: String = "3.2.5" // available: "4.0.0-b1"
 
     const val com_squareup_moshi: String = "1.8.0"
 
-    const val okhttp: String = "3.14.1"
+    const val com_squareup_okhttp3: String = "3.14.1"
 
     const val okio: String = "2.2.2"
 
@@ -76,6 +78,8 @@ object Versions {
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.3.2"
 
     const val io_fabric_tools_gradle: String = "1.28.1"
+
+    const val assertj_core: String = "3.12.2"
 
     const val org_jetbrains_kotlin: String = "1.3.30"
 
@@ -89,12 +93,12 @@ object Versions {
      *      ./gradle/wrapper/gradle-wrapper.properties
      */
     object Gradle {
-        const val runningVersion: String = "5.3.1"
+        const val runningVersion: String = "5.4"
 
-        const val currentVersion: String = "5.3.1"
+        const val currentVersion: String = "5.4"
 
-        const val nightlyVersion: String = "5.5-20190414000043+0000"
+        const val nightlyVersion: String = "5.5-20190424001143+0000"
 
-        const val releaseCandidate: String = "5.4-rc-1"
+        const val releaseCandidate: String = ""
     }
 }
