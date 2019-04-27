@@ -11,7 +11,7 @@ object Versions {
 
     const val androidx_core_core_ktx: String = "1.1.0-alpha05"
 
-    const val fragment_ktx: String = "1.1.0-alpha06"
+    const val fragment_ktx: String = "1.1.0-alpha07"
 
     const val lifecycle_extensions: String = "2.1.0-alpha04"
 
@@ -81,9 +81,9 @@ object Versions {
 
     const val assertj_core: String = "3.12.2"
 
-    const val org_jetbrains_kotlin: String = "1.3.30"
+    const val org_jetbrains_kotlin: String = "1.3.31"
 
-    const val kotlinx_coroutines_android: String = "1.2.0"
+    const val kotlinx_coroutines_android: String = "1.2.1"
 
     const val ru_ztrap_iconics_core_ktx: String = "1.0.3"
 
@@ -93,11 +93,11 @@ object Versions {
      *      ./gradle/wrapper/gradle-wrapper.properties
      */
     object Gradle {
-        const val runningVersion: String = "5.4"
+        const val runningVersion: String = "5.4.1"
 
-        const val currentVersion: String = "5.4"
+        const val currentVersion: String = "5.4.1"
 
-        const val nightlyVersion: String = "5.5-20190424001143+0000"
+        const val nightlyVersion: String = "5.5-20190427095532+0000"
 
         const val releaseCandidate: String = ""
     }
