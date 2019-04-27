@@ -1,5 +1,8 @@
 package com.ivoberger.jmusicbot.model
 
+import com.ivoberger.jmusicbot.api.PORT
+import com.ivoberger.jmusicbot.di.ServerModule
+import com.ivoberger.jmusicbot.di.UserModule
 import kotlinx.coroutines.Job
 
 /**
@@ -28,24 +31,61 @@ enum class MusicBotState {
     }
 }
 
-sealed class State {
+internal sealed class State {
     object Disconnected : State()
+    object Discovering : State()
     object AuthRequired : State()
     object Connecting : State()
     object Connected : State()
+
+    val isDisconnected
+        get() = this == Disconnected
+    val isDiscovering
+        get() = this == Discovering
+    val isAuthRequired
+        get() = this == AuthRequired
+    val isConnecting
+        get() = this == Connecting
+    val isConnected: Boolean
+        get() = this == Connected
+
+    fun connectionCheck() {
+        check(isConnected) { "Client not connected" }
+    }
+
+    fun serverCheck() {
+        check(isAuthRequired) { "Client has no server" }
+    }
 }
 
-sealed class Event {
-    object OnServerFound : Event()
-    object OnGotCredentials : Event()
+internal sealed class Event {
+    object OnStartDiscovery : Event()
+    class OnServerFound(
+        baseUrl: String,
+        port: Int = PORT,
+        val serverModule: ServerModule = ServerModule(baseUrl, port)
+    ) : Event()
+
+    class OnGotCredentials(
+        user: User,
+        authToken: Auth.Token
+    ) : Event() {
+        val userModule: UserModule
+
+        init {
+            user.permissions = authToken.permissions
+            userModule = UserModule(user, authToken)
+        }
+    }
+
     object OnAuthorize : Event()
     object OnAuthExpired : Event()
     object OnDisconnect : Event()
 }
 
-sealed class SideEffect {
-    object LogMelted : SideEffect()
-    object LogFrozen : SideEffect()
-    object LogVaporized : SideEffect()
-    object LogCondensed : SideEffect()
+internal sealed class SideEffect {
+    object StartServerSession : SideEffect()
+    object StartUserSession : SideEffect()
+    object EndUserSession : SideEffect()
+    object EndServerSession : SideEffect()
 }
