@@ -25,6 +25,8 @@ import kotlinx.android.synthetic.main.fragment_player.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import splitties.toast.toast
 import timber.log.Timber
 
 
@@ -43,15 +45,20 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     private val mFlingListener by lazy {
         object : GestureDetector.SimpleOnGestureListener() {
-            override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
+            override fun onFling(
+                motionEventStart: MotionEvent?,
+                motionEventEnd: MotionEvent?,
+                velocityX: Float,
+                velocityY: Float
+            ): Boolean {
                 Timber.d("FLING! $velocityX, $velocityY")
                 if (velocityX > Math.abs(velocityY)) if (JMusicBot.user!!.permissions.contains(Permissions.SKIP)) {
                     mBackgroundScope.launch { JMusicBot.skip() }
                     return true
                 } else {
-                    context!!.toastShort(R.string.msg_no_permission)
+                    context!!.toast(R.string.msg_no_permission)
                 }
-                return super.onFling(e1, e2, velocityX, velocityY)
+                return super.onFling(motionEventStart, motionEventEnd, velocityX, velocityY)
             }
         }
     }
@@ -107,33 +114,35 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 JMusicBot.skip()
             } catch (e: Exception) {
                 Timber.e(e)
-                mMainScope.launch { context?.toastShort(R.string.msg_no_permission) }
+                mMainScope.launch { context?.toast(R.string.msg_no_permission) }
             } finally {
                 return@launch
             }
         }
-        when (mPlayerState.state) {
-            PlayerStates.STOP -> JMusicBot.play()
-            PlayerStates.PLAY -> JMusicBot.pause()
-            PlayerStates.PAUSE -> JMusicBot.play()
-            PlayerStates.ERROR -> JMusicBot.play()
-        }
-    }
-
-    private fun addToFavorites() {
-        mBackgroundScope.launch {
-            changeFavoriteStatus(context!!, mPlayerState.songEntry!!.song).join()
-            mMainScope.launch {
-                song_favorite.setImageDrawable(
-                    if (mPlayerState.songEntry!!.song in favorites) mInFavoritesDrawable
-                    else mNotInFavoritesDrawable
-                )
+        tryWithErrorToast {
+            runBlocking {
+                when (mPlayerState.state) {
+                    PlayerStates.STOP -> JMusicBot.play()
+                    PlayerStates.PLAY -> JMusicBot.pause()
+                    PlayerStates.PAUSE -> JMusicBot.play()
+                    PlayerStates.ERROR -> JMusicBot.play()
+                }
             }
         }
     }
 
+    private fun addToFavorites() = mBackgroundScope.launch {
+        changeFavoriteStatus(context!!, mPlayerState.songEntry!!.song).join()
+        mMainScope.launch {
+            song_favorite.setImageDrawable(
+                if (mPlayerState.songEntry!!.song in favorites) mInFavoritesDrawable
+                else mNotInFavoritesDrawable
+            )
+        }
+    }
 
-    fun onPlayerStateChanged(newState: PlayerState) {
+
+    private fun onPlayerStateChanged(newState: PlayerState) {
         if (newState == mPlayerState || view == null) return
         mMainScope.launch {
             mPlayerState = newState

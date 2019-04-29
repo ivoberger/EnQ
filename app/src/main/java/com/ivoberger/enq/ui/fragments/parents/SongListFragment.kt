@@ -9,7 +9,6 @@ import com.ivoberger.enq.R
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.items.SongItem
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
-import com.ivoberger.enq.utils.toastShort
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.Song
 import com.mikepenz.fastadapter.FastAdapter
@@ -20,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import splitties.resources.str
+import splitties.toast.toast
 
 abstract class SongListFragment<T : SongItem> : Fragment(R.layout.fragment_queue) {
 
@@ -52,9 +52,7 @@ abstract class SongListFragment<T : SongItem> : Fragment(R.layout.fragment_queue
         JMusicBot.enqueue(item.model)
         withContext(Dispatchers.Main) {
             if (isRemoveAfterEnQ) songAdapter.remove(position)
-            context!!.toastShort(
-                context!!.str(R.string.msg_enqueued, item.model.title)
-            )
+            context!!.toast(context!!.str(R.string.msg_enqueued, item.model.title))
         }
     }
 

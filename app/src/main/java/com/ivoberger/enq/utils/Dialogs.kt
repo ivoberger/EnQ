@@ -12,6 +12,8 @@ import com.ivoberger.jmusicbot.exceptions.InvalidParametersException
 import com.ivoberger.jmusicbot.exceptions.ServerErrorException
 import com.ivoberger.jmusicbot.exceptions.UsernameTakenException
 import kotlinx.coroutines.*
+import splitties.toast.longToast
+import splitties.toast.toast
 import timber.log.Timber
 
 private fun AlertDialog.styleButtons(@ColorInt color: Int) {
@@ -83,7 +85,7 @@ fun MainActivity.showLoginDialog(
         try {
             withContext(Dispatchers.Default) { JMusicBot.authorize(userName, password) }
             continueWithBot()
-            this@showLoginDialog.toastShort(getString(R.string.msg_logged_in, JMusicBot.user!!.name))
+            this@showLoginDialog.toast(getString(R.string.msg_logged_in, JMusicBot.user!!.name))
             loginDialog.dismiss()
         } catch (e: UsernameTakenException) {
             Timber.w(e)
@@ -97,7 +99,7 @@ fun MainActivity.showLoginDialog(
         } catch (e: AuthException) {
             Timber.w("Authentication error with reason ${e.reason}")
             Timber.w(e)
-            this@showLoginDialog.toastLong(R.string.msg_password_wrong)
+            this@showLoginDialog.longToast(R.string.msg_password_wrong)
             showLoginDialog(false, userName, password)
             loginDialog.cancel()
         } catch (e: IllegalStateException) {
@@ -106,17 +108,17 @@ fun MainActivity.showLoginDialog(
             loginDialog.cancel()
         } catch (e: InvalidParametersException) {
             Timber.w(e)
-            this@showLoginDialog.toastLong(R.string.msg_password_wrong)
+            this@showLoginDialog.longToast(R.string.msg_password_wrong)
             showLoginDialog(false, userName, password)
             loginDialog.cancel()
         } catch (e: ServerErrorException) {
             Timber.e(e)
-            this@showLoginDialog.toastLong(R.string.msg_server_error)
+            this@showLoginDialog.longToast(R.string.msg_server_error)
             showLoginDialog(false, userName, password)
             loginDialog.cancel()
         } catch (e: Exception) {
             Timber.e(e)
-            this@showLoginDialog.toastLong(R.string.msg_unknown_error)
+            this@showLoginDialog.longToast(R.string.msg_unknown_error)
             showLoginDialog(false, userName, password)
             loginDialog.cancel()
         }

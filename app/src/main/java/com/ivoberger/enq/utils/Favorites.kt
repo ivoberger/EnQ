@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import splitties.toast.toast
 import timber.log.Timber
 
 fun changeFavoriteStatus(context: Context, song: Song) = GlobalScope.launch {
@@ -20,14 +21,12 @@ fun changeFavoriteStatus(context: Context, song: Song) = GlobalScope.launch {
         Timber.d("Removing $song from favorites")
         MainActivity.favorites.remove(song)
         withContext(Dispatchers.Main) {
-            context.toastShort(context.getString(R.string.msg_removed_from_favs, song.title))
+            context.toast(context.getString(R.string.msg_removed_from_favs, song.title))
         }
     } else {
         Timber.d("Adding $song to favorites")
         MainActivity.favorites.add(song)
-        withContext(Dispatchers.Main) {
-            context.toastShort(context.getString(R.string.msg_added_to_favs, song.title))
-        }
+        withContext(Dispatchers.Main) { context.toast(context.getString(R.string.msg_added_to_favs, song.title)) }
     }
     saveFavorites(context, MainActivity.favorites)
 }

@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.ivoberger.enq.persistence.Configuration
-import com.ivoberger.enq.utils.toastShort
+import splitties.toast.toast
 
 class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -15,7 +15,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             title = "Clear saved users"
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 Configuration(context).savedUsers = null
-                context.toastShort("Cleared saved users")
+                context.toast("Cleared saved users")
                 return@OnPreferenceClickListener true
             }
         })

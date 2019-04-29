@@ -11,7 +11,10 @@ import com.ivoberger.enq.R
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.items.QueueItem
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
-import com.ivoberger.enq.utils.*
+import com.ivoberger.enq.utils.attributeColor
+import com.ivoberger.enq.utils.changeFavoriteStatus
+import com.ivoberger.enq.utils.icon
+import com.ivoberger.enq.utils.onPrimaryColor
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.KEY_QUEUE
 import com.ivoberger.jmusicbot.exceptions.AuthException
@@ -30,6 +33,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import splitties.resources.color
+import splitties.toast.toast
 import timber.log.Timber
 
 class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.ItemSwipeCallback, ItemTouchCallback {
@@ -113,7 +117,7 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
                     } catch (e: AuthException) {
                         Timber.e("AuthException with reason ${e.reason}")
                         withContext(Dispatchers.Main) {
-                            context!!.toastShort(R.string.msg_no_permission)
+                            context!!.toast(R.string.msg_no_permission)
                             mFastItemAdapter.notifyAdapterItemChanged(position)
                         }
                     }
@@ -143,9 +147,7 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
                 JMusicBot.moveEntry(entry, entry.song.provider.id, entry.song.id, newPosition)
             } catch (e: Exception) {
                 Timber.e(e)
-                mMainScope.launch {
-                    context?.toastShort(R.string.msg_no_permission)
-                }
+                mMainScope.launch { context?.toast(R.string.msg_no_permission) }
             }
         }
         mViewModel.queue.observe(this, Observer { updateQueue(it) })

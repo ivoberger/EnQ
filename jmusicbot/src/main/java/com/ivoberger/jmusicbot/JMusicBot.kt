@@ -83,7 +83,7 @@ object JMusicBot {
         }
 
     internal val mBaseComponent: BaseComponent =
-        DaggerBaseComponent.builder().baseModule(BaseModule(HttpLoggingInterceptor.Level.BODY)).build()
+        DaggerBaseComponent.builder().baseModule(BaseModule(HttpLoggingInterceptor.Level.BASIC)).build()
 
     private val mWifiManager: WifiManager = mBaseComponent.wifiManager
 

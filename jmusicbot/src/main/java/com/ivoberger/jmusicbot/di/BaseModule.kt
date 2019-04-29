@@ -29,7 +29,7 @@ internal class BaseModule(private val logLevel: HttpLoggingInterceptor.Level = H
     @Singleton
     fun okHttpClientBuilder(): OkHttpClient.Builder = OkHttpClient.Builder().cache(null).addInterceptor(
         HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { msg ->
-            Timber.tag("BotSDKNetworking").d(msg)
+            Timber.tag("BotSDKNetworking").v(msg)
         }).setLevel(logLevel)
     ).authenticator(TokenAuthenticator())
 
