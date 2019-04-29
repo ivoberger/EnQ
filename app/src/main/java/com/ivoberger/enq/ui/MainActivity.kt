@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
             main_bottom_navigation.menu.forEachIndexed { idx, itm -> itm.icon = icons[idx].await() }
         }
 
-        if (!JMusicBot.state.hasServer()) {
+        if (!JMusicBot.state.hasServer) {
             JMusicBot.discoverHost()
             showServerDiscoveryDialog(true)
         } else continueToLogin()

@@ -5,6 +5,7 @@ import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.KEY_AUTHORIZATION
 import com.ivoberger.jmusicbot.exceptions.*
 import com.ivoberger.jmusicbot.model.Auth
+import com.ivoberger.jmusicbot.model.Event
 import kotlinx.coroutines.Deferred
 import okhttp3.OkHttpClient
 import retrofit2.Response
@@ -56,12 +57,12 @@ internal suspend inline fun <reified T> Deferred<Response<T>>.process(
     try {
         response = await()
     } catch (e: IOException) {
-        JMusicBot.isConnected = false
+        JMusicBot.stateMachine.transition(Event.OnDisconnect)
         throw e
     }
     return when (response.code()) {
         in successCodes -> response.body()
-        in errorCodes -> throw errorCodes[response.code()]!!
+        in errorCodes -> throw errorCodes.getValue(response.code())
         400 -> throw InvalidParametersException(
             invalidParamsType,
             response.errorBody()!!.string()

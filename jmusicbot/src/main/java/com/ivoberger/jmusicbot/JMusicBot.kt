@@ -23,7 +23,7 @@ import kotlin.concurrent.timer
 
 object JMusicBot {
 
-    private val stateMachine = StateMachine.create<State, Event, SideEffect> {
+    internal val stateMachine = StateMachine.create<State, Event, SideEffect> {
         initialState(State.Disconnected)
         state<State.Disconnected> { on<Event.OnStartDiscovery> { transitionTo(State.Discovering) } }
         state<State.Discovering> {
@@ -31,10 +31,6 @@ object JMusicBot {
             on<Event.OnDisconnect> { transitionTo(State.Disconnected, SideEffect.EndServerSession) }
         }
         state<State.AuthRequired> {
-            on<Event.OnGotCredentials> { transitionTo(State.Connecting) }
-            on<Event.OnDisconnect> { transitionTo(State.Disconnected, SideEffect.EndServerSession) }
-        }
-        state<State.Connecting> {
             on<Event.OnAuthorize> { transitionTo(State.Connected, SideEffect.StartUserSession) }
             on<Event.OnDisconnect> { transitionTo(State.Disconnected, SideEffect.EndServerSession) }
         }
@@ -51,13 +47,19 @@ object JMusicBot {
                     is SideEffect.StartServerSession -> {
                         val event = trans.event as Event.OnServerFound
                         mServerSession = mBaseComponent.serverSession(event.serverModule)
+                        mServiceClient = mServerSession!!.musicBotService()
                     }
                     is SideEffect.StartUserSession -> {
-                        val event = trans.event as Event.OnGotCredentials
+                        val event = trans.event as Event.OnAuthorize
                         mUserSession = mServerSession!!.userSession(event.userModule)
+                        mServiceClient = mUserSession!!.musicBotService()
                     }
-                    SideEffect.EndUserSession -> mUserSession = null
+                    SideEffect.EndUserSession -> {
+                        authToken = null
+                        mUserSession = null
+                    }
                     SideEffect.EndServerSession -> {
+                        authToken = null
                         mUserSession = null
                         mServerSession = null
                     }
@@ -67,7 +69,7 @@ object JMusicBot {
         }
     }
 
-    internal val state: State
+    val state: State
         get() = stateMachine.state
     var isConnected: Boolean = false
         get() = state == State.Connected
@@ -115,38 +117,32 @@ object JMusicBot {
         set(value) {
             Timber.d("Setting Token to $value")
             BotPreferences.authToken = value
-            if (value == null) state = MusicBotState.NEEDS_AUTH
+            if (value == null) stateMachine.transition(Event.OnAuthExpired)
             field = value
             field?.let {
-                state = MusicBotState.CONNECTED
                 user?.permissions = it.permissions
-                // TODO: create user module with token
             }
         }
 
-    fun discoverHost() {
+    fun discoverHost() = GlobalScope.launch {
         Timber.d("Discovering host")
-        if (state.isDiscovering) return
+        if (state.isDiscovering) return@launch
         if (!state.isDisconnected) stateMachine.transition(Event.OnDisconnect)
         stateMachine.transition(Event.OnStartDiscovery)
-        GlobalScope.launch {
-            baseUrl = mWifiManager.discoverHost()
-            baseUrl?.let {
-                Timber.d("Found host: $it")
-                stateMachine.transition(Event.OnServerFound(it))
-                return@launch
-            }
-            Timber.d("No host found")
-            stateMachine.transition(Event.OnDisconnect)
+        baseUrl = mWifiManager.discoverHost()
+        baseUrl?.let {
+            Timber.d("Found host: $it")
+            stateMachine.transition(Event.OnServerFound(it))
+            return@launch
         }
-
+        Timber.d("No host found")
+        stateMachine.transition(Event.OnDisconnect)
     }
 
     suspend fun recoverConnection() {
         Timber.d("Reconnecting")
         while (!state.isAuthRequired) {
-            discoverHost()
-            state.job.join()
+            discoverHost().join()
         }
         authorize()
     }
@@ -158,14 +154,13 @@ object JMusicBot {
         IllegalStateException::class
     )
     suspend fun authorize(userName: String? = null, password: String? = null) {
-        check(state == State.Connected)
+        state.serverCheck()
         Timber.d("Starting authorization")
         if (tokenValid()) return
         if (userName == null && user == null) throw IllegalStateException("No username stored or supplied")
         try {
             register(userName)
             if (!password.isNullOrBlank()) changePassword(password)
-            state = MusicBotState.CONNECTED
             return
         } catch (e: UsernameTakenException) {
             Timber.w(e)
@@ -182,7 +177,6 @@ object JMusicBot {
             Timber.d("Authorization failed")
             throw e
         }
-        state = MusicBotState.CONNECTED
     }
 
     private suspend fun tokenValid(): Boolean {
@@ -199,8 +193,7 @@ object JMusicBot {
             val tmpUser = mServiceClient!!.testToken(authToken!!.toAuthHeader()).process()
             if (tmpUser?.name == user?.name) {
                 Timber.d("Valid Token: $user")
-                // TODO: create user module with token
-                state = MusicBotState.CONNECTED
+                stateMachine.transition(Event.OnAuthorize(user!!, authToken!!))
                 return true
             }
             Timber.d("Invalid Token: User changed")
@@ -232,6 +225,7 @@ object JMusicBot {
         val token = mServiceClient!!.registerUser(credentials).process()!!
         Timber.d("Registered $user")
         authToken = Auth.Token(token)
+        stateMachine.transition(Event.OnAuthorize(user!!, authToken!!))
     }
 
     @Throws(
@@ -256,6 +250,7 @@ object JMusicBot {
         val token = mServiceClient!!.loginUser(credentials).process()!!
         Timber.d("Logged in $user")
         authToken = Auth.Token(token)
+        stateMachine.transition(Event.OnAuthorize(user!!, authToken!!))
     }
 
     @Throws(InvalidParametersException::class, AuthException::class)
@@ -266,7 +261,7 @@ object JMusicBot {
     }
 
     suspend fun reloadPermissions() {
-        authToken = null
+        stateMachine.transition(Event.OnAuthExpired)
         authorize()
     }
 
@@ -283,6 +278,7 @@ object JMusicBot {
         authToken ?: throw IllegalStateException("Auth token is null")
         mServiceClient!!.deleteUser().process()
         user = null
+        stateMachine.transition(Event.OnAuthExpired)
     }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
@@ -348,8 +344,7 @@ object JMusicBot {
     }
 
     fun startQueueUpdates() {
-        if (mQueue.hasObservers())
-            mQueueUpdateTimer = timer(period = 500) { updateQueue() }
+        mQueueUpdateTimer = timer(period = 500) { updateQueue() }
     }
 
     fun stopQueueUpdates() {
@@ -363,7 +358,7 @@ object JMusicBot {
     }
 
     fun startPlayerUpdates() {
-        if (mPlayerState.hasObservers()) mPlayerUpdateTimer = timer(period = 500) { updatePlayer() }
+        mPlayerUpdateTimer = timer(period = 500) { updatePlayer() }
     }
 
     fun stopPlayerUpdates() {
@@ -372,6 +367,7 @@ object JMusicBot {
     }
 
     private fun updateQueue(newQueue: List<QueueEntry>? = null) = GlobalScope.launch {
+        if (!mQueue.hasActiveObservers()) return@launch
         if (newQueue != null) Timber.d("Manual Queue Update")
         try {
             state.connectionCheck()
@@ -379,11 +375,11 @@ object JMusicBot {
             withContext(Dispatchers.Main) { mQueue.value = queue }
         } catch (e: Exception) {
             Timber.w(e)
-            // TODO: propagate error
         }
     }
 
     private fun updatePlayer(playerState: PlayerState? = null) = GlobalScope.launch {
+        if (!mPlayerState.hasActiveObservers()) return@launch
         if (playerState != null) Timber.d("Manual Player Update")
         try {
             state.connectionCheck()

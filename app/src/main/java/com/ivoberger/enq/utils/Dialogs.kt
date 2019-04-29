@@ -38,7 +38,7 @@ fun MainActivity.showServerDiscoveryDialog(searching: Boolean = false): Job = Gl
         if (!searching) serverDialog.styleButtons(secondaryColor())
         serverDialog.show()
         if (!searching) return@withContext
-        if (withContext(Dispatchers.IO) { JMusicBot.state.job?.join(); JMusicBot.state.hasServer() }) {
+        if (withContext(Dispatchers.IO) { delay(2000); JMusicBot.state.hasServer }) {
             this@showServerDiscoveryDialog.continueToLogin()
             serverDialog.dismiss()
         } else {
