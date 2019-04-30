@@ -35,8 +35,7 @@ dependencies {
     kapt(Libs.dagger_compiler)
     implementation(Libs.dagger)
 
-    implementation(Libs.splitties_systemservices)
-    implementation(Libs.splitties_preferences)
+    implementation(Libs.splitties_fun_pack_android_base)
     implementation(Libs.jwtdecode)
 
     implementation(Libs.okhttp)

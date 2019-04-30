@@ -113,35 +113,13 @@ object Libs {
      * https://github.com/JakeWharton/timber */
     const val timber: String = "com.jakewharton.timber:timber:" + Versions.timber
 
-    /**
-     * https://github.com/LouisCAD/Splitties */
-    const val splitties_material_colors: String =
-        "com.louiscad.splitties:splitties-material-colors:" + Versions.com_louiscad_splitties
+    const val splitties_fun_pack_android_base: String =
+        "com.louiscad.splitties:splitties-fun-pack-android-base:" +
+                Versions.com_louiscad_splitties
 
-    /**
-     * https://github.com/LouisCAD/Splitties */
-    const val splitties_preferences: String = "com.louiscad.splitties:splitties-preferences:" +
-            Versions.com_louiscad_splitties
-
-    /**
-     * https://github.com/LouisCAD/Splitties */
-    const val splitties_resources: String = "com.louiscad.splitties:splitties-resources:" +
-            Versions.com_louiscad_splitties
-
-    /**
-     * https://github.com/LouisCAD/Splitties */
-    const val splitties_systemservices: String =
-        "com.louiscad.splitties:splitties-systemservices:" + Versions.com_louiscad_splitties
-
-    /**
-     * https://github.com/LouisCAD/Splitties */
-    const val splitties_toast: String = "com.louiscad.splitties:splitties-toast:" +
-            Versions.com_louiscad_splitties
-
-    /**
-     * https://github.com/LouisCAD/Splitties */
-    const val splitties_views_appcompat: String =
-        "com.louiscad.splitties:splitties-views-appcompat:" + Versions.com_louiscad_splitties
+    const val splitties_fun_pack_android_material_components: String =
+        "com.louiscad.splitties:splitties-fun-pack-android-material-components:" +
+                Versions.com_louiscad_splitties
 
     /**
      * https://github.com/mikepenz/Android-Iconics */
