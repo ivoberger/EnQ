@@ -52,6 +52,7 @@ object JMusicBot {
                         val event = trans.event as Event.OnAuthorize
                         mUserSession = mServerSession!!.userSession(event.userModule)
                         mServiceClient = mUserSession!!.musicBotService()
+                        connectionChangeListeners.forEach { it.onConnectionRecovered() }
                     }
                     SideEffect.EndUserSession -> {
                         authToken = null
@@ -61,6 +62,8 @@ object JMusicBot {
                         authToken = null
                         mUserSession = null
                         mServerSession = null
+                        val event = trans.event as Event.OnDisconnect
+                        connectionChangeListeners.forEach { it.onConnectionLost(event.reason) }
                     }
                 }
                 return@onTransition
@@ -72,16 +75,8 @@ object JMusicBot {
 
     val state: State
         get() = stateMachine.state
-    var isConnected: Boolean = false
-        get() = state == State.Connected
-        set(value) {
-            if (value && !field) connectionChangeListeners.forEach { it.onConnectionRecovered() }
-            if (!value && field) {
-                connectionChangeListeners.forEach { it.onConnectionLost() }
-                stateMachine.transition(Event.OnDisconnect)
-            }
-            field = value
-        }
+    val isConnected: Boolean
+        get() = state.isConnected
 
     internal val mBaseComponent: BaseComponent =
         DaggerBaseComponent.builder().baseModule(BaseModule(HttpLoggingInterceptor.Level.BASIC)).build()
@@ -125,25 +120,25 @@ object JMusicBot {
             }
         }
 
-    fun discoverHost() = GlobalScope.launch {
+    suspend fun discoverHost() = withContext(Dispatchers.IO) {
         Timber.d("Discovering host")
-        if (state.isDiscovering) return@launch
-        if (!state.isDisconnected) stateMachine.transition(Event.OnDisconnect)
+        if (state.isDiscovering) return@withContext
+        if (!state.isDisconnected) stateMachine.transition(Event.OnDisconnect())
         stateMachine.transition(Event.OnStartDiscovery)
         baseUrl = mWifiManager.discoverHost()
         baseUrl?.let {
             Timber.d("Found host: $it")
             stateMachine.transition(Event.OnServerFound(it))
-            return@launch
+            return@withContext
         }
         Timber.d("No host found")
-        stateMachine.transition(Event.OnDisconnect)
+        stateMachine.transition(Event.OnDisconnect())
     }
 
     suspend fun recoverConnection() {
         Timber.d("Reconnecting")
-        while (!state.isAuthRequired) {
-            discoverHost().join()
+        while (!state.hasServer) {
+            discoverHost()
         }
         authorize()
     }

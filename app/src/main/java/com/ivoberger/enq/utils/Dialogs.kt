@@ -12,6 +12,9 @@ import com.ivoberger.jmusicbot.exceptions.InvalidParametersException
 import com.ivoberger.jmusicbot.exceptions.ServerErrorException
 import com.ivoberger.jmusicbot.exceptions.UsernameTakenException
 import kotlinx.coroutines.*
+import splitties.experimental.ExperimentalSplittiesApi
+import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
+import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.toast.longToast
 import splitties.toast.toast
 import timber.log.Timber
@@ -22,6 +25,8 @@ private fun AlertDialog.styleButtons(@ColorInt color: Int) {
     }
 }
 
+@PotentialFutureAndroidXLifecycleKtxApi
+@ExperimentalSplittiesApi
 fun MainActivity.showServerDiscoveryDialog(searching: Boolean = false): Job = GlobalScope.launch {
     Timber.d("Showing Server Discovery Dialog, $searching")
     val serverDialogBuilder = AlertDialog.Builder(this@showServerDiscoveryDialog)
@@ -30,7 +35,7 @@ fun MainActivity.showServerDiscoveryDialog(searching: Boolean = false): Job = Gl
     if (!searching) serverDialogBuilder
         .setTitle(R.string.tlt_no_server)
         .setPositiveButton(R.string.btn_retry) { dialog, _ ->
-            JMusicBot.discoverHost()
+            lifecycleScope.launch { JMusicBot.discoverHost() }
             showServerDiscoveryDialog(true)
             dialog.dismiss()
         }
@@ -51,6 +56,8 @@ fun MainActivity.showServerDiscoveryDialog(searching: Boolean = false): Job = Gl
 }
 
 
+@PotentialFutureAndroidXLifecycleKtxApi
+@ExperimentalSplittiesApi
 fun MainActivity.showLoginDialog(
     loggingIn: Boolean = true,
     userName: String? = null,

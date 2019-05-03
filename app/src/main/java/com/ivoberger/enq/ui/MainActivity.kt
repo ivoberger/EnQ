@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (!JMusicBot.state.hasServer) {
-            JMusicBot.discoverHost()
+            lifecycleScope.launch { JMusicBot.discoverHost() }
             showServerDiscoveryDialog(true)
         } else continueToLogin()
     }

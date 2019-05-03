@@ -39,10 +39,8 @@ sealed class State {
         get() = this == Disconnected
     val isDiscovering
         get() = this == Discovering
-    val isAuthRequired
-        get() = this == AuthRequired
     val hasServer
-        get() = isAuthRequired
+        get() = this == AuthRequired
     val isConnected: Boolean
         get() = this == Connected
 
@@ -53,7 +51,7 @@ sealed class State {
 
     @Throws(IllegalStateException::class)
     fun serverCheck() {
-        check(isAuthRequired) { "Client has no server" }
+        check(hasServer) { "Client has no server" }
     }
 }
 
@@ -80,7 +78,7 @@ internal sealed class Event {
     }
 
     object OnAuthExpired : Event()
-    object OnDisconnect : Event()
+    class OnDisconnect(val reason: Exception? = null) : Event()
 }
 
 internal sealed class SideEffect {
