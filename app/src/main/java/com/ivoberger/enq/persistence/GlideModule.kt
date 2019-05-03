@@ -10,7 +10,7 @@ import com.bumptech.glide.module.AppGlideModule
 @GlideModule
 class GlideModule : AppGlideModule() {
     override fun applyOptions(context: Context, builder: GlideBuilder) {
-        val diskCacheSizeBytes = 1024 * 1024 * 100 // 100 MB
-        builder.setDiskCache(InternalCacheDiskCacheFactory(context, diskCacheSizeBytes.toLong()))
+        val diskCacheSizeBytes = 1024L * 1024L * 100L // 100 MB
+        builder.setDiskCache(InternalCacheDiskCacheFactory(context, diskCacheSizeBytes))
     }
 }

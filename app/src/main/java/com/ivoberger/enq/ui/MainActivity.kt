@@ -182,15 +182,14 @@ class MainActivity : AppCompatActivity() {
      */
     private fun changePlayerCollapse(collapse: Boolean, duration: Long = 1000) = lifecycleScope.launch {
         if (mViewModel.playerCollapsed == collapse) return@launch
-        if (!mViewModel.playerCollapsed) {
-            main_current_song.animate().setDuration(duration)
-                .translationYBy(main_current_song.height.toFloat())
-                .withEndAction { main_current_song.visibility = View.GONE }.start()
-        } else {
-            main_current_song.animate().setDuration(duration)
-                .translationYBy(-main_current_song.height.toFloat())
-                .withStartAction { main_current_song.visibility = View.VISIBLE }.start()
-        }
+        val animation = main_current_song.animate().setDuration(duration)
+        val translateBy = main_current_song.height.toFloat()
+        if (!mViewModel.playerCollapsed) animation.translationYBy(translateBy)
+            .withEndAction { main_current_song.visibility = View.GONE }
+            .start()
+        else animation.translationYBy(-translateBy)
+            .withStartAction { main_current_song.visibility = View.VISIBLE }
+            .start()
         mViewModel.playerCollapsed = collapse
     }
 
@@ -201,16 +200,14 @@ class MainActivity : AppCompatActivity() {
      */
     private fun changeBottomNavCollapse(collapse: Boolean, duration: Long = 1000) = lifecycleScope.launch {
         if (mViewModel.bottomNavCollapsed == collapse) return@launch
-        if (!mViewModel.bottomNavCollapsed) {
-            main_bottom_navigation.animate().setDuration(duration)
-                .translationYBy(main_current_song.height.toFloat())
-                .withEndAction { main_bottom_navigation.visibility = View.GONE }.start()
-
-        } else {
-            main_bottom_navigation.animate().setDuration(duration)
-                .translationYBy(-main_current_song.height.toFloat())
-                .withStartAction { main_bottom_navigation.visibility = View.VISIBLE }.start()
-        }
+        val animation = main_current_song.animate().setDuration(duration)
+        val translateBy = main_current_song.height.toFloat()
+        if (!mViewModel.bottomNavCollapsed) animation.translationYBy(translateBy)
+            .withEndAction { main_bottom_navigation.visibility = View.GONE }
+            .start()
+        else animation.translationYBy(-translateBy)
+            .withStartAction { main_bottom_navigation.visibility = View.VISIBLE }
+            .start()
         mViewModel.bottomNavCollapsed = collapse
     }
 }
