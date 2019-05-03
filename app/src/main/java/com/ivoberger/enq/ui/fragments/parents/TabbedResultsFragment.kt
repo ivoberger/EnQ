@@ -11,15 +11,20 @@ import com.ivoberger.enq.R
 import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
 import com.ivoberger.jmusicbot.model.MusicBotPlugin
 import kotlinx.android.synthetic.main.fragment_results.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Runnable
+import kotlinx.coroutines.launch
+import splitties.experimental.ExperimentalSplittiesApi
+import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
+import splitties.lifecycle.coroutines.lifecycleScope
 import timber.log.Timber
 
 
+@PotentialFutureAndroidXLifecycleKtxApi
+@ExperimentalSplittiesApi
 abstract class TabbedResultsFragment : Fragment(R.layout.fragment_results), ViewPager.OnPageChangeListener,
     ConnectionChangeListener {
-    val mMainScope = CoroutineScope(Dispatchers.Main)
-
-    val mBackgroundScope = CoroutineScope(Dispatchers.IO)
     lateinit var mProviderPlugins: Deferred<List<MusicBotPlugin>?>
 
     var mSelectedPlugin: MusicBotPlugin? = null
@@ -28,7 +33,7 @@ abstract class TabbedResultsFragment : Fragment(R.layout.fragment_results), View
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view_pager.addOnPageChangeListener(this)
-        mMainScope.launch {
+        lifecycleScope.launch {
             if (mSelectedPlugin == null) mSelectedPlugin = mProviderPlugins.await()?.get(0)
             mSelectedPlugin?.let {
                 Timber.d("Setting tab to ${mProviderPlugins.await()!!.indexOf(it)}")
@@ -64,7 +69,7 @@ abstract class TabbedResultsFragment : Fragment(R.layout.fragment_results), View
 
     override fun onPageSelected(position: Int) {
         onTabSelected(position)
-        mBackgroundScope.launch { mSelectedPlugin = mProviderPlugins.await()?.get(position) }
+        lifecycleScope.launch(Dispatchers.IO) { mSelectedPlugin = mProviderPlugins.await()?.get(position) }
     }
 
     abstract inner class SongListFragmentPager(

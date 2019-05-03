@@ -11,21 +11,24 @@ import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
 import com.ivoberger.jmusicbot.model.MusicBotPlugin
 import kotlinx.android.synthetic.main.fragment_results.*
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import splitties.experimental.ExperimentalSplittiesApi
+import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
+import splitties.lifecycle.coroutines.lifecycleScope
 import timber.log.Timber
 
 
+@PotentialFutureAndroidXLifecycleKtxApi
+@ExperimentalSplittiesApi
 class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
 
     private val mSearchView: SearchView by lazy { (activity as MainActivity).searchView }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mProviderPlugins = mBackgroundScope.async { JMusicBot.getProvider() }
+        mProviderPlugins = lifecycleScope.async(Dispatchers.IO) { JMusicBot.getProvider() }
         JMusicBot.connectionChangeListeners.add(this@SearchFragment)
-        mBackgroundScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             mProviderPlugins.await() ?: return@launch
             Configuration.lastProvider?.also {
                 if (mProviderPlugins.await()!!.contains(it)) mSelectedPlugin = it
@@ -47,7 +50,7 @@ class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
                 if (newQuery == oldQuery) return true
                 newQuery?.also { oldQuery = it }
                 // debounce
-                mBackgroundScope.launch {
+                lifecycleScope.launch(Dispatchers.IO) {
                     delay(300)
                     if (oldQuery != newQuery) return@launch
                     search(oldQuery)
@@ -58,23 +61,23 @@ class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
     }
 
     override fun initializeTabs() {
-        mBackgroundScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             mProviderPlugins.await() ?: return@launch
             mFragmentPagerAdapter = async {
                 SearchFragmentPager(childFragmentManager, mProviderPlugins.await()!!)
             }
-            mMainScope.launch { view_pager.adapter = mFragmentPagerAdapter.await() }
+            withContext(Dispatchers.Main) { view_pager.adapter = mFragmentPagerAdapter.await() }
         }
     }
 
     fun search(query: String) {
-        mBackgroundScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             if (query.isNotBlank()) (mFragmentPagerAdapter.await() as SearchFragmentPager).search(query)
         }
     }
 
     override fun onTabSelected(position: Int) {
-        mBackgroundScope.launch { mFragmentPagerAdapter.await().onTabSelected(position) }
+        lifecycleScope.launch(Dispatchers.IO) { mFragmentPagerAdapter.await().onTabSelected(position) }
     }
 
     override fun onConnectionLost(e: Exception?) {

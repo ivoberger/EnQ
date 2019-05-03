@@ -8,15 +8,22 @@ import com.ivoberger.enq.ui.fragments.parents.TabbedResultsFragment
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.MusicBotPlugin
 import kotlinx.android.synthetic.main.fragment_results.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import splitties.experimental.ExperimentalSplittiesApi
+import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
+import splitties.lifecycle.coroutines.lifecycleScope
 
+@PotentialFutureAndroidXLifecycleKtxApi
+@ExperimentalSplittiesApi
 class SuggestionsFragment : TabbedResultsFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mProviderPlugins = mBackgroundScope.async { JMusicBot.getSuggesters() }
-        mBackgroundScope.launch {
+        mProviderPlugins = lifecycleScope.async(Dispatchers.IO) { JMusicBot.getSuggesters() }
+        lifecycleScope.launch(Dispatchers.IO) {
             mProviderPlugins.await() ?: return@launch
             Configuration.lastSuggester?.also {
                 if (mProviderPlugins.await()!!.contains(it)) mSelectedPlugin = it
@@ -25,13 +32,13 @@ class SuggestionsFragment : TabbedResultsFragment() {
     }
 
     override fun initializeTabs() {
-        mBackgroundScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             val provider = JMusicBot.getSuggesters()
             mFragmentPagerAdapter =
                 async {
                     SuggestionsFragmentPager(childFragmentManager, provider)
                 }
-            mMainScope.launch { view_pager.adapter = mFragmentPagerAdapter.await() }
+            withContext(Dispatchers.Main) { view_pager.adapter = mFragmentPagerAdapter.await() }
         }
     }
 

@@ -40,7 +40,6 @@ object JMusicBot {
         }
         onTransition { transition ->
             val validTransition = transition as? StateMachine.Transition.Valid
-            val invalidTransition = transition as? StateMachine.Transition.Invalid
             validTransition?.let { trans ->
                 Timber.d("State transition from ${trans.fromState} to ${trans.toState} by ${trans.event}")
                 when (trans.sideEffect) {
@@ -64,7 +63,9 @@ object JMusicBot {
                         mServerSession = null
                     }
                 }
+                return@onTransition
             }
+            val invalidTransition = transition as? StateMachine.Transition.Invalid
             invalidTransition?.let { Timber.d("Attempted state transition from ${it.fromState} by ${it.event}") }
         }
     }

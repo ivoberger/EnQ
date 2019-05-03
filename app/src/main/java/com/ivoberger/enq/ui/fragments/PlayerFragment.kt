@@ -25,10 +25,10 @@ import com.ivoberger.jmusicbot.model.PlayerStates
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_player.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import splitties.experimental.ExperimentalSplittiesApi
 import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
 import splitties.lifecycle.coroutines.lifecycleScope
@@ -40,12 +40,6 @@ import timber.log.Timber
 @ExperimentalSplittiesApi
 class PlayerFragment : Fragment(R.layout.fragment_player) {
 
-    companion object {
-        fun newInstance(): PlayerFragment = PlayerFragment()
-    }
-
-    private val mMainScope = CoroutineScope(Dispatchers.Main)
-    //    private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
     private val mViewModel by lazy { ViewModelProviders.of(context as MainActivity).get(MainViewModel::class.java) }
 
     private var mPlayerState: PlayerState = PlayerState(PlayerStates.STOP, null)
@@ -59,8 +53,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 velocityX: Float,
                 velocityY: Float
             ): Boolean {
-                Timber.d("FLING! $velocityX, $velocityY")
-                if (velocityX > Math.abs(velocityY)) if (JMusicBot.user!!.permissions.contains(Permissions.SKIP)) {
+                if (velocityX > Math.abs(velocityY) * 2) if (JMusicBot.user!!.permissions.contains(Permissions.SKIP)) {
                     lifecycleScope.launch(Dispatchers.IO) { JMusicBot.skip() }
                     return true
                 } else {
@@ -122,7 +115,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 JMusicBot.skip()
             } catch (e: Exception) {
                 Timber.e(e)
-                mMainScope.launch { context?.toast(R.string.msg_no_permission) }
+                withContext(Dispatchers.Main) { context?.toast(R.string.msg_no_permission) }
             } finally {
                 return@launch
             }
@@ -141,7 +134,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     private fun addToFavorites() = lifecycleScope.launch(Dispatchers.IO) {
         Configuration.changeFavoriteStatus(context!!, mPlayerState.songEntry!!.song).join()
-        mMainScope.launch {
+        withContext(Dispatchers.Main) {
             song_favorite.setImageDrawable(
                 if (mPlayerState.songEntry!!.song in Configuration.favorites) mInFavoritesDrawable
                 else mNotInFavoritesDrawable
@@ -152,7 +145,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     private fun onPlayerStateChanged(newState: PlayerState) {
         if (newState == mPlayerState || view == null) return
-        mMainScope.launch {
+        lifecycleScope.launch {
             mPlayerState = newState
             when (newState.state) {
                 PlayerStates.STOP -> {

@@ -19,9 +19,16 @@ import com.mikepenz.fastadapter.adapters.ModelAdapter
 import com.mikepenz.fastadapter.diff.FastAdapterDiffUtil
 import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
 import kotlinx.android.synthetic.main.fragment_queue.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import splitties.experimental.ExperimentalSplittiesApi
+import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
+import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.toast.toast
 
+@ExperimentalSplittiesApi
+@PotentialFutureAndroidXLifecycleKtxApi
 class FavoritesFragment : SongListFragment<SongItem>(), SimpleSwipeCallback.ItemSwipeCallback {
 
     override val songAdapter: ModelAdapter<Song, SongItem> by lazy {
@@ -48,10 +55,10 @@ class FavoritesFragment : SongListFragment<SongItem>(), SimpleSwipeCallback.Item
     }
 
     override fun onEntryClicked(item: SongItem, position: Int): Boolean {
-        mBackgroundScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             val providerIds = JMusicBot.getProvider().map { it.id }
             if (providerIds.contains(item.model.provider.id)) super.onEntryClicked(item, position)
-            else mMainScope.launch {
+            else withContext(Dispatchers.Main) {
                 (activity as MainActivity).search(item.model.title)
                 toast(R.string.msg_provider_not_found)
             }

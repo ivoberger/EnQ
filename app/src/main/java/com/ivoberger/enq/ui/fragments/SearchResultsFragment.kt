@@ -7,11 +7,16 @@ import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.KEY_PROVIDER_ID
 import com.ivoberger.jmusicbot.model.Song
 import com.mikepenz.fastadapter.ui.items.ProgressItem
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import splitties.experimental.ExperimentalSplittiesApi
+import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
+import splitties.lifecycle.coroutines.lifecycleScope
 import timber.log.Timber
 
+@PotentialFutureAndroidXLifecycleKtxApi
+@ExperimentalSplittiesApi
 class SearchResultsFragment : ResultsFragment() {
 
     companion object {
@@ -35,10 +40,10 @@ class SearchResultsFragment : ResultsFragment() {
         mCurrentQuery = query
     }
 
-    fun startSearch() = mBackgroundScope.launch {
+    fun startSearch() = lifecycleScope.launch(Dispatchers.IO) {
         if (mCurrentQuery.isBlank()) return@launch
         mLastQuery = mCurrentQuery
-        if (loadingHeader.adapterItemCount == 0) withContext(mMainScope.coroutineContext) {
+        if (loadingHeader.adapterItemCount == 0) withContext(Dispatchers.Main) {
             songAdapter.clear()
             loadingHeader.add(0, ProgressItem())
         }
@@ -60,8 +65,6 @@ class SearchResultsFragment : ResultsFragment() {
     override fun onDetach() {
         Timber.d("DETACHING")
         mQueryChanged = true
-        mMainScope.coroutineContext.cancel()
-        mBackgroundScope.coroutineContext.cancel()
         super.onDetach()
     }
 }

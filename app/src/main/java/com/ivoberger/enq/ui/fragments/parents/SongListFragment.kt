@@ -14,17 +14,19 @@ import com.ivoberger.jmusicbot.model.Song
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ModelAdapter
 import kotlinx.android.synthetic.main.fragment_queue.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import splitties.experimental.ExperimentalSplittiesApi
+import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
+import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.resources.str
 import splitties.toast.toast
 
+@PotentialFutureAndroidXLifecycleKtxApi
+@ExperimentalSplittiesApi
 abstract class SongListFragment<T : SongItem> : Fragment(R.layout.fragment_queue) {
 
-    val mMainScope = CoroutineScope(Dispatchers.Main)
-    val mBackgroundScope = CoroutineScope(Dispatchers.IO)
     val mViewModel by lazy { ViewModelProviders.of(context as MainActivity).get(MainViewModel::class.java) }
 
     abstract val songAdapter: ModelAdapter<Song, T>
@@ -48,7 +50,7 @@ abstract class SongListFragment<T : SongItem> : Fragment(R.layout.fragment_queue
         }
     }
 
-    private fun enqueueEntry(item: T, position: Int) = mBackgroundScope.launch {
+    private fun enqueueEntry(item: T, position: Int) = lifecycleScope.launch(Dispatchers.IO) {
         JMusicBot.enqueue(item.model)
         withContext(Dispatchers.Main) {
             if (isRemoveAfterEnQ) songAdapter.remove(position)

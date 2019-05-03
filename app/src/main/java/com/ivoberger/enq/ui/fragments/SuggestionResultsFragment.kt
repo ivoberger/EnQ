@@ -19,9 +19,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import splitties.experimental.ExperimentalSplittiesApi
+import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
+import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.toast.toast
 import timber.log.Timber
 
+@PotentialFutureAndroidXLifecycleKtxApi
+@ExperimentalSplittiesApi
 class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwipeCallback {
 
     companion object {
@@ -45,16 +50,16 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
         getSuggestions()
         if (mCanDislike) fastAdapter.onLongClickListener = { _, _, item: ResultItem, position: Int ->
             if (JMusicBot.isConnected) {
-                mBackgroundScope.launch {
+                lifecycleScope.launch(Dispatchers.IO) {
                     tryWithErrorToast { runBlocking { JMusicBot.deleteSuggestion(mSuggesterId, item.model) } }
-                    withContext(mMainScope.coroutineContext) { songAdapter.remove(position) }
+                    withContext(Dispatchers.Main) { songAdapter.remove(position) }
                 }
                 true
             } else false
         }
     }
 
-    private fun getSuggestions() = mBackgroundScope.launch {
+    private fun getSuggestions() = lifecycleScope.launch(Dispatchers.IO) {
         Timber.d("Getting suggestions for suggester $mSuggesterId")
         val suggestions = tryWithErrorToast(listOf()) {
             runBlocking { JMusicBot.suggestions(mSuggesterId) }
@@ -63,7 +68,7 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
     }
 
     override fun itemSwiped(position: Int, direction: Int) {
-        mBackgroundScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             val entry = songAdapter.getAdapterItem(position)
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
@@ -73,7 +78,7 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
                             getSuggestions()
                         } catch (e: AuthException) {
                             Timber.e("AuthException with reason ${e.reason}")
-                            mMainScope.launch {
+                            lifecycleScope.launch {
                                 context!!.toast(R.string.msg_no_permission)
                                 fastAdapter.notifyAdapterItemChanged(position)
                             }
