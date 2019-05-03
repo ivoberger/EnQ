@@ -12,16 +12,16 @@ private const val URL_SUGGEST = "suggester"
 private const val URL_PROVIDER = "provider"
 private const val URL_QUEUE = "queue"
 
-internal interface MusicBotAPI {
+internal interface MusicBotService {
     // User operations
     @PUT(URL_USER)
-    fun changePassword(@Body newPassword: AuthTypes.PasswordChange): Deferred<Response<String>>
+    fun changePassword(@Body newPassword: Auth.PasswordChange): Deferred<Response<String>>
 
     @DELETE(URL_USER)
     fun deleteUser(): Deferred<Response<Unit>>
 
     @POST(URL_USER)
-    fun registerUser(@Body credentials: AuthTypes.Register): Deferred<Response<String>>
+    fun registerUser(@Body credentials: Auth.Register): Deferred<Response<String>>
 
     @GET("token")
     fun loginUser(@Header(KEY_AUTHORIZATION) loginCredentials: String): Deferred<Response<String>>

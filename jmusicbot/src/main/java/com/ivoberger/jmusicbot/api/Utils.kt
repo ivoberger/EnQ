@@ -4,7 +4,8 @@ import android.net.wifi.WifiManager
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.KEY_AUTHORIZATION
 import com.ivoberger.jmusicbot.exceptions.*
-import com.ivoberger.jmusicbot.model.AuthTypes
+import com.ivoberger.jmusicbot.model.Auth
+import com.ivoberger.jmusicbot.model.Event
 import kotlinx.coroutines.Deferred
 import okhttp3.OkHttpClient
 import retrofit2.Response
@@ -15,7 +16,7 @@ import java.net.InetAddress
 import java.net.MulticastSocket
 
 private const val GROUP_ADDRESS = "224.0.0.142"
-private const val PORT = 42945
+internal const val PORT = 42945
 private const val LOCK_TAG = "enq_broadcast"
 
 internal fun WifiManager.discoverHost(): String? {
@@ -31,7 +32,7 @@ internal fun WifiManager.discoverHost(): String? {
             socket.broadcast = true
             socket.receive(packet)
             socket.leaveGroup(groupAddress)
-            "http://${packet.address.hostAddress}:$PORT"
+            packet.address.hostAddress
         }
     } catch (e: IOException) {
         null
@@ -40,7 +41,7 @@ internal fun WifiManager.discoverHost(): String? {
     }
 }
 
-internal fun OkHttpClient.withToken(token: AuthTypes.Token) = newBuilder().addInterceptor { chain ->
+internal fun OkHttpClient.Builder.withToken(token: Auth.Token) = addInterceptor { chain ->
     chain.proceed(chain.request().newBuilder().header(KEY_AUTHORIZATION, token.toAuthHeader()).build())
 }.authenticator(TokenAuthenticator()).build()
 
@@ -56,12 +57,12 @@ internal suspend inline fun <reified T> Deferred<Response<T>>.process(
     try {
         response = await()
     } catch (e: IOException) {
-        JMusicBot.isConnected = false
+        JMusicBot.stateMachine.transition(Event.OnDisconnect(e))
         throw e
     }
     return when (response.code()) {
         in successCodes -> response.body()
-        in errorCodes -> throw errorCodes[response.code()]!!
+        in errorCodes -> throw errorCodes.getValue(response.code())
         400 -> throw InvalidParametersException(
             invalidParamsType,
             response.errorBody()!!.string()

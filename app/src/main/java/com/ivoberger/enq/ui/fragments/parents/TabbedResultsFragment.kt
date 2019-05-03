@@ -3,28 +3,29 @@ package com.ivoberger.enq.ui.fragments.parents
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.ContentView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.ivoberger.enq.R
-import com.ivoberger.enq.persistence.Configuration
-import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
 import com.ivoberger.jmusicbot.model.MusicBotPlugin
 import kotlinx.android.synthetic.main.fragment_results.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Runnable
+import kotlinx.coroutines.launch
+import splitties.experimental.ExperimentalSplittiesApi
+import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
+import splitties.lifecycle.coroutines.lifecycleScope
 import timber.log.Timber
 
-@ContentView(R.layout.fragment_results)
-abstract class TabbedResultsFragment : Fragment(), ViewPager.OnPageChangeListener,
-    ConnectionChangeListener {
-    val mMainScope = CoroutineScope(Dispatchers.Main)
 
-    val mBackgroundScope = CoroutineScope(Dispatchers.IO)
+@PotentialFutureAndroidXLifecycleKtxApi
+@ExperimentalSplittiesApi
+abstract class TabbedResultsFragment : Fragment(R.layout.fragment_results), ViewPager.OnPageChangeListener,
+    ConnectionChangeListener {
     lateinit var mProviderPlugins: Deferred<List<MusicBotPlugin>?>
-    var mConfig: Configuration = MainActivity.config
 
     var mSelectedPlugin: MusicBotPlugin? = null
     lateinit var mFragmentPagerAdapter: Deferred<SongListFragmentPager>
@@ -32,7 +33,7 @@ abstract class TabbedResultsFragment : Fragment(), ViewPager.OnPageChangeListene
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view_pager.addOnPageChangeListener(this)
-        mMainScope.launch {
+        lifecycleScope.launch {
             if (mSelectedPlugin == null) mSelectedPlugin = mProviderPlugins.await()?.get(0)
             mSelectedPlugin?.let {
                 Timber.d("Setting tab to ${mProviderPlugins.await()!!.indexOf(it)}")
@@ -68,12 +69,12 @@ abstract class TabbedResultsFragment : Fragment(), ViewPager.OnPageChangeListene
 
     override fun onPageSelected(position: Int) {
         onTabSelected(position)
-        mBackgroundScope.launch { mSelectedPlugin = mProviderPlugins.await()?.get(position) }
+        lifecycleScope.launch(Dispatchers.IO) { mSelectedPlugin = mProviderPlugins.await()?.get(position) }
     }
 
     abstract inner class SongListFragmentPager(
         fm: FragmentManager, val provider: List<MusicBotPlugin>
-    ) : FragmentStatePagerAdapter(fm) {
+    ) : FragmentStatePagerAdapter(fm, RESUME_ONLY_CURRENT_FRAGMENT) {
 
         val resultFragments: MutableList<ResultsFragment> = mutableListOf()
 

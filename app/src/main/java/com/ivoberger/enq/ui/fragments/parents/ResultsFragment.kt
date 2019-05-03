@@ -2,9 +2,7 @@ package com.ivoberger.enq.ui.fragments.parents
 
 import android.os.Bundle
 import android.view.View
-import androidx.annotation.ContentView
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.ivoberger.enq.R
 import com.ivoberger.enq.ui.items.ResultItem
 import com.ivoberger.jmusicbot.model.Song
 import com.mikepenz.fastadapter.FastAdapter
@@ -13,8 +11,12 @@ import com.mikepenz.fastadapter.adapters.ModelAdapter
 import com.mikepenz.fastadapter.ui.items.ProgressItem
 import kotlinx.android.synthetic.main.fragment_queue.*
 import kotlinx.coroutines.launch
+import splitties.experimental.ExperimentalSplittiesApi
+import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
+import splitties.lifecycle.coroutines.lifecycleScope
 
-@ContentView(R.layout.fragment_queue)
+@ExperimentalSplittiesApi
+@PotentialFutureAndroidXLifecycleKtxApi
 open class ResultsFragment : SongListFragment<ResultItem>() {
 
     val loadingHeader: ItemAdapter<ProgressItem> by lazy { ItemAdapter<ProgressItem>() }
@@ -34,7 +36,7 @@ open class ResultsFragment : SongListFragment<ResultItem>() {
         recycler_queue.adapter = fastAdapter
     }
 
-    fun displayResults(results: List<Song>?) = mMainScope.launch {
+    fun displayResults(results: List<Song>?) = lifecycleScope.launch {
         loadingHeader.clear()
         results ?: return@launch
         songAdapter.set(results)

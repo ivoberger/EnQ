@@ -3,8 +3,9 @@ plugins {
     kotlin("android")
     kotlin("android.extensions")
     kotlin("kapt")
-    id("com.github.triplet.play") version Versions.com_github_triplet_play_gradle_plugin
-    id("io.sentry.android.gradle")
+    id("com.google.gms.google-services")
+    id("io.fabric")
+    id("com.github.triplet.play")
 }
 
 android {
@@ -14,7 +15,7 @@ android {
         minSdkVersion(21)
         targetSdkVersion(28)
         versionCode = 2
-        versionName = "0.5.4"
+        versionName = "0.6.2"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -30,8 +31,9 @@ android {
     }
     buildTypes {
         getByName("debug") {
-            applicationIdSuffix = ".debug"
+            //            applicationIdSuffix = ".debug"
             versionNameSuffix = " (debug)"
+            ext["enableCrashlytics"] = false
         }
         getByName("release") {
             isMinifyEnabled = true
@@ -46,7 +48,7 @@ android {
     lintOptions {
         isAbortOnError = false
     }
-    packagingOptions.exclude("META-INF/core-ktx_release.kotlin_module")
+    packagingOptions.pickFirsts = setOf("META-INF/core-ktx_release.kotlin_module", "META-INF/atomicfu.kotlin_module")
 }
 
 play {
@@ -54,11 +56,6 @@ play {
     track = "beta"
     defaultToAppBundles = true
     resolutionStrategy = "auto"
-}
-
-sentry {
-    autoProguardConfig = true
-    autoUpload = true
 }
 
 dependencies {
@@ -80,17 +77,17 @@ dependencies {
     implementation(project(":jmusicbot"))
 
     // utils
-    implementation(Libs.timbersentry)
+    implementation(Libs.timber)
+    implementation(Libs.firebase_core)
+    implementation(Libs.crashlytics)
 
     implementation(Libs.glide)
+    implementation(Libs.okhttp3_integration)
     kapt(Libs.com_github_bumptech_glide_compiler)
     implementation(Libs.moshi)
     implementation(Libs.okio)
 
-    implementation(Libs.splitties_views_appcompat)
-    implementation(Libs.splitties_toast)
-    implementation(Libs.splitties_material_colors)
-    implementation(Libs.splitties_resources)
+    implementation(Libs.splitties_fun_pack_android_material_components)
 
     implementation(Libs.fastadapter)
     implementation(Libs.fastadapter_extensions_utils)

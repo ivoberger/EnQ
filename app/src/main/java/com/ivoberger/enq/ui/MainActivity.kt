@@ -15,56 +15,51 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.ivoberger.enq.BuildConfig
 import com.ivoberger.enq.R
-import com.ivoberger.enq.persistence.Configuration
 import com.ivoberger.enq.ui.fragments.PlayerFragment
 import com.ivoberger.enq.ui.listener.ConnectionListener
 import com.ivoberger.enq.ui.listener.MainNavigationListener
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
 import com.ivoberger.enq.utils.*
 import com.ivoberger.jmusicbot.JMusicBot
-import com.ivoberger.jmusicbot.model.Song
-import com.ivoberger.timbersentry.SentryTree
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.typeface.IIcon
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import splitties.experimental.ExperimentalSplittiesApi
+import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
+import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.resources.colorSL
 import timber.log.Timber
 
+@ExperimentalSplittiesApi
+@PotentialFutureAndroidXLifecycleKtxApi
 class MainActivity : AppCompatActivity() {
 
     companion object {
         private var mTreePlanted = false
-        var favorites: MutableList<Song> = mutableListOf()
-        lateinit var config: Configuration
     }
 
     lateinit var searchView: SearchView
-
-    val mainScope = CoroutineScope(Dispatchers.Main)
-    private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
     private val mViewModel: MainViewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
     private val mNavController: NavController by lazy {
         main_content.findNavController()
     }
 
-    private val mPlayerFragment by lazy { PlayerFragment.newInstance() }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         // general setup
-        mBackgroundScope.launch {
-            // logging
+        lifecycleScope.launch(Dispatchers.Default) {
+            // logging (and crash reporting)
             if (!mTreePlanted) {
-                Timber.plant(if (BuildConfig.DEBUG) EnQDebugTree() else SentryTree(context = this@MainActivity))
+                Timber.plant(if (BuildConfig.DEBUG) EnQDebugTree() else FirebaseTree(this@MainActivity))
                 mTreePlanted = true
             }
-            // saved data
-            favorites = loadFavorites(this@MainActivity)
-            config = Configuration(this@MainActivity)
         }
 
         mNavController.addOnDestinationChangedListener(MainNavigationListener(this))
@@ -74,13 +69,13 @@ class MainActivity : AppCompatActivity() {
             CommunityMaterial.Icon2.cmd_playlist_play,
             CommunityMaterial.Icon.cmd_all_inclusive,
             CommunityMaterial.Icon2.cmd_star_outline
-        ).map { mBackgroundScope.async { icon(it).color(colorSL(R.color.bottom_navigation)!!) } }
-        mainScope.launch {
+        ).map { lifecycleScope.async(Dispatchers.Default) { icon(it).color(colorSL(R.color.bottom_navigation)) } }
+        lifecycleScope.launch {
             main_bottom_navigation.menu.forEachIndexed { idx, itm -> itm.icon = icons[idx].await() }
         }
 
-        if (!JMusicBot.state.hasServer()) {
-            JMusicBot.discoverHost()
+        if (!JMusicBot.state.hasServer) {
+            lifecycleScope.launch { JMusicBot.discoverHost() }
             showServerDiscoveryDialog(true)
         } else continueToLogin()
     }
@@ -88,7 +83,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * continueToLogin is called by showServerDiscoveryDialog after a server was found
      */
-    fun continueToLogin() = mBackgroundScope.launch {
+    fun continueToLogin() = lifecycleScope.launch(Dispatchers.Default) {
         Timber.d("Continuing with login")
         showLoginDialog()
     }
@@ -96,13 +91,12 @@ class MainActivity : AppCompatActivity() {
     /**
      * continueWithBot is called by showLoginDialog after loginUser is complete
      */
-    fun continueWithBot() = mBackgroundScope.launch {
+    fun continueWithBot() = lifecycleScope.launch(Dispatchers.Default) {
         JMusicBot.connectionChangeListeners.add((ConnectionListener(this@MainActivity)))
         mNavController.setGraph(R.navigation.nav_graph)
         supportFragmentManager.commit {
-            replace(R.id.main_current_song, mPlayerFragment, null)
+            replace(R.id.main_current_song, PlayerFragment(), null)
         }
-        Timber.d("${this@MainActivity}")
     }
 
     override fun onBackPressed() {
@@ -165,14 +159,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun search(query: String) = mainScope.launch {
+    fun search(query: String) = lifecycleScope.launch {
         searchView.isIconified = false
         // give search fragment time to setup
         delay(200)
         searchView.setQuery(query, false)
     }
 
-    fun reset() = mainScope.launch {
+    fun reset() = lifecycleScope.launch {
         supportFragmentManager.commitNow {
             supportFragmentManager.fragments.forEach {
                 remove(it)
@@ -186,17 +180,16 @@ class MainActivity : AppCompatActivity() {
      * @param collapse: specifies if the player should be collapsed
      * @param duration: duration of the animation
      */
-    fun changePlayerCollapse(collapse: Boolean, duration: Long = 1000) = mainScope.launch {
+    private fun changePlayerCollapse(collapse: Boolean, duration: Long = 1000) = lifecycleScope.launch {
         if (mViewModel.playerCollapsed == collapse) return@launch
-        if (!mViewModel.playerCollapsed) {
-            main_current_song.animate().setDuration(duration)
-                .translationYBy(main_current_song.height.toFloat())
-                .withEndAction { main_current_song.visibility = View.GONE }.start()
-        } else {
-            main_current_song.animate().setDuration(duration)
-                .translationYBy(-main_current_song.height.toFloat())
-                .withStartAction { main_current_song.visibility = View.VISIBLE }.start()
-        }
+        val animation = main_current_song.animate().setDuration(duration)
+        val translateBy = main_current_song.height.toFloat()
+        if (!mViewModel.playerCollapsed) animation.translationYBy(translateBy)
+            .withEndAction { main_current_song.visibility = View.GONE }
+            .start()
+        else animation.translationYBy(-translateBy)
+            .withStartAction { main_current_song.visibility = View.VISIBLE }
+            .start()
         mViewModel.playerCollapsed = collapse
     }
 
@@ -205,26 +198,16 @@ class MainActivity : AppCompatActivity() {
      * @param collapse: specifies if the navigation should be collapsed
      * @param duration: duration of the animation
      */
-    private fun changeBottomNavCollapse(collapse: Boolean, duration: Long = 1000) =
-        mainScope.launch {
-            if (mViewModel.bottomNavCollapsed == collapse) return@launch
-            if (!mViewModel.bottomNavCollapsed) {
-                main_bottom_navigation.animate().setDuration(duration)
-                    .translationYBy(main_current_song.height.toFloat())
-                    .withEndAction { main_bottom_navigation.visibility = View.GONE }.start()
-
-            } else {
-                main_bottom_navigation.animate().setDuration(duration)
-                    .translationYBy(-main_current_song.height.toFloat())
-                    .withStartAction { main_bottom_navigation.visibility = View.VISIBLE }.start()
-            }
-            mViewModel.bottomNavCollapsed = collapse
-        }
-
-    override fun onDestroy() {
-        // cancel all running coroutines
-        mainScope.coroutineContext.cancel()
-        mBackgroundScope.coroutineContext.cancel()
-        super.onDestroy()
+    private fun changeBottomNavCollapse(collapse: Boolean, duration: Long = 1000) = lifecycleScope.launch {
+        if (mViewModel.bottomNavCollapsed == collapse) return@launch
+        val animation = main_current_song.animate().setDuration(duration)
+        val translateBy = main_current_song.height.toFloat()
+        if (!mViewModel.bottomNavCollapsed) animation.translationYBy(translateBy)
+            .withEndAction { main_bottom_navigation.visibility = View.GONE }
+            .start()
+        else animation.translationYBy(-translateBy)
+            .withStartAction { main_bottom_navigation.visibility = View.VISIBLE }
+            .start()
+        mViewModel.bottomNavCollapsed = collapse
     }
 }

@@ -5,17 +5,19 @@ import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import androidx.annotation.ContentView
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.ivoberger.enq.R
+import com.ivoberger.enq.persistence.Configuration
 import com.ivoberger.enq.persistence.GlideApp
 import com.ivoberger.enq.ui.MainActivity
-import com.ivoberger.enq.ui.MainActivity.Companion.favorites
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
-import com.ivoberger.enq.utils.*
+import com.ivoberger.enq.utils.icon
+import com.ivoberger.enq.utils.onPrimaryColor
+import com.ivoberger.enq.utils.secondaryColor
+import com.ivoberger.enq.utils.tryWithErrorToast
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.Permissions
 import com.ivoberger.jmusicbot.model.PlayerState
@@ -23,20 +25,21 @@ import com.ivoberger.jmusicbot.model.PlayerStates
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_player.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import splitties.experimental.ExperimentalSplittiesApi
+import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
+import splitties.lifecycle.coroutines.lifecycleScope
+import splitties.toast.toast
 import timber.log.Timber
 
-@ContentView(R.layout.fragment_player)
-class PlayerFragment : Fragment() {
 
-    companion object {
-        fun newInstance(): PlayerFragment = PlayerFragment()
-    }
+@PotentialFutureAndroidXLifecycleKtxApi
+@ExperimentalSplittiesApi
+class PlayerFragment : Fragment(R.layout.fragment_player) {
 
-    private val mMainScope = CoroutineScope(Dispatchers.Main)
-    private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
     private val mViewModel by lazy { ViewModelProviders.of(context as MainActivity).get(MainViewModel::class.java) }
 
     private var mPlayerState: PlayerState = PlayerState(PlayerStates.STOP, null)
@@ -44,15 +47,19 @@ class PlayerFragment : Fragment() {
 
     private val mFlingListener by lazy {
         object : GestureDetector.SimpleOnGestureListener() {
-            override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
-                Timber.d("FLING! $velocityX, $velocityY")
-                if (velocityX > Math.abs(velocityY)) if (JMusicBot.user!!.permissions.contains(Permissions.SKIP)) {
-                    mBackgroundScope.launch { JMusicBot.skip() }
+            override fun onFling(
+                motionEventStart: MotionEvent?,
+                motionEventEnd: MotionEvent?,
+                velocityX: Float,
+                velocityY: Float
+            ): Boolean {
+                if (velocityX > Math.abs(velocityY) * 2) if (JMusicBot.user!!.permissions.contains(Permissions.SKIP)) {
+                    lifecycleScope.launch(Dispatchers.IO) { JMusicBot.skip() }
                     return true
                 } else {
-                    context!!.toastShort(R.string.msg_no_permission)
+                    context!!.toast(R.string.msg_no_permission)
                 }
-                return super.onFling(e1, e2, velocityX, velocityY)
+                return super.onFling(motionEventStart, motionEventEnd, velocityX, velocityY)
             }
         }
     }
@@ -70,7 +77,7 @@ class PlayerFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         // pre-load drawables for player buttons
-        mBackgroundScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             val color = context.onPrimaryColor()
             mPlayDrawable = icon(CommunityMaterial.Icon2.cmd_play).color(color)
             mPauseDrawable = icon(CommunityMaterial.Icon2.cmd_pause).color(color)
@@ -101,42 +108,44 @@ class PlayerFragment : Fragment() {
         }
     }
 
-    private fun changePlaybackState() = mBackgroundScope.launch {
+    private fun changePlaybackState() = lifecycleScope.launch(Dispatchers.IO) {
         if (!JMusicBot.isConnected) return@launch
         if (mShowSkip) {
             try {
                 JMusicBot.skip()
             } catch (e: Exception) {
                 Timber.e(e)
-                mMainScope.launch { context?.toastShort(R.string.msg_no_permission) }
+                withContext(Dispatchers.Main) { context?.toast(R.string.msg_no_permission) }
             } finally {
                 return@launch
             }
         }
-        when (mPlayerState.state) {
-            PlayerStates.STOP -> JMusicBot.play()
-            PlayerStates.PLAY -> JMusicBot.pause()
-            PlayerStates.PAUSE -> JMusicBot.play()
-            PlayerStates.ERROR -> JMusicBot.play()
-        }
-    }
-
-    private fun addToFavorites() {
-        mBackgroundScope.launch {
-            changeFavoriteStatus(context!!, mPlayerState.songEntry!!.song).join()
-            mMainScope.launch {
-                song_favorite.setImageDrawable(
-                    if (mPlayerState.songEntry!!.song in favorites) mInFavoritesDrawable
-                    else mNotInFavoritesDrawable
-                )
+        tryWithErrorToast {
+            runBlocking {
+                when (mPlayerState.state) {
+                    PlayerStates.STOP -> JMusicBot.play()
+                    PlayerStates.PLAY -> JMusicBot.pause()
+                    PlayerStates.PAUSE -> JMusicBot.play()
+                    PlayerStates.ERROR -> JMusicBot.play()
+                }
             }
         }
     }
 
+    private fun addToFavorites() = lifecycleScope.launch(Dispatchers.IO) {
+        Configuration.changeFavoriteStatus(context!!, mPlayerState.songEntry!!.song).join()
+        withContext(Dispatchers.Main) {
+            song_favorite.setImageDrawable(
+                if (mPlayerState.songEntry!!.song in Configuration.favorites) mInFavoritesDrawable
+                else mNotInFavoritesDrawable
+            )
+        }
+    }
 
-    fun onPlayerStateChanged(newState: PlayerState) {
+
+    private fun onPlayerStateChanged(newState: PlayerState) {
         if (newState == mPlayerState || view == null) return
-        mMainScope.launch {
+        lifecycleScope.launch {
             mPlayerState = newState
             when (newState.state) {
                 PlayerStates.STOP -> {
@@ -175,7 +184,7 @@ class PlayerFragment : Fragment() {
             songEntry.userName?.also { song_chosen_by.text = it }
             // set fav status
             song_favorite.setImageDrawable(
-                if (song in favorites) mInFavoritesDrawable
+                if (song in Configuration.favorites) mInFavoritesDrawable
                 else mNotInFavoritesDrawable
             )
         }

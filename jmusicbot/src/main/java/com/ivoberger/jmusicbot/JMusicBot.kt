@@ -3,75 +3,96 @@ package com.ivoberger.jmusicbot
 import android.net.wifi.WifiManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.ivoberger.jmusicbot.api.MusicBotAPI
+import com.ivoberger.jmusicbot.api.MusicBotService
 import com.ivoberger.jmusicbot.api.discoverHost
 import com.ivoberger.jmusicbot.api.process
-import com.ivoberger.jmusicbot.api.withToken
+import com.ivoberger.jmusicbot.di.*
 import com.ivoberger.jmusicbot.exceptions.*
 import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
 import com.ivoberger.jmusicbot.model.*
-import com.squareup.moshi.Moshi
+import com.tinder.StateMachine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import splitties.systemservices.wifiManager
+import okhttp3.logging.HttpLoggingInterceptor
 import timber.log.Timber
 import java.util.*
 import kotlin.concurrent.timer
 
 
 object JMusicBot {
-    var state: MusicBotState = MusicBotState.DISCONNECTED
-        set(newState) {
-            Timber.d("State changed from $field to $newState")
-            if (newState == MusicBotState.NEEDS_AUTH || newState == MusicBotState.DISCONNECTED) {
-                stopQueueUpdates()
-                stopPlayerUpdates()
-                mOkHttpClient = getDefaultOkHttpClient()
-                mRetrofit = getDefaultRetrofitClient(mOkHttpClient, baseUrl)
-            }
-            if (newState == MusicBotState.CONNECTED) isConnected = true
-            field = newState
+
+    internal val stateMachine = StateMachine.create<State, Event, SideEffect> {
+        initialState(State.Disconnected)
+        state<State.Disconnected> { on<Event.OnStartDiscovery> { transitionTo(State.Discovering) } }
+        state<State.Discovering> {
+            on<Event.OnServerFound> { transitionTo(State.AuthRequired, SideEffect.StartServerSession) }
+            on<Event.OnDisconnect> { transitionTo(State.Disconnected, SideEffect.EndServerSession) }
         }
-    private val mWifiManager: WifiManager? by lazy { wifiManager }
-    internal val mMoshi: Moshi by lazy { Moshi.Builder().build() }
+        state<State.AuthRequired> {
+            on<Event.OnAuthorize> { transitionTo(State.Connected, SideEffect.StartUserSession) }
+            on<Event.OnDisconnect> { transitionTo(State.Disconnected, SideEffect.EndServerSession) }
+        }
+        state<State.Connected> {
+            on<Event.OnAuthExpired> { transitionTo(State.AuthRequired, SideEffect.EndUserSession) }
+            on<Event.OnDisconnect> { transitionTo(State.Disconnected, SideEffect.EndServerSession) }
+        }
+        onTransition { transition ->
+            val validTransition = transition as? StateMachine.Transition.Valid
+            validTransition?.let { trans ->
+                Timber.d("State transition from ${trans.fromState} to ${trans.toState} by ${trans.event}")
+                when (trans.sideEffect) {
+                    is SideEffect.StartServerSession -> {
+                        val event = trans.event as Event.OnServerFound
+                        mServerSession = mBaseComponent.serverSession(event.serverModule)
+                        mServiceClient = mServerSession!!.musicBotService()
+                    }
+                    is SideEffect.StartUserSession -> {
+                        val event = trans.event as Event.OnAuthorize
+                        mUserSession = mServerSession!!.userSession(event.userModule)
+                        mServiceClient = mUserSession!!.musicBotService()
+                        connectionChangeListeners.forEach { it.onConnectionRecovered() }
+                    }
+                    SideEffect.EndUserSession -> {
+                        authToken = null
+                        mUserSession = null
+                    }
+                    SideEffect.EndServerSession -> {
+                        authToken = null
+                        mUserSession = null
+                        mServerSession = null
+                        val event = trans.event as Event.OnDisconnect
+                        connectionChangeListeners.forEach { it.onConnectionLost(event.reason) }
+                    }
+                }
+                return@onTransition
+            }
+            val invalidTransition = transition as? StateMachine.Transition.Invalid
+            invalidTransition?.let { Timber.d("Attempted state transition from ${it.fromState} by ${it.event}") }
+        }
+    }
+
+    val state: State
+        get() = stateMachine.state
+    val isConnected: Boolean
+        get() = state.isConnected
+
+    internal val mBaseComponent: BaseComponent =
+        DaggerBaseComponent.builder().baseModule(BaseModule(HttpLoggingInterceptor.Level.BASIC)).build()
+
+    private val mWifiManager: WifiManager = mBaseComponent.wifiManager
+
+    private var mServerSession: ServerSession? = null
+    private var mUserSession: UserSession? = null
 
     private var baseUrl: String? = null
-        set(value) {
-            field = value
-            value?.let { mRetrofit = mRetrofit.newBuilder().baseUrl(it).build() }
-        }
+        get() = mServerSession?.baseUrl() ?: field
 
-    private var mOkHttpClient: OkHttpClient = getDefaultOkHttpClient()
-        set(value) {
-            field = value
-            // rebuild retrofit with new okHttpClient
-            mRetrofit = mRetrofit.newBuilder().client(value).build()
-        }
-
-    private var mRetrofit: Retrofit = getDefaultRetrofitClient(mOkHttpClient, baseUrl)
-        set(value) {
-            field = value
-            // rebuild API client with new retrofit
-            mApiClient = value.create(MusicBotAPI::class.java)
-        }
-
-    private var mApiClient: MusicBotAPI = mRetrofit.create(MusicBotAPI::class.java)
+    private var mServiceClient: MusicBotService? = null
 
     val connectionChangeListeners: MutableList<ConnectionChangeListener> = mutableListOf()
-    var isConnected: Boolean = false
-        get() = state.isConnected()
-        set(value) {
-            field = value
-            if (value) connectionChangeListeners.forEach { it.onConnectionRecovered() }
-            if (!value) {
-                connectionChangeListeners.forEach { it.onConnectionLost() }
-                state = MusicBotState.DISCONNECTED
-            }
-        }
+
 
     private val mQueue: MutableLiveData<List<QueueEntry>> = MutableLiveData()
     private val mPlayerState: MutableLiveData<PlayerState> = MutableLiveData()
@@ -79,49 +100,45 @@ object JMusicBot {
     private var mQueueUpdateTimer: Timer? = null
     private var mPlayerUpdateTimer: Timer? = null
 
-    var user: User?
-        get() = BotPreferences.user
+    var user: User? = BotPreferences.user
+        get() = mUserSession?.user ?: field ?: BotPreferences.user
         set(value) {
             Timber.d("Setting user to ${value?.name}")
             BotPreferences.user = value
             if (value == null) authToken = null
         }
 
-    var authToken: AuthTypes.Token? = BotPreferences.authToken
-        get() = BotPreferences.authToken
+    var authToken: Auth.Token? = BotPreferences.authToken
+        get() = mUserSession?.authToken ?: field ?: BotPreferences.authToken
         set(value) {
             Timber.d("Setting Token to $value")
             BotPreferences.authToken = value
-            if (value == null) state = MusicBotState.NEEDS_AUTH
+            if (value == null) stateMachine.transition(Event.OnAuthExpired)
             field = value
             field?.let {
-                state = MusicBotState.CONNECTED
                 user?.permissions = it.permissions
-                mOkHttpClient = mOkHttpClient.withToken(it)
             }
         }
 
-    fun discoverHost() {
+    suspend fun discoverHost() = withContext(Dispatchers.IO) {
         Timber.d("Discovering host")
-        state = MusicBotState.CONNECTING
-        state.job = GlobalScope.launch {
-            baseUrl = mWifiManager?.discoverHost()
-            state = if (baseUrl != null) {
-                Timber.d("Found host: $baseUrl")
-                MusicBotState.NEEDS_AUTH
-            } else {
-                Timber.d("No host found")
-                MusicBotState.DISCONNECTED
-            }
+        if (state.isDiscovering) return@withContext
+        if (!state.isDisconnected) stateMachine.transition(Event.OnDisconnect())
+        stateMachine.transition(Event.OnStartDiscovery)
+        baseUrl = mWifiManager.discoverHost()
+        baseUrl?.let {
+            Timber.d("Found host: $it")
+            stateMachine.transition(Event.OnServerFound(it))
+            return@withContext
         }
-
+        Timber.d("No host found")
+        stateMachine.transition(Event.OnDisconnect())
     }
 
-    suspend fun recoverConnection() = GlobalScope.launch {
+    suspend fun recoverConnection() {
         Timber.d("Reconnecting")
-        while (!state.hasServer()) {
+        while (!state.hasServer) {
             discoverHost()
-            state.job?.join()
         }
         authorize()
     }
@@ -140,7 +157,6 @@ object JMusicBot {
         try {
             register(userName)
             if (!password.isNullOrBlank()) changePassword(password)
-            state = MusicBotState.CONNECTED
             return
         } catch (e: UsernameTakenException) {
             Timber.w(e)
@@ -157,7 +173,6 @@ object JMusicBot {
             Timber.d("Authorization failed")
             throw e
         }
-        state = MusicBotState.CONNECTED
     }
 
     private suspend fun tokenValid(): Boolean {
@@ -171,11 +186,10 @@ object JMusicBot {
                 authToken = null
                 return false
             }
-            val tmpUser = mApiClient.testToken(authToken!!.toAuthHeader()).process()
+            val tmpUser = mServiceClient!!.testToken(authToken!!.toAuthHeader()).process()
             if (tmpUser?.name == user?.name) {
                 Timber.d("Valid Token: $user")
-                mOkHttpClient = mOkHttpClient.withToken(authToken!!)
-                state = MusicBotState.CONNECTED
+                stateMachine.transition(Event.OnAuthorize(user!!, authToken!!))
                 return true
             }
             Timber.d("Invalid Token: User changed")
@@ -199,14 +213,15 @@ object JMusicBot {
         val credentials = when {
             (!userName.isNullOrBlank()) -> {
                 user = User(userName)
-                AuthTypes.Register(userName)
+                Auth.Register(userName)
             }
-            user != null -> AuthTypes.Register(user!!)
+            user != null -> Auth.Register(user!!)
             else -> throw IllegalStateException("No username stored or supplied")
         }
-        val token = mApiClient.registerUser(credentials).process()!!
+        val token = mServiceClient!!.registerUser(credentials).process()!!
         Timber.d("Registered $user")
-        authToken = AuthTypes.Token(token)
+        authToken = Auth.Token(token)
+        stateMachine.transition(Event.OnAuthorize(user!!, authToken!!))
     }
 
     @Throws(
@@ -222,26 +237,27 @@ object JMusicBot {
         val credentials = when {
             (!(userName.isNullOrBlank() || password.isNullOrBlank())) -> {
                 user = User(userName, password)
-                AuthTypes.Basic(userName, password).toAuthHeader()
+                Auth.Basic(userName, password).toAuthHeader()
             }
-            user != null -> AuthTypes.Basic(user!!).toAuthHeader()
+            user != null -> Auth.Basic(user!!).toAuthHeader()
             else -> throw IllegalStateException("No user stored or supplied")
         }
-        Timber.d("AuthTypes: $credentials")
-        val token = mApiClient.loginUser(credentials).process()!!
+        Timber.d("Auth: $credentials")
+        val token = mServiceClient!!.loginUser(credentials).process()!!
         Timber.d("Logged in $user")
-        authToken = AuthTypes.Token(token)
+        authToken = Auth.Token(token)
+        stateMachine.transition(Event.OnAuthorize(user!!, authToken!!))
     }
 
     @Throws(InvalidParametersException::class, AuthException::class)
     suspend fun changePassword(newPassword: String) {
         state.connectionCheck()
-        authToken = AuthTypes.Token(mApiClient.changePassword(AuthTypes.PasswordChange((newPassword))).process()!!)
+        authToken = Auth.Token(mServiceClient!!.changePassword(Auth.PasswordChange((newPassword))).process()!!)
         authToken?.also { user?.password = newPassword }
     }
 
     suspend fun reloadPermissions() {
-        authToken = null
+        stateMachine.transition(Event.OnAuthExpired)
         authorize()
     }
 
@@ -256,65 +272,66 @@ object JMusicBot {
         state.connectionCheck()
         Timber.d("Deleting user ${user?.name}")
         authToken ?: throw IllegalStateException("Auth token is null")
-        mApiClient.deleteUser().process()
+        mServiceClient!!.deleteUser().process()
         user = null
+        stateMachine.transition(Event.OnAuthExpired)
     }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     suspend fun enqueue(song: Song) {
         state.connectionCheck()
-        updateQueue(mApiClient.enqueue(song.id, song.provider.id).process())
+        updateQueue(mServiceClient!!.enqueue(song.id, song.provider.id).process())
     }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
     suspend fun dequeue(song: Song) {
         state.connectionCheck()
-        updateQueue(mApiClient.dequeue(song.id, song.provider.id).process())
+        updateQueue(mServiceClient!!.dequeue(song.id, song.provider.id).process())
     }
 
     suspend fun moveEntry(entry: QueueEntry, providerId: String, songId: String, newPosition: Int) {
         state.connectionCheck()
-        updateQueue(mApiClient.moveEntry(entry, providerId, songId, newPosition).process())
+        updateQueue(mServiceClient!!.moveEntry(entry, providerId, songId, newPosition).process())
     }
 
     suspend fun search(providerId: String, query: String): List<Song> {
         state.connectionCheck()
-        return mApiClient.searchForSong(providerId, query).process() ?: listOf()
+        return mServiceClient!!.searchForSong(providerId, query).process() ?: listOf()
     }
 
     suspend fun suggestions(suggesterId: String): List<Song> {
         state.connectionCheck()
-        return mApiClient.getSuggestions(suggesterId).process() ?: listOf()
+        return mServiceClient!!.getSuggestions(suggesterId).process() ?: listOf()
     }
 
     suspend fun deleteSuggestion(suggesterId: String, song: Song) {
         state.connectionCheck()
-        mApiClient.deleteSuggestion(suggesterId, song.id, song.provider.id).process()
+        mServiceClient!!.deleteSuggestion(suggesterId, song.id, song.provider.id).process()
     }
 
     suspend fun pause() {
         state.connectionCheck()
-        updatePlayer(mApiClient.pause().process())
+        updatePlayer(mServiceClient!!.pause().process())
     }
 
     suspend fun play() {
         state.connectionCheck()
-        updatePlayer(mApiClient.play().process())
+        updatePlayer(mServiceClient!!.play().process())
     }
 
     suspend fun skip() {
         state.connectionCheck()
-        updatePlayer(mApiClient.skip().process())
+        updatePlayer(mServiceClient!!.skip().process())
     }
 
     suspend fun getProvider(): List<MusicBotPlugin> {
         state.connectionCheck()
-        return mApiClient.getProvider().process() ?: listOf()
+        return mServiceClient!!.getProvider().process() ?: listOf()
     }
 
     suspend fun getSuggesters(): List<MusicBotPlugin> {
         state.connectionCheck()
-        return mApiClient.getSuggesters().process() ?: listOf()
+        return mServiceClient!!.getSuggesters().process() ?: listOf()
     }
 
     fun getQueue(period: Long = 500): LiveData<List<QueueEntry>> {
@@ -323,8 +340,7 @@ object JMusicBot {
     }
 
     fun startQueueUpdates() {
-        if (mQueue.hasObservers())
-            mQueueUpdateTimer = timer(period = 500) { updateQueue() }
+        mQueueUpdateTimer = timer(period = 500) { updateQueue() }
     }
 
     fun stopQueueUpdates() {
@@ -338,7 +354,7 @@ object JMusicBot {
     }
 
     fun startPlayerUpdates() {
-        if (mPlayerState.hasObservers()) mPlayerUpdateTimer = timer(period = 500) { updatePlayer() }
+        mPlayerUpdateTimer = timer(period = 500) { updatePlayer() }
     }
 
     fun stopPlayerUpdates() {
@@ -347,22 +363,23 @@ object JMusicBot {
     }
 
     private fun updateQueue(newQueue: List<QueueEntry>? = null) = GlobalScope.launch {
+        if (!mQueue.hasActiveObservers()) return@launch
         if (newQueue != null) Timber.d("Manual Queue Update")
         try {
             state.connectionCheck()
-            val queue = newQueue ?: mApiClient.getQueue().process() ?: listOf()
+            val queue = newQueue ?: mServiceClient!!.getQueue().process() ?: listOf()
             withContext(Dispatchers.Main) { mQueue.value = queue }
         } catch (e: Exception) {
             Timber.w(e)
-            // TODO: propagate error
         }
     }
 
     private fun updatePlayer(playerState: PlayerState? = null) = GlobalScope.launch {
+        if (!mPlayerState.hasActiveObservers()) return@launch
         if (playerState != null) Timber.d("Manual Player Update")
         try {
             state.connectionCheck()
-            val state = playerState ?: mApiClient.getPlayerState().process() ?: PlayerState(PlayerStates.ERROR)
+            val state = playerState ?: mServiceClient!!.getPlayerState().process() ?: PlayerState(PlayerStates.ERROR)
             withContext(Dispatchers.Main) {
                 mPlayerState.value = state
             }

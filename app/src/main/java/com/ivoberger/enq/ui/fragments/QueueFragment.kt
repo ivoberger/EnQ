@@ -2,17 +2,19 @@ package com.ivoberger.enq.ui.fragments
 
 import android.os.Bundle
 import android.view.View
-import androidx.annotation.ContentView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ivoberger.enq.R
+import com.ivoberger.enq.persistence.Configuration
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.items.QueueItem
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
-import com.ivoberger.enq.utils.*
+import com.ivoberger.enq.utils.attributeColor
+import com.ivoberger.enq.utils.icon
+import com.ivoberger.enq.utils.onPrimaryColor
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.KEY_QUEUE
 import com.ivoberger.jmusicbot.exceptions.AuthException
@@ -26,22 +28,21 @@ import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
 import com.mikepenz.fastadapter.swipe_drag.SimpleSwipeDragCallback
 import com.mikepenz.fastadapter.utils.DragDropUtil
 import kotlinx.android.synthetic.main.fragment_queue.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import splitties.experimental.ExperimentalSplittiesApi
+import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
+import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.resources.color
+import splitties.toast.toast
 import timber.log.Timber
 
-@ContentView(R.layout.fragment_queue)
-class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTouchCallback {
-    companion object {
-        fun newInstance() = QueueFragment()
-    }
+@PotentialFutureAndroidXLifecycleKtxApi
+@ExperimentalSplittiesApi
+class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.ItemSwipeCallback, ItemTouchCallback {
 
     private val mViewModel by lazy { ViewModelProviders.of(context as MainActivity).get(MainViewModel::class.java) }
-    private val mMainScope = CoroutineScope(Dispatchers.Main)
-    private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
 
     private var mQueue = listOf<QueueEntry>()
     private val mFastItemAdapter: FastItemAdapter<QueueItem> by lazy { FastItemAdapter<QueueItem>() }
@@ -92,7 +93,7 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
 
     }
 
-    private fun updateQueue(newQueue: List<QueueEntry>) = mBackgroundScope.launch {
+    private fun updateQueue(newQueue: List<QueueEntry>) = lifecycleScope.launch(Dispatchers.IO) {
         if (newQueue == mQueue) return@launch
         Timber.d("Updating Queue")
         mQueue = newQueue
@@ -101,11 +102,11 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
             newQueue.map { QueueItem(it) },
             QueueItem.DiffCallback()
         )
-        withContext(mMainScope.coroutineContext) { FastAdapterDiffUtil.set(mFastItemAdapter.itemAdapter, diff) }
+        withContext(Dispatchers.Main) { FastAdapterDiffUtil.set(mFastItemAdapter.itemAdapter, diff) }
     }
 
     override fun itemSwiped(position: Int, direction: Int) {
-        mBackgroundScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             val entry = mFastItemAdapter.getAdapterItem(position)
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
@@ -115,13 +116,13 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
                     } catch (e: AuthException) {
                         Timber.e("AuthException with reason ${e.reason}")
                         withContext(Dispatchers.Main) {
-                            context!!.toastShort(R.string.msg_no_permission)
+                            context!!.toast(R.string.msg_no_permission)
                             mFastItemAdapter.notifyAdapterItemChanged(position)
                         }
                     }
                 }
                 ItemTouchHelper.LEFT -> {
-                    changeFavoriteStatus(context!!, entry.song)
+                    Configuration.changeFavoriteStatus(context!!, entry.song)
                     withContext(Dispatchers.Main) {
                         mFastItemAdapter.notifyAdapterItemChanged(position)
                     }
@@ -138,16 +139,14 @@ class QueueFragment : Fragment(), SimpleSwipeCallback.ItemSwipeCallback, ItemTou
 
     override fun itemTouchDropped(oldPosition: Int, newPosition: Int) {
         if (!JMusicBot.isConnected) return
-        mBackgroundScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             val entry = mFastItemAdapter.getAdapterItem(newPosition).model
             Timber.d("Moved ${entry.song.title} from $oldPosition to $newPosition")
             try {
                 JMusicBot.moveEntry(entry, entry.song.provider.id, entry.song.id, newPosition)
             } catch (e: Exception) {
                 Timber.e(e)
-                mMainScope.launch {
-                    context?.toastShort(R.string.msg_no_permission)
-                }
+                lifecycleScope.launch { context?.toast(R.string.msg_no_permission) }
             }
         }
         mViewModel.queue.observe(this, Observer { updateQueue(it) })

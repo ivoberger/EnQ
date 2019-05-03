@@ -6,14 +6,18 @@ executors:
     environment:
       JVM_OPTS: -Xmx3200m
       GRADLE_USER_HOME: /tmp/workspace/.gradle
+commands:
+  setup:
+    steps:
+      - run: echo $SIGNING_KEYSTORE | base64 -d > keystore.jks
+      - run: echo $PLAY_CREDENTIALS > app/play_credentials.json
+      - run: echo $FIREBASE_CREDENTIALS > app/google-services.json
 jobs:
   test:
     executor: android-executor
     steps:
       - checkout
-      - run:
-          name: Signing Setup
-          command: bash .circleci/signing_setup.sh
+      - setup
       - restore_cache:
           key: jars-{{ checksum "buildSrc/src/main/kotlin/Versions.kt" }}-{{ checksum  "buildSrc/src/main/kotlin/Libs.kt" }}
       - run:
@@ -47,9 +51,7 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace/
       - checkout
-      - run:
-          name: Signing Setup
-          command: bash .circleci/signing_setup.sh
+      - setup
       - run:
           name: Bundle debug
           command: ./gradlew bundleDebug
@@ -62,12 +64,7 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace/
       - checkout
-      - run:
-          name: Signing Setup
-          command: bash .circleci/signing_setup.sh
-      - run:
-          name: Sentry Setup
-          command: .circleci/sentry_setup.sh
+      - setup
       - run:
           name: Bundle release
           command: ./gradlew bundleRelease
@@ -84,12 +81,7 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace/
       - checkout
-      - run:
-          name: Signing Setup
-          command: .circleci/signing_setup.sh
-      - run:
-          name: Sentry Setup
-          command: .circleci/sentry_setup.sh
+      - setup
       - run:
           name: Deploy
           command: ./gradlew publishRelease

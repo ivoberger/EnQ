@@ -12,6 +12,11 @@ import com.ivoberger.jmusicbot.exceptions.InvalidParametersException
 import com.ivoberger.jmusicbot.exceptions.ServerErrorException
 import com.ivoberger.jmusicbot.exceptions.UsernameTakenException
 import kotlinx.coroutines.*
+import splitties.experimental.ExperimentalSplittiesApi
+import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
+import splitties.lifecycle.coroutines.lifecycleScope
+import splitties.toast.longToast
+import splitties.toast.toast
 import timber.log.Timber
 
 private fun AlertDialog.styleButtons(@ColorInt color: Int) {
@@ -20,6 +25,8 @@ private fun AlertDialog.styleButtons(@ColorInt color: Int) {
     }
 }
 
+@PotentialFutureAndroidXLifecycleKtxApi
+@ExperimentalSplittiesApi
 fun MainActivity.showServerDiscoveryDialog(searching: Boolean = false): Job = GlobalScope.launch {
     Timber.d("Showing Server Discovery Dialog, $searching")
     val serverDialogBuilder = AlertDialog.Builder(this@showServerDiscoveryDialog)
@@ -28,7 +35,7 @@ fun MainActivity.showServerDiscoveryDialog(searching: Boolean = false): Job = Gl
     if (!searching) serverDialogBuilder
         .setTitle(R.string.tlt_no_server)
         .setPositiveButton(R.string.btn_retry) { dialog, _ ->
-            JMusicBot.discoverHost()
+            lifecycleScope.launch { JMusicBot.discoverHost() }
             showServerDiscoveryDialog(true)
             dialog.dismiss()
         }
@@ -38,7 +45,7 @@ fun MainActivity.showServerDiscoveryDialog(searching: Boolean = false): Job = Gl
         if (!searching) serverDialog.styleButtons(secondaryColor())
         serverDialog.show()
         if (!searching) return@withContext
-        if (withContext(Dispatchers.IO) { JMusicBot.state.job?.join(); JMusicBot.state.hasServer() }) {
+        if (withContext(Dispatchers.IO) { delay(2000); JMusicBot.state.hasServer }) {
             this@showServerDiscoveryDialog.continueToLogin()
             serverDialog.dismiss()
         } else {
@@ -49,6 +56,8 @@ fun MainActivity.showServerDiscoveryDialog(searching: Boolean = false): Job = Gl
 }
 
 
+@PotentialFutureAndroidXLifecycleKtxApi
+@ExperimentalSplittiesApi
 fun MainActivity.showLoginDialog(
     loggingIn: Boolean = true,
     userName: String? = null,
@@ -83,7 +92,7 @@ fun MainActivity.showLoginDialog(
         try {
             withContext(Dispatchers.Default) { JMusicBot.authorize(userName, password) }
             continueWithBot()
-            this@showLoginDialog.toastShort(getString(R.string.msg_logged_in, JMusicBot.user!!.name))
+            this@showLoginDialog.toast(getString(R.string.msg_logged_in, JMusicBot.user!!.name))
             loginDialog.dismiss()
         } catch (e: UsernameTakenException) {
             Timber.w(e)
@@ -97,7 +106,7 @@ fun MainActivity.showLoginDialog(
         } catch (e: AuthException) {
             Timber.w("Authentication error with reason ${e.reason}")
             Timber.w(e)
-            this@showLoginDialog.toastLong(R.string.msg_password_wrong)
+            this@showLoginDialog.longToast(R.string.msg_password_wrong)
             showLoginDialog(false, userName, password)
             loginDialog.cancel()
         } catch (e: IllegalStateException) {
@@ -106,17 +115,17 @@ fun MainActivity.showLoginDialog(
             loginDialog.cancel()
         } catch (e: InvalidParametersException) {
             Timber.w(e)
-            this@showLoginDialog.toastLong(R.string.msg_password_wrong)
+            this@showLoginDialog.longToast(R.string.msg_password_wrong)
             showLoginDialog(false, userName, password)
             loginDialog.cancel()
         } catch (e: ServerErrorException) {
             Timber.e(e)
-            this@showLoginDialog.toastLong(R.string.msg_server_error)
+            this@showLoginDialog.longToast(R.string.msg_server_error)
             showLoginDialog(false, userName, password)
             loginDialog.cancel()
         } catch (e: Exception) {
             Timber.e(e)
-            this@showLoginDialog.toastLong(R.string.msg_unknown_error)
+            this@showLoginDialog.longToast(R.string.msg_unknown_error)
             showLoginDialog(false, userName, password)
             loginDialog.cancel()
         }

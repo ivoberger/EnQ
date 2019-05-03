@@ -50,6 +50,10 @@ object Libs {
 
     /**
      * https://developer.android.com/studio */
+    const val aapt2: String = "com.android.tools.build:aapt2:" + Versions.aapt2
+
+    /**
+     * https://developer.android.com/studio */
     const val com_android_tools_build_gradle: String = "com.android.tools.build:gradle:" +
             Versions.com_android_tools_build_gradle
 
@@ -61,6 +65,9 @@ object Libs {
      * https://github.com/auth0/jwtdecode.android */
     const val jwtdecode: String = "com.auth0.android:jwtdecode:" + Versions.jwtdecode
 
+    const val crashlytics: String = "com.crashlytics.sdk.android:crashlytics:" +
+            Versions.crashlytics
+
     /**
      * https://github.com/bumptech/glide */
     const val com_github_bumptech_glide_compiler: String = "com.github.bumptech.glide:compiler:" +
@@ -71,6 +78,15 @@ object Libs {
     const val glide: String = "com.github.bumptech.glide:glide:" +
             Versions.com_github_bumptech_glide
 
+    /**
+     * https://github.com/bumptech/glide */
+    const val okhttp3_integration: String = "com.github.bumptech.glide:okhttp3-integration:" +
+            Versions.com_github_bumptech_glide
+
+    /**
+     * https://github.com/Tinder/StateMachine */
+    const val statemachine: String = "com.github.tinder:statemachine:" + Versions.statemachine
+
     const val com_github_triplet_play_gradle_plugin: String =
             "com.github.triplet.play:com.github.triplet.play.gradle.plugin:" +
             Versions.com_github_triplet_play_gradle_plugin
@@ -80,8 +96,19 @@ object Libs {
     const val material: String = "com.google.android.material:material:" + Versions.material
 
     /**
-     * https://github.com/IIIuminator/timberSentry */
-    const val timbersentry: String = "com.ivoberger:timberSentry:" + Versions.timbersentry
+     * https://github.com/google/dagger */
+    const val dagger_compiler: String = "com.google.dagger:dagger-compiler:" +
+            Versions.com_google_dagger
+
+    /**
+     * https://github.com/google/dagger */
+    const val dagger: String = "com.google.dagger:dagger:" + Versions.com_google_dagger
+
+    const val firebase_core: String = "com.google.firebase:firebase-core:" + Versions.firebase_core
+
+    /**
+     * http://tools.android.com/ */
+    const val google_services: String = "com.google.gms:google-services:" + Versions.google_services
 
     /**
      * https://github.com/JakeWharton/retrofit2-kotlin-coroutines-adapter/ */
@@ -93,35 +120,13 @@ object Libs {
      * https://github.com/JakeWharton/timber */
     const val timber: String = "com.jakewharton.timber:timber:" + Versions.timber
 
-    /**
-     * https://github.com/LouisCAD/Splitties */
-    const val splitties_material_colors: String =
-            "com.louiscad.splitties:splitties-material-colors:" + Versions.com_louiscad_splitties
-
-    /**
-     * https://github.com/LouisCAD/Splitties */
-    const val splitties_preferences: String = "com.louiscad.splitties:splitties-preferences:" +
+    const val splitties_fun_pack_android_base: String =
+            "com.louiscad.splitties:splitties-fun-pack-android-base:" +
             Versions.com_louiscad_splitties
 
-    /**
-     * https://github.com/LouisCAD/Splitties */
-    const val splitties_resources: String = "com.louiscad.splitties:splitties-resources:" +
+    const val splitties_fun_pack_android_material_components: String =
+            "com.louiscad.splitties:splitties-fun-pack-android-material-components:" +
             Versions.com_louiscad_splitties
-
-    /**
-     * https://github.com/LouisCAD/Splitties */
-    const val splitties_systemservices: String =
-            "com.louiscad.splitties:splitties-systemservices:" + Versions.com_louiscad_splitties
-
-    /**
-     * https://github.com/LouisCAD/Splitties */
-    const val splitties_toast: String = "com.louiscad.splitties:splitties-toast:" +
-            Versions.com_louiscad_splitties
-
-    /**
-     * https://github.com/LouisCAD/Splitties */
-    const val splitties_views_appcompat: String =
-            "com.louiscad.splitties:splitties-views-appcompat:" + Versions.com_louiscad_splitties
 
     /**
      * https://github.com/mikepenz/Android-Iconics */
@@ -162,7 +167,12 @@ object Libs {
 
     /**
      * https://github.com/square/okhttp */
-    const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.okhttp
+    const val logging_interceptor: String = "com.squareup.okhttp3:logging-interceptor:" +
+            Versions.com_squareup_okhttp3
+
+    /**
+     * https://github.com/square/okhttp */
+    const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.com_squareup_okhttp3
 
     /**
      * https://github.com/square/okio/ */
@@ -182,10 +192,18 @@ object Libs {
             "de.fayard.buildSrcVersions:de.fayard.buildSrcVersions.gradle.plugin:" +
             Versions.de_fayard_buildsrcversions_gradle_plugin
 
+    const val io_fabric_tools_gradle: String = "io.fabric.tools:gradle:" +
+            Versions.io_fabric_tools_gradle
+
     /**
-     * https://github.com/getsentry/sentry-java */
-    const val sentry_android_gradle_plugin: String = "io.sentry:sentry-android-gradle-plugin:" +
-            Versions.sentry_android_gradle_plugin
+     * http://assertj.org */
+    const val assertj_core: String = "org.assertj:assertj-core:" + Versions.assertj_core
+
+    /**
+     * https://kotlinlang.org/ */
+    const val kotlin_android_extensions_runtime: String =
+            "org.jetbrains.kotlin:kotlin-android-extensions-runtime:" +
+            Versions.org_jetbrains_kotlin
 
     /**
      * https://kotlinlang.org/ */

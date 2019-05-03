@@ -1,8 +1,8 @@
 plugins {
     id("com.android.library")
-    id("kotlin-android-extensions")
-    id("kotlin-android")
-    id("kotlin-kapt")
+    kotlin("android")
+    kotlin("android.extensions")
+    kotlin("kapt")
 }
 
 android {
@@ -11,7 +11,7 @@ android {
         minSdkVersion(21)
         targetSdkVersion(28)
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = "0.2.0"
     }
 
     buildTypes {
@@ -20,6 +20,7 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
+    packagingOptions.pickFirst("META-INF/atomicfu.kotlin_module")
 }
 
 dependencies {
@@ -29,15 +30,22 @@ dependencies {
     implementation(Libs.lifecycle_extensions)
 
     implementation(Libs.timber)
+    implementation(Libs.statemachine)
 
-    implementation(Libs.splitties_systemservices)
-    implementation(Libs.splitties_preferences)
+    kapt(Libs.dagger_compiler)
+    implementation(Libs.dagger)
+
+    implementation(Libs.splitties_fun_pack_android_base)
     implementation(Libs.jwtdecode)
 
     implementation(Libs.okhttp)
+    implementation(Libs.logging_interceptor)
     implementation(Libs.retrofit)
     implementation(Libs.retrofit2_kotlin_coroutines_adapter)
     implementation(Libs.converter_moshi)
     implementation(Libs.moshi)
     kapt(Libs.moshi_kotlin_codegen)
+
+    testImplementation(Libs.assertj_core)
+
 }

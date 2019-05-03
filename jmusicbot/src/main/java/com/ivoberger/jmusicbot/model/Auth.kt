@@ -7,19 +7,17 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.util.*
 
-sealed class AuthTypes {
+sealed class Auth {
 
     @JsonClass(generateAdapter = true)
     class Register(
         @Json(name = "name") val name: String,
         @Json(name = "userId") val uuid: String = UUID.randomUUID().toString()
-    ) : AuthTypes() {
+    ) : Auth() {
         constructor(user: User) : this(user.name, user.id)
     }
 
-    class Basic(
-        val name: String, val password: String
-    ) : AuthTypes() {
+    class Basic(val name: String, val password: String) : Auth() {
         constructor(user: User) : this(
             user.name,
             user.password ?: throw InvalidParametersException(
@@ -32,7 +30,7 @@ sealed class AuthTypes {
             "Basic ${Base64.encodeToString("$name:$password".toByteArray(), Base64.DEFAULT).trim()}"
     }
 
-    class Token(private val token: String) {
+    class Token(private val token: String) : Auth() {
 
         private val jwt by lazy { JWT(token) }
         val permissions by lazy { Permissions.fromClaims(jwt.claims) }
@@ -43,7 +41,7 @@ sealed class AuthTypes {
     }
 
     @JsonClass(generateAdapter = true)
-    class PasswordChange(@Json(name = "newPassword") val newPassword: String)
+    class PasswordChange(@Json(name = "newPassword") val newPassword: String) : Auth()
 }
 
 @JsonClass(generateAdapter = true)

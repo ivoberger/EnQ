@@ -2,9 +2,9 @@ package com.ivoberger.jmusicbot.api
 
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.KEY_AUTHORIZATION
+import com.ivoberger.jmusicbot.model.Auth
 import com.ivoberger.jmusicbot.model.AuthExpectation
 import com.ivoberger.jmusicbot.model.AuthType
-import com.ivoberger.jmusicbot.model.AuthTypes
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
 import okhttp3.Request
@@ -18,12 +18,13 @@ class TokenAuthenticator : Authenticator {
         Timber.d("Re-authorizing")
         var auth: String? = null
         response.body()?.let { body ->
-            val authExpectation = JMusicBot.mMoshi.adapter(AuthExpectation::class.java).fromJson(String(body.bytes()))
+            val authExpectation =
+                JMusicBot.mBaseComponent.moshi.adapter(AuthExpectation::class.java).fromJson(String(body.bytes()))
             Timber.d("AuthExpectation: $authExpectation")
             auth = when (authExpectation?.format) {
                 AuthType.BASIC -> {
                     Timber.d("BASIC Auth")
-                    JMusicBot.user?.let { AuthTypes.Basic(it).toAuthHeader() }
+                    JMusicBot.user?.let { Auth.Basic(it).toAuthHeader() }
                 }
                 AuthType.TOKEN -> {
                     Timber.d("TOKEN Auth")
