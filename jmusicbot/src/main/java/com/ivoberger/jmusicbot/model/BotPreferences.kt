@@ -1,8 +1,10 @@
 package com.ivoberger.jmusicbot.model
 
 import com.ivoberger.jmusicbot.KEY_PREFERENCES
+import splitties.experimental.ExperimentalSplittiesApi
 import splitties.preferences.Preferences
 
+@ExperimentalSplittiesApi
 internal object BotPreferences : Preferences(KEY_PREFERENCES) {
     var user: User? = null
         get() = serializedUser?.let { User.fromString(it) }

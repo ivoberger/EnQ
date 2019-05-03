@@ -8,11 +8,11 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ivoberger.enq.R
+import com.ivoberger.enq.persistence.Configuration
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.items.QueueItem
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
 import com.ivoberger.enq.utils.attributeColor
-import com.ivoberger.enq.utils.changeFavoriteStatus
 import com.ivoberger.enq.utils.icon
 import com.ivoberger.enq.utils.onPrimaryColor
 import com.ivoberger.jmusicbot.JMusicBot
@@ -37,9 +37,6 @@ import splitties.toast.toast
 import timber.log.Timber
 
 class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.ItemSwipeCallback, ItemTouchCallback {
-    companion object {
-        fun newInstance() = QueueFragment()
-    }
 
     private val mViewModel by lazy { ViewModelProviders.of(context as MainActivity).get(MainViewModel::class.java) }
     private val mMainScope = CoroutineScope(Dispatchers.Main)
@@ -123,7 +120,7 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
                     }
                 }
                 ItemTouchHelper.LEFT -> {
-                    changeFavoriteStatus(context!!, entry.song)
+                    Configuration.changeFavoriteStatus(context!!, entry.song)
                     withContext(Dispatchers.Main) {
                         mFastItemAdapter.notifyAdapterItemChanged(position)
                     }

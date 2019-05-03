@@ -10,11 +10,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.ivoberger.enq.R
+import com.ivoberger.enq.persistence.Configuration
 import com.ivoberger.enq.persistence.GlideApp
 import com.ivoberger.enq.ui.MainActivity
-import com.ivoberger.enq.ui.MainActivity.Companion.favorites
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
-import com.ivoberger.enq.utils.*
+import com.ivoberger.enq.utils.icon
+import com.ivoberger.enq.utils.onPrimaryColor
+import com.ivoberger.enq.utils.secondaryColor
+import com.ivoberger.enq.utils.tryWithErrorToast
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.Permissions
 import com.ivoberger.jmusicbot.model.PlayerState
@@ -26,10 +29,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import splitties.experimental.ExperimentalSplittiesApi
+import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
+import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.toast.toast
 import timber.log.Timber
 
 
+@PotentialFutureAndroidXLifecycleKtxApi
+@ExperimentalSplittiesApi
 class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     companion object {
@@ -37,7 +45,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     }
 
     private val mMainScope = CoroutineScope(Dispatchers.Main)
-    private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
+    //    private val mBackgroundScope = CoroutineScope(Dispatchers.IO)
     private val mViewModel by lazy { ViewModelProviders.of(context as MainActivity).get(MainViewModel::class.java) }
 
     private var mPlayerState: PlayerState = PlayerState(PlayerStates.STOP, null)
@@ -53,7 +61,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             ): Boolean {
                 Timber.d("FLING! $velocityX, $velocityY")
                 if (velocityX > Math.abs(velocityY)) if (JMusicBot.user!!.permissions.contains(Permissions.SKIP)) {
-                    mBackgroundScope.launch { JMusicBot.skip() }
+                    lifecycleScope.launch(Dispatchers.IO) { JMusicBot.skip() }
                     return true
                 } else {
                     context!!.toast(R.string.msg_no_permission)
@@ -76,7 +84,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         // pre-load drawables for player buttons
-        mBackgroundScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             val color = context.onPrimaryColor()
             mPlayDrawable = icon(CommunityMaterial.Icon2.cmd_play).color(color)
             mPauseDrawable = icon(CommunityMaterial.Icon2.cmd_pause).color(color)
@@ -107,7 +115,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
     }
 
-    private fun changePlaybackState() = mBackgroundScope.launch {
+    private fun changePlaybackState() = lifecycleScope.launch(Dispatchers.IO) {
         if (!JMusicBot.isConnected) return@launch
         if (mShowSkip) {
             try {
@@ -131,11 +139,11 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
     }
 
-    private fun addToFavorites() = mBackgroundScope.launch {
-        changeFavoriteStatus(context!!, mPlayerState.songEntry!!.song).join()
+    private fun addToFavorites() = lifecycleScope.launch(Dispatchers.IO) {
+        Configuration.changeFavoriteStatus(context!!, mPlayerState.songEntry!!.song).join()
         mMainScope.launch {
             song_favorite.setImageDrawable(
-                if (mPlayerState.songEntry!!.song in favorites) mInFavoritesDrawable
+                if (mPlayerState.songEntry!!.song in Configuration.favorites) mInFavoritesDrawable
                 else mNotInFavoritesDrawable
             )
         }
@@ -183,7 +191,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             songEntry.userName?.also { song_chosen_by.text = it }
             // set fav status
             song_favorite.setImageDrawable(
-                if (song in favorites) mInFavoritesDrawable
+                if (song in Configuration.favorites) mInFavoritesDrawable
                 else mNotInFavoritesDrawable
             )
         }

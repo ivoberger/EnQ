@@ -3,6 +3,7 @@ package com.ivoberger.enq.ui.fragments
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.ivoberger.enq.persistence.Configuration
 import com.ivoberger.enq.ui.fragments.parents.TabbedResultsFragment
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.MusicBotPlugin
@@ -17,7 +18,7 @@ class SuggestionsFragment : TabbedResultsFragment() {
         mProviderPlugins = mBackgroundScope.async { JMusicBot.getSuggesters() }
         mBackgroundScope.launch {
             mProviderPlugins.await() ?: return@launch
-            mConfig.lastSuggester?.also {
+            Configuration.lastSuggester?.also {
                 if (mProviderPlugins.await()!!.contains(it)) mSelectedPlugin = it
             }
         }
@@ -36,7 +37,7 @@ class SuggestionsFragment : TabbedResultsFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mConfig.lastSuggester = mSelectedPlugin
+        Configuration.lastSuggester = mSelectedPlugin
     }
 
     inner class SuggestionsFragmentPager(fm: FragmentManager, provider: List<MusicBotPlugin>) :

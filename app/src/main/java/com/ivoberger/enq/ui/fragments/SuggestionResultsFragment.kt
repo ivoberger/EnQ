@@ -5,9 +5,9 @@ import android.view.View
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.ivoberger.enq.R
+import com.ivoberger.enq.persistence.Configuration
 import com.ivoberger.enq.ui.fragments.parents.ResultsFragment
 import com.ivoberger.enq.ui.items.ResultItem
-import com.ivoberger.enq.utils.changeFavoriteStatus
 import com.ivoberger.enq.utils.tryWithErrorToast
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.KEY_SUGGESTER_ID
@@ -81,7 +81,7 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
                     }
                 }
                 ItemTouchHelper.LEFT -> {
-                    changeFavoriteStatus(context!!, entry.model)
+                    Configuration.changeFavoriteStatus(context!!, entry.model)
                     withContext(Dispatchers.Main) {
                         fastAdapter.notifyAdapterItemChanged(position)
                     }

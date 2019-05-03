@@ -15,14 +15,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.ivoberger.enq.BuildConfig
 import com.ivoberger.enq.R
-import com.ivoberger.enq.persistence.Configuration
 import com.ivoberger.enq.ui.fragments.PlayerFragment
 import com.ivoberger.enq.ui.listener.ConnectionListener
 import com.ivoberger.enq.ui.listener.MainNavigationListener
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
 import com.ivoberger.enq.utils.*
 import com.ivoberger.jmusicbot.JMusicBot
-import com.ivoberger.jmusicbot.model.Song
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.typeface.IIcon
 import kotlinx.android.synthetic.main.activity_main.*
@@ -34,8 +32,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private var mTreePlanted = false
-        var favorites: MutableList<Song> = mutableListOf()
-        lateinit var config: Configuration
     }
 
     lateinit var searchView: SearchView
@@ -61,9 +57,6 @@ class MainActivity : AppCompatActivity() {
                 Timber.plant(if (BuildConfig.DEBUG) EnQDebugTree() else FirebaseTree(this@MainActivity))
                 mTreePlanted = true
             }
-            // saved data
-            favorites = loadFavorites(this@MainActivity)
-            config = Configuration(this@MainActivity)
         }
 
         mNavController.addOnDestinationChangedListener(MainNavigationListener(this))
@@ -73,7 +66,7 @@ class MainActivity : AppCompatActivity() {
             CommunityMaterial.Icon2.cmd_playlist_play,
             CommunityMaterial.Icon.cmd_all_inclusive,
             CommunityMaterial.Icon2.cmd_star_outline
-        ).map { mBackgroundScope.async { icon(it).color(colorSL(R.color.bottom_navigation)!!) } }
+        ).map { mBackgroundScope.async { icon(it).color(colorSL(R.color.bottom_navigation)) } }
         mainScope.launch {
             main_bottom_navigation.menu.forEachIndexed { idx, itm -> itm.icon = icons[idx].await() }
         }

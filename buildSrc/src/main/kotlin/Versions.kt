@@ -49,7 +49,7 @@ object Versions {
 
     const val timber: String = "4.7.1"
 
-    const val com_louiscad_splitties: String = "3.0.0-alpha05"
+    const val com_louiscad_splitties: String = "3.0.0-alpha06"
 
     const val community_material_typeface: String = "3.5.95.1"
 

@@ -8,8 +8,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.ivoberger.enq.R
-import com.ivoberger.enq.persistence.Configuration
-import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
 import com.ivoberger.jmusicbot.model.MusicBotPlugin
 import kotlinx.android.synthetic.main.fragment_results.*
@@ -23,7 +21,6 @@ abstract class TabbedResultsFragment : Fragment(R.layout.fragment_results), View
 
     val mBackgroundScope = CoroutineScope(Dispatchers.IO)
     lateinit var mProviderPlugins: Deferred<List<MusicBotPlugin>?>
-    var mConfig: Configuration = MainActivity.config
 
     var mSelectedPlugin: MusicBotPlugin? = null
     lateinit var mFragmentPagerAdapter: Deferred<SongListFragmentPager>
@@ -72,7 +69,7 @@ abstract class TabbedResultsFragment : Fragment(R.layout.fragment_results), View
 
     abstract inner class SongListFragmentPager(
         fm: FragmentManager, val provider: List<MusicBotPlugin>
-    ) : FragmentStatePagerAdapter(fm) {
+    ) : FragmentStatePagerAdapter(fm, RESUME_ONLY_CURRENT_FRAGMENT) {
 
         val resultFragments: MutableList<ResultsFragment> = mutableListOf()
 

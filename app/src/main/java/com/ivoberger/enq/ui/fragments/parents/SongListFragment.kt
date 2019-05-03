@@ -48,7 +48,7 @@ abstract class SongListFragment<T : SongItem> : Fragment(R.layout.fragment_queue
         }
     }
 
-    fun enqueueEntry(item: T, position: Int) = mBackgroundScope.launch {
+    private fun enqueueEntry(item: T, position: Int) = mBackgroundScope.launch {
         JMusicBot.enqueue(item.model)
         withContext(Dispatchers.Main) {
             if (isRemoveAfterEnQ) songAdapter.remove(position)
