@@ -82,6 +82,7 @@ dependencies {
     implementation(Libs.crashlytics)
 
     implementation(Libs.glide)
+    implementation(Libs.okhttp3_integration)
     kapt(Libs.com_github_bumptech_glide_compiler)
     implementation(Libs.moshi)
     implementation(Libs.okio)
