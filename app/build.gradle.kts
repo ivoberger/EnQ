@@ -15,7 +15,7 @@ android {
         minSdkVersion(21)
         targetSdkVersion(28)
         versionCode = 2
-        versionName = "0.6.0"
+        versionName = "0.6.2"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
