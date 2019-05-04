@@ -7,8 +7,12 @@ import androidx.navigation.NavDestination
 import com.ivoberger.enq.R
 import com.ivoberger.enq.ui.MainActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import splitties.experimental.ExperimentalSplittiesApi
+import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
 import timber.log.Timber
 
+@PotentialFutureAndroidXLifecycleKtxApi
+@ExperimentalSplittiesApi
 class MainNavigationListener(private val mainActivity: MainActivity) : NavController.OnDestinationChangedListener {
 
     override fun onDestinationChanged(controller: NavController, destination: NavDestination, arguments: Bundle?) {

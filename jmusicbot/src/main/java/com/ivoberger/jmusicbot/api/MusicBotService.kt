@@ -6,13 +6,15 @@ import kotlinx.coroutines.Deferred
 import retrofit2.Response
 import retrofit2.http.*
 
-private const val URL_USER = "user"
-private const val URL_PLAYER = "player"
-private const val URL_SUGGEST = "suggester"
-private const val URL_PROVIDER = "provider"
-private const val URL_QUEUE = "queue"
-
 internal interface MusicBotService {
+    companion object {
+        private const val URL_USER = "user"
+        private const val URL_PLAYER = "player"
+        private const val URL_SUGGEST = "suggester"
+        private const val URL_PROVIDER = "provider"
+        private const val URL_QUEUE = "queue"
+    }
+
     // User operations
     @PUT(URL_USER)
     fun changePassword(@Body newPassword: Auth.PasswordChange): Deferred<Response<String>>
@@ -85,8 +87,8 @@ internal interface MusicBotService {
     @GET(URL_PLAYER)
     fun getPlayerState(): Deferred<Response<PlayerState>>
 
-    @PUT(URL_PLAYER)
-    fun setPlayerState(@Body playerStateChange: PlayerStateChange): Deferred<Response<PlayerState>>
+//    @PUT(URL_PLAYER)
+//    fun setPlayerState(@Body playerStateChange: PlayerStateChange): Deferred<Response<PlayerState>>
 
     @PUT(URL_PLAYER)
     fun pause(@Body playerStateChange: PlayerStateChange = PlayerStateChange(PlayerAction.PAUSE)): Deferred<Response<PlayerState>>
