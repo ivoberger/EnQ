@@ -65,6 +65,6 @@ enum class Permissions(val label: String) {
         }
 
         @FromJson
-        fun fromJson(permString: String) = Permissions.valueOf(permString.toUpperCase())
+        fun fromJson(permString: String) = valueOf(permString.toUpperCase())
     }
 }

@@ -30,7 +30,7 @@ dependencies {
     implementation(Libs.lifecycle_extensions)
 
     implementation(Libs.timber)
-    implementation(Libs.statemachine)
+    api(Libs.statemachine)
 
     kapt(Libs.dagger_compiler)
     implementation(Libs.dagger)

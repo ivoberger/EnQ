@@ -5,6 +5,7 @@ import com.ivoberger.jmusicbot.KEY_AUTHORIZATION
 import com.ivoberger.jmusicbot.model.Auth
 import com.ivoberger.jmusicbot.model.AuthExpectation
 import com.ivoberger.jmusicbot.model.AuthType
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
 import okhttp3.Request
@@ -14,7 +15,7 @@ import timber.log.Timber
 
 class TokenAuthenticator : Authenticator {
 
-    override fun authenticate(route: Route?, response: Response): Request? = runBlocking {
+    override fun authenticate(route: Route?, response: Response): Request? = runBlocking(Dispatchers.IO) {
         Timber.d("Re-authorizing")
         var auth: String? = null
         response.body()?.let { body ->

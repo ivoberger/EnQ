@@ -45,7 +45,7 @@ object Configuration {
             MainScope().launch { favoritesLiveData.value = value }
         }
 
-    private val favoritesLiveData = MutableLiveData<List<Song>>()
+    private val favoritesLiveData by lazy { MutableLiveData<List<Song>>(favorites) }
 
     fun getFavoritesLiveData() = favoritesLiveData as LiveData<List<Song>>
 

@@ -6,19 +6,6 @@ import com.ivoberger.jmusicbot.di.UserModule
 
 /**
  * Possible states for the musicBotService bot client to be in
- * DISCONNECTED: Client has no server connection
- * CONNECTING: client is trying to find a server
- * NEEDS_AUTH: Client has found a server but needs login/new auth token
- * CONNECTED: Server connection and authentication is successfully set up, client is ready to send command
- */
-enum class MusicBotState {
-    NEEDS_AUTH, CONNECTED, DISCONNECTED, CONNECTING;
-
-    fun hasServer() = this != DISCONNECTED && this != CONNECTING
-}
-
-/**
- * Possible states for the musicBotService bot client to be in
  */
 sealed class State {
     override fun toString(): String = this::class.java.simpleName
@@ -55,21 +42,19 @@ sealed class State {
     }
 }
 
-internal sealed class Event {
+sealed class Event {
     override fun toString(): String = this::class.java.simpleName
 
     object OnStartDiscovery : Event()
-    class OnServerFound(
-        baseUrl: String,
-        port: Int = PORT,
-        val serverModule: ServerModule = ServerModule(baseUrl, port)
-    ) : Event()
+    class OnServerFound(baseUrl: String, port: Int = PORT) : Event() {
+        internal val serverModule: ServerModule = ServerModule(baseUrl, port)
+    }
 
     class OnAuthorize(
         user: User,
         authToken: Auth.Token
     ) : Event() {
-        val userModule: UserModule
+        internal val userModule: UserModule
 
         init {
             user.permissions = authToken.permissions
@@ -81,7 +66,7 @@ internal sealed class Event {
     class OnDisconnect(val reason: Exception? = null) : Event()
 }
 
-internal sealed class SideEffect {
+sealed class SideEffect {
     override fun toString(): String = this::class.java.simpleName
 
     object StartServerSession : SideEffect()
