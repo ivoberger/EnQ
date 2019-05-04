@@ -181,6 +181,7 @@ class MainActivity : AppCompatActivity() {
      * @param duration: duration of the animation
      */
     private fun changePlayerCollapse(collapse: Boolean, duration: Long = 1000) = lifecycleScope.launch {
+        main_current_song.animation.awaitEnd()
         if (mViewModel.playerCollapsed == collapse) return@launch
         val animation = main_current_song.animate().setDuration(duration)
         val translateBy = main_current_song.height.toFloat()
@@ -199,6 +200,7 @@ class MainActivity : AppCompatActivity() {
      * @param duration: duration of the animation
      */
     private fun changeBottomNavCollapse(collapse: Boolean, duration: Long = 1000) = lifecycleScope.launch {
+        main_current_song.animation.awaitEnd()
         if (mViewModel.bottomNavCollapsed == collapse) return@launch
         val animation = main_current_song.animate().setDuration(duration)
         val translateBy = main_current_song.height.toFloat()

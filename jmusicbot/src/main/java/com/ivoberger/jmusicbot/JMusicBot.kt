@@ -335,12 +335,12 @@ object JMusicBot {
     }
 
     fun getQueue(period: Long = 500): LiveData<List<QueueEntry>> {
-        if (mQueueUpdateTimer == null) mQueueUpdateTimer = timer(period = period) { updateQueue() }
+        startQueueUpdates(period)
         return mQueue
     }
 
-    fun startQueueUpdates() {
-        mQueueUpdateTimer = timer(period = 500) { updateQueue() }
+    fun startQueueUpdates(period: Long = 500) {
+        if (mQueueUpdateTimer == null) mQueueUpdateTimer = timer(period = period) { updateQueue() }
     }
 
     fun stopQueueUpdates() {
@@ -349,12 +349,12 @@ object JMusicBot {
     }
 
     fun getPlayerState(period: Long = 500): LiveData<PlayerState> {
-        if (mPlayerUpdateTimer == null) mPlayerUpdateTimer = timer(period = period) { updatePlayer() }
+        startPlayerUpdates(period)
         return mPlayerState
     }
 
-    fun startPlayerUpdates() {
-        mPlayerUpdateTimer = timer(period = 500) { updatePlayer() }
+    fun startPlayerUpdates(period: Long = 500) {
+        if (mPlayerUpdateTimer == null) mPlayerUpdateTimer = timer(period = period) { updatePlayer() }
     }
 
     fun stopPlayerUpdates() {
@@ -380,9 +380,7 @@ object JMusicBot {
         try {
             state.connectionCheck()
             val state = playerState ?: mServiceClient!!.getPlayerState().process() ?: PlayerState(PlayerStates.ERROR)
-            withContext(Dispatchers.Main) {
-                mPlayerState.value = state
-            }
+            withContext(Dispatchers.Main) { mPlayerState.value = state }
         } catch (e: Exception) {
             Timber.w(e)
         }
