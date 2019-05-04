@@ -61,28 +61,24 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
         savedInstanceState?.also { mFastItemAdapter.withSavedInstanceState(it, KEY_QUEUE) }
 
         val deleteDrawable =
-            context!!.icon(CommunityMaterial.Icon2.cmd_star).color(context!!.onPrimaryColor()).sizeDp(24)
+            context!!.icon(CommunityMaterial.Icon2.cmd_star).color(onPrimaryColor()).sizeDp(24)
         val favoritesDrawable =
-            context!!.icon(CommunityMaterial.Icon.cmd_delete).color(context!!.onPrimaryColor()).sizeDp(24)
-        val userPermissions = JMusicBot.user!!.permissions
-        val touchCallback = if (userPermissions.contains(Permissions.MOVE)) SimpleSwipeDragCallback(
-            this, this,
-            deleteDrawable, ItemTouchHelper.LEFT, context!!.attributeColor(R.attr.colorFavorite)
-        ) else SimpleSwipeCallback(
-            this,
-            deleteDrawable,
-            ItemTouchHelper.LEFT,
-            context!!.attributeColor(R.attr.colorDelete)
-        )
+            context!!.icon(CommunityMaterial.Icon.cmd_delete).color(onPrimaryColor()).sizeDp(24)
 
-        if (userPermissions.contains(Permissions.SKIP)) if (touchCallback is SimpleSwipeCallback)
-            touchCallback.withBackgroundSwipeRight(color(R.color.deleteColor)).withLeaveBehindSwipeRight(
-                favoritesDrawable
-            )
-        else if (touchCallback is SimpleSwipeDragCallback)
-            touchCallback.withBackgroundSwipeRight(color(R.color.deleteColor)).withLeaveBehindSwipeRight(
-                favoritesDrawable
-            )
+        // enable swipe and drag actions depending on the users permissions
+        val userPermissions = JMusicBot.user!!.permissions
+        val touchCallback = if (userPermissions.contains(Permissions.MOVE))
+            SimpleSwipeDragCallback(
+                this, this, deleteDrawable, ItemTouchHelper.LEFT, attributeColor(R.attr.colorFavorite)
+            ) else SimpleSwipeCallback(this, deleteDrawable, ItemTouchHelper.LEFT, attributeColor(R.attr.colorDelete))
+
+        when (touchCallback) {
+            is SimpleSwipeCallback -> touchCallback.withBackgroundSwipeRight(color(R.color.deleteColor))
+                .withLeaveBehindSwipeRight(favoritesDrawable)
+            is SimpleSwipeDragCallback -> touchCallback.withBackgroundSwipeRight(color(R.color.deleteColor))
+                .withLeaveBehindSwipeRight(favoritesDrawable)
+        }
+
 
         ItemTouchHelper(touchCallback).attachToRecyclerView(recycler_queue)
 
@@ -114,7 +110,7 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
                     try {
                         JMusicBot.dequeue(entry.song)
                     } catch (e: AuthException) {
-                        Timber.e("AuthException with reason ${e.reason}")
+                        Timber.e("AuthException with reason ${e.reason}, message ${e.message}")
                         withContext(Dispatchers.Main) {
                             context!!.toast(R.string.msg_no_permission)
                             mFastItemAdapter.notifyAdapterItemChanged(position)
