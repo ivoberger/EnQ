@@ -86,8 +86,8 @@ class UserInfoFragment : Fragment(R.layout.fragment_user_info) {
         }
     }
 
-    private fun logout() {
-        JMusicBot.user = null
+    private fun logout() = lifecycleScope.launch {
+        JMusicBot.logout()
         (context as MainActivity).reset()
     }
 

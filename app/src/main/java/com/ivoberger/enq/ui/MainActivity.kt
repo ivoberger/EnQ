@@ -38,10 +38,6 @@ import timber.log.Timber
 @PotentialFutureAndroidXLifecycleKtxApi
 class MainActivity : AppCompatActivity() {
 
-    companion object {
-        private var mTreePlanted = false
-    }
-
     lateinit var searchView: SearchView
 
     private val mViewModel: MainViewModel by lazy { ViewModelProviders.of(this).get(MainViewModel::class.java) }
@@ -56,10 +52,7 @@ class MainActivity : AppCompatActivity() {
         // general setup
         lifecycleScope.launch(Dispatchers.Default) {
             // logging (and crash reporting)
-            if (!mTreePlanted) {
-                Timber.plant(if (BuildConfig.DEBUG) EnQDebugTree() else FirebaseTree(this@MainActivity))
-                mTreePlanted = true
-            }
+            Timber.plant(if (BuildConfig.DEBUG) EnQDebugTree() else FirebaseTree(this@MainActivity))
         }
 
         mNavController.addOnDestinationChangedListener(MainNavigationListener(this))
@@ -92,7 +85,7 @@ class MainActivity : AppCompatActivity() {
      * continueWithBot is called by showLoginDialog after loginUser is complete
      */
     fun continueWithBot() = lifecycleScope.launch(Dispatchers.Default) {
-        JMusicBot.connectionChangeListeners.add((ConnectionListener(this@MainActivity)))
+        JMusicBot.connectionListeners.add((ConnectionListener(this@MainActivity)))
         mNavController.setGraph(R.navigation.nav_graph)
         supportFragmentManager.commit {
             replace(R.id.main_current_song, PlayerFragment(), null)
@@ -168,11 +161,10 @@ class MainActivity : AppCompatActivity() {
 
     fun reset() = lifecycleScope.launch {
         supportFragmentManager.commitNow {
-            supportFragmentManager.fragments.forEach {
-                remove(it)
-            }
+            supportFragmentManager.fragments.forEach { if (it is PlayerFragment) remove(it) }
         }
-        recreate()
+        mNavController.popBackStack(R.id.Queue, false)
+        showLoginDialog(false)
     }
 
     /**

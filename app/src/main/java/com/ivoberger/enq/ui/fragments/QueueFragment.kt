@@ -43,8 +43,6 @@ import timber.log.Timber
 class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.ItemSwipeCallback, ItemTouchCallback {
 
     private val mViewModel by lazy { ViewModelProviders.of(context as MainActivity).get(MainViewModel::class.java) }
-
-    private var mQueue = listOf<QueueEntry>()
     private val mFastItemAdapter: FastItemAdapter<QueueItem> by lazy { FastItemAdapter<QueueItem>() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,21 +64,26 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
             context!!.icon(CommunityMaterial.Icon.cmd_delete).color(onPrimaryColor()).sizeDp(24)
 
         // enable swipe and drag actions depending on the users permissions
-        val userPermissions = JMusicBot.user!!.permissions
-        val touchCallback = if (userPermissions.contains(Permissions.MOVE))
-            SimpleSwipeDragCallback(
-                this, this, deleteDrawable, ItemTouchHelper.LEFT, attributeColor(R.attr.colorFavorite)
-            ) else SimpleSwipeCallback(this, deleteDrawable, ItemTouchHelper.LEFT, attributeColor(R.attr.colorDelete))
+        JMusicBot.user?.let {
+            val userPermissions = it.permissions
+            val touchCallback = if (userPermissions.contains(Permissions.MOVE))
+                SimpleSwipeDragCallback(
+                    this, this, deleteDrawable, ItemTouchHelper.LEFT, attributeColor(R.attr.colorFavorite)
+                ) else SimpleSwipeCallback(
+                this,
+                deleteDrawable,
+                ItemTouchHelper.LEFT,
+                attributeColor(R.attr.colorDelete)
+            )
 
-        when (touchCallback) {
-            is SimpleSwipeCallback -> touchCallback.withBackgroundSwipeRight(color(R.color.deleteColor))
-                .withLeaveBehindSwipeRight(favoritesDrawable)
-            is SimpleSwipeDragCallback -> touchCallback.withBackgroundSwipeRight(color(R.color.deleteColor))
-                .withLeaveBehindSwipeRight(favoritesDrawable)
+            when (touchCallback) {
+                is SimpleSwipeCallback -> touchCallback.withBackgroundSwipeRight(color(R.color.deleteColor))
+                    .withLeaveBehindSwipeRight(favoritesDrawable)
+                is SimpleSwipeDragCallback -> touchCallback.withBackgroundSwipeRight(color(R.color.deleteColor))
+                    .withLeaveBehindSwipeRight(favoritesDrawable)
+            }
+            ItemTouchHelper(touchCallback).attachToRecyclerView(recycler_queue)
         }
-
-
-        ItemTouchHelper(touchCallback).attachToRecyclerView(recycler_queue)
 
         mFastItemAdapter.onLongClickListener = { _, _, _, _ ->
             mViewModel.queue.removeObservers(this@QueueFragment)
@@ -90,12 +93,10 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
     }
 
     private fun updateQueue(newQueue: List<QueueEntry>) = lifecycleScope.launch(Dispatchers.IO) {
-        if (newQueue == mQueue) return@launch
         Timber.d("Updating Queue")
-        mQueue = newQueue
         val diff = FastAdapterDiffUtil.calculateDiff(
             mFastItemAdapter.itemAdapter,
-            newQueue.map { QueueItem(it) },
+            if (newQueue.isEmpty()) listOf() else newQueue.map { QueueItem(it) },
             QueueItem.DiffCallback()
         )
         withContext(Dispatchers.Main) { FastAdapterDiffUtil.set(mFastItemAdapter.itemAdapter, diff) }

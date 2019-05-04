@@ -27,7 +27,7 @@ class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mProviderPlugins = lifecycleScope.async(Dispatchers.IO) { JMusicBot.getProvider() }
-        JMusicBot.connectionChangeListeners.add(this@SearchFragment)
+        JMusicBot.connectionListeners.add(this@SearchFragment)
         lifecycleScope.launch(Dispatchers.IO) {
             mProviderPlugins.await() ?: return@launch
             Configuration.lastProvider?.also {
@@ -89,7 +89,7 @@ class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
     override fun onDestroy() {
         super.onDestroy()
         Configuration.lastProvider = mSelectedPlugin
-        JMusicBot.connectionChangeListeners.remove(this)
+        JMusicBot.connectionListeners.remove(this)
     }
 
     inner class SearchFragmentPager(fm: FragmentManager, provider: List<MusicBotPlugin>) :

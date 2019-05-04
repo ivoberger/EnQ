@@ -51,7 +51,7 @@ object JMusicBot {
                         val event = trans.event as Event.OnAuthorize
                         mUserSession = mServerSession!!.userSession(event.userModule)
                         mServiceClient = mUserSession!!.musicBotService()
-                        connectionChangeListeners.forEach { it.onConnectionRecovered() }
+                        connectionListeners.forEach { it.onConnectionRecovered() }
                     }
                     SideEffect.EndUserSession -> {
                         authToken = null
@@ -62,7 +62,7 @@ object JMusicBot {
                         mUserSession = null
                         mServerSession = null
                         val event = trans.event as Event.OnDisconnect
-                        connectionChangeListeners.forEach { it.onConnectionLost(event.reason) }
+                        connectionListeners.forEach { it.onConnectionLost(event.reason) }
                     }
                 }
                 return@onTransition
@@ -90,7 +90,7 @@ object JMusicBot {
 
     private var mServiceClient: MusicBotService? = null
 
-    val connectionChangeListeners: MutableList<ConnectionChangeListener> = mutableListOf()
+    val connectionListeners: MutableList<ConnectionChangeListener> = mutableListOf()
 
 
     private val mQueue: MutableLiveData<List<QueueEntry>> = MutableLiveData()
@@ -101,13 +101,13 @@ object JMusicBot {
 
     var user: User? = BotPreferences.user
         get() = mUserSession?.user ?: field ?: BotPreferences.user
-        set(value) {
+        internal set(value) {
             Timber.d("Setting user to ${value?.name}")
             BotPreferences.user = value
             if (value == null) authToken = null
         }
 
-    var authToken: Auth.Token? = BotPreferences.authToken
+    internal var authToken: Auth.Token? = BotPreferences.authToken
         get() = mUserSession?.authToken ?: field ?: BotPreferences.authToken
         set(value) {
             Timber.d("Setting Token to $value")
@@ -253,6 +253,12 @@ object JMusicBot {
         state.connectionCheck()
         authToken = Auth.Token(mServiceClient!!.changePassword(Auth.PasswordChange((newPassword))).process()!!)
         authToken?.also { user?.password = newPassword }
+    }
+
+    suspend fun logout() = withContext(Dispatchers.Main) {
+        stopQueueUpdates()
+        stopPlayerUpdates()
+        user = null
     }
 
     suspend fun reloadPermissions() {

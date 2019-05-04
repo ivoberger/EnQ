@@ -7,8 +7,10 @@ import androidx.navigation.NavDestination
 import com.ivoberger.enq.R
 import com.ivoberger.enq.ui.MainActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
+import splitties.lifecycle.coroutines.lifecycleScope
 import timber.log.Timber
 
 @PotentialFutureAndroidXLifecycleKtxApi
@@ -25,7 +27,7 @@ class MainNavigationListener(private val mainActivity: MainActivity) : NavContro
         }
     }
 
-    private fun checkIfNotChecked(idx: Int) {
+    private fun checkIfNotChecked(idx: Int) = mainActivity.lifecycleScope.launch {
         mainActivity.main_bottom_navigation.menu.setGroupCheckable(0, true, true)
         if (!mainActivity.main_bottom_navigation.menu[idx].isChecked)
             mainActivity.main_bottom_navigation.menu[idx].isChecked = true

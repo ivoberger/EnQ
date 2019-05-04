@@ -20,7 +20,7 @@ class MainViewModel : ViewModel(), ConnectionChangeListener {
     val queue: LiveData<List<QueueEntry>>by lazy { JMusicBot.getQueue() }
 
     init {
-        JMusicBot.connectionChangeListeners.add(this)
+        JMusicBot.connectionListeners.add(this)
     }
 
     override fun onConnectionLost(e: Exception?) {
@@ -41,6 +41,6 @@ class MainViewModel : ViewModel(), ConnectionChangeListener {
 
     override fun onCleared() {
         super.onCleared()
-        JMusicBot.connectionChangeListeners.remove(this)
+        JMusicBot.connectionListeners.remove(this)
     }
 }
