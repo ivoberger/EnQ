@@ -21,11 +21,11 @@ object Versions {
 
     const val recyclerview: String = "1.1.0-alpha04"
 
-    const val aapt2: String = "3.5.0-alpha12-5342889"
+    const val aapt2: String = "3.5.0-alpha13-5435860"
 
-    const val com_android_tools_build_gradle: String = "3.5.0-alpha12"
+    const val com_android_tools_build_gradle: String = "3.5.0-alpha13"
 
-    const val lint_gradle: String = "26.5.0-alpha12"
+    const val lint_gradle: String = "26.5.0-alpha13"
 
     const val jwtdecode: String = "1.3.0"
 
@@ -97,7 +97,7 @@ object Versions {
 
         const val currentVersion: String = "5.4.1"
 
-        const val nightlyVersion: String = "5.5-20190504000037+0000"
+        const val nightlyVersion: String = "5.5-20190505000026+0000"
 
         const val releaseCandidate: String = ""
     }

@@ -60,13 +60,15 @@ class UserInfoFragment : Fragment(R.layout.fragment_user_info) {
             }
             btn_reload_permissions.onClick {
                 if (it.password != null) {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        JMusicBot.reloadPermissions()
-                        withContext(Dispatchers.Main) {
-                            toast(R.string.msg_permissions_reloaded)
-                            txt_permissions.text = JMusicBot.user?.permissions.toString()
+                    lifecycleScope.launch {
+                        try {
+                            JMusicBot.reloadPermissions()
+                        } catch (e: IllegalStateException) {
+                            Timber.w(e)
+                            toast(R.string.msg_server_error)
                         }
-
+                        toast(R.string.msg_permissions_reloaded)
+                        txt_permissions.text = JMusicBot.user?.permissions.toString()
                     }
                 } else toast(R.string.msg_set_password_needed)
             }
