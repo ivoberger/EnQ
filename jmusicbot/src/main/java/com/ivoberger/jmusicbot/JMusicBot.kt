@@ -4,6 +4,7 @@ import android.net.wifi.WifiManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.ivoberger.jmusicbot.api.MusicBotService
+import com.ivoberger.jmusicbot.api.PORT
 import com.ivoberger.jmusicbot.api.discoverHost
 import com.ivoberger.jmusicbot.api.process
 import com.ivoberger.jmusicbot.di.*
@@ -124,10 +125,11 @@ object JMusicBot {
         if (state.isDiscovering) return@withContext
         if (!state.isDisconnected) stateMachine.transition(Event.OnDisconnect())
         stateMachine.transition(Event.OnStartDiscovery)
-        baseUrl = mWifiManager.discoverHost()
-        baseUrl?.let {
-            Timber.d("Found host: $it")
-            stateMachine.transition(Event.OnServerFound(it))
+        val hostAdress = mWifiManager.discoverHost()
+        hostAdress?.let {
+            baseUrl = "http://$it:$PORT/"
+            Timber.d("Found host: $baseUrl")
+            stateMachine.transition(Event.OnServerFound(baseUrl!!))
             return@withContext
         }
         Timber.d("No host found")

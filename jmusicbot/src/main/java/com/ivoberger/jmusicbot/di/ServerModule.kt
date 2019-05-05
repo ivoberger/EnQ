@@ -1,18 +1,17 @@
 package com.ivoberger.jmusicbot.di
 
 import com.ivoberger.jmusicbot.api.MusicBotService
-import com.ivoberger.jmusicbot.api.PORT
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
 import javax.inject.Named
 
 @Module
-internal class ServerModule(private val hostAddress: String, private val port: Int = PORT) {
+internal class ServerModule(private val baseUrl: String) {
 
     @Provides
     @Named(NameKeys.BASE_URL)
-    fun baseUrl(): String = "http://$hostAddress:$port"
+    fun baseUrl(): String = baseUrl
 
     @Provides
     @Named(NameKeys.BUILDER_RETROFIT_URL)

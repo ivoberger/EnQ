@@ -1,6 +1,5 @@
 package com.ivoberger.jmusicbot.model
 
-import com.ivoberger.jmusicbot.api.PORT
 import com.ivoberger.jmusicbot.di.ServerModule
 import com.ivoberger.jmusicbot.di.UserModule
 
@@ -46,8 +45,8 @@ sealed class Event {
     override fun toString(): String = this::class.java.simpleName
 
     object OnStartDiscovery : Event()
-    class OnServerFound(baseUrl: String, port: Int = PORT) : Event() {
-        internal val serverModule: ServerModule = ServerModule(baseUrl, port)
+    class OnServerFound(baseUrl: String) : Event() {
+        internal val serverModule: ServerModule = ServerModule(baseUrl)
     }
 
     class OnAuthorize(
