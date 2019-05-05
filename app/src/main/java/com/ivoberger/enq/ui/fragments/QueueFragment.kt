@@ -93,7 +93,6 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
     }
 
     private fun updateQueue(newQueue: List<QueueEntry>) = lifecycleScope.launch(Dispatchers.IO) {
-        Timber.d("Updating Queue")
         val diff = FastAdapterDiffUtil.calculateDiff(
             mFastItemAdapter.itemAdapter,
             if (newQueue.isEmpty()) listOf() else newQueue.map { QueueItem(it) },

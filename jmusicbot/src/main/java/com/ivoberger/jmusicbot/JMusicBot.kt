@@ -263,9 +263,9 @@ object JMusicBot {
         user = null
     }
 
-    suspend fun reloadPermissions() {
+    suspend fun reloadPermissions() = withContext(Dispatchers.IO) {
         stateMachine.transition(Event.OnAuthExpired)
-        authorize()
+        recoverConnection()
     }
 
     @Throws(
