@@ -20,8 +20,11 @@ internal const val PORT = 42945
 private const val LOCK_TAG = "enq_broadcast"
 
 internal fun WifiManager.discoverHost(): String? {
+
     val lock = createMulticastLock(LOCK_TAG)
+    if (lock.isHeld) return null
     lock.acquire()
+    Timber.d("Multicast lock acquired")
     return try {
         MulticastSocket(PORT).use { socket ->
             val groupAddress = InetAddress.getByName(GROUP_ADDRESS)

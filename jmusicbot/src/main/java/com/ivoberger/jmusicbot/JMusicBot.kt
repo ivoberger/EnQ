@@ -134,7 +134,7 @@ object JMusicBot {
         stateMachine.transition(Event.OnDisconnect())
     }
 
-    suspend fun recoverConnection() {
+    suspend fun recoverConnection() = withContext(Dispatchers.IO) {
         Timber.d("Reconnecting")
         while (!state.hasServer) {
             discoverHost()
