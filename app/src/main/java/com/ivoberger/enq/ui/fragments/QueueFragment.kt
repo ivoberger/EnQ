@@ -29,6 +29,8 @@ import com.mikepenz.fastadapter.swipe_drag.SimpleSwipeDragCallback
 import com.mikepenz.fastadapter.utils.DragDropUtil
 import kotlinx.android.synthetic.main.fragment_queue.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.sendBlocking
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import splitties.experimental.ExperimentalSplittiesApi
@@ -44,15 +46,17 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
 
     private val mViewModel by lazy { ViewModelProviders.of(context as MainActivity).get(MainViewModel::class.java) }
     private val mFastItemAdapter: FastItemAdapter<QueueItem> by lazy { FastItemAdapter<QueueItem>() }
+    private val mQueueUpdateChannel = Channel<List<QueueEntry>>(Channel.CONFLATED)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("Creating Queue Fragment")
         super.onCreate(savedInstanceState)
+        updateQueue()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mViewModel.queue.observe(this, Observer { updateQueue(it) })
+        mViewModel.queue.observe(this, Observer { mQueueUpdateChannel.sendBlocking(it) })
 
         recycler_queue.layoutManager = LinearLayoutManager(context).apply { reverseLayout = true }
         recycler_queue.adapter = mFastItemAdapter
@@ -84,20 +88,16 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
             }
             ItemTouchHelper(touchCallback).attachToRecyclerView(recycler_queue)
         }
-
-        mFastItemAdapter.onLongClickListener = { _, _, _, _ ->
-            mViewModel.queue.removeObservers(this@QueueFragment)
-            true
-        }
-
     }
 
-    private fun updateQueue(newQueue: List<QueueEntry>) = lifecycleScope.launch {
-        if (isHidden) return@launch
-        val diff = FastAdapterDiffUtil.calculateDiff(
-            mFastItemAdapter.itemAdapter, newQueue.map { QueueItem(it) }, QueueItem.DiffCallback()
-        )
-        FastAdapterDiffUtil.set(mFastItemAdapter.itemAdapter, diff)
+    private fun updateQueue() = lifecycleScope.launch(Dispatchers.Default) {
+        for (newQueue in mQueueUpdateChannel) {
+            if (isHidden) continue
+            val diff = FastAdapterDiffUtil.calculateDiff(
+                mFastItemAdapter.itemAdapter, newQueue.map { QueueItem(it) }, QueueItem.DiffCallback()
+            )
+            withContext(Dispatchers.Main) { FastAdapterDiffUtil.set(mFastItemAdapter.itemAdapter, diff) }
+        }
     }
 
     override fun itemSwiped(position: Int, direction: Int) {
@@ -144,6 +144,5 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
                 lifecycleScope.launch { context?.toast(R.string.msg_no_permission) }
             }
         }
-        mViewModel.queue.observe(this, Observer { updateQueue(it) })
     }
 }
