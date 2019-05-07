@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/queue_entry"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -16,7 +17,8 @@
         android:contentDescription="@string/lbl_album_art"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@tools:sample/avatars" />
 
     <TextView
         android:id="@+id/song_title"
@@ -30,7 +32,8 @@
         app:layout_constraintBottom_toTopOf="@id/song_description"
         app:layout_constraintEnd_toStartOf="@id/song_chosen_by"
         app:layout_constraintStart_toEndOf="@id/song_album_art"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Awesome Song" />
 
     <TextView
         android:id="@+id/song_description"
@@ -45,7 +48,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/song_duration"
         app:layout_constraintStart_toEndOf="@id/song_album_art"
-        app:layout_constraintTop_toBottomOf="@id/song_title" />
+        app:layout_constraintTop_toBottomOf="@id/song_title"
+        tools:text="Description" />
 
     <TextView
         android:id="@+id/song_chosen_by"
@@ -58,7 +62,8 @@
         android:textStyle="italic"
         app:layout_constraintBottom_toTopOf="@id/song_duration"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@tools:sample/first_names" />
 
     <TextView
         android:id="@+id/song_duration"
@@ -69,6 +74,7 @@
         android:textAppearance="?textAppearanceCaption"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/song_chosen_by"
-        app:layout_constraintTop_toBottomOf="@id/song_title" />
+        app:layout_constraintTop_toBottomOf="@id/song_title"
+        tools:text="3:22" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

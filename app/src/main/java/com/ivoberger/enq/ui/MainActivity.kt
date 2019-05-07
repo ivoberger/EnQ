@@ -24,6 +24,7 @@ import com.ivoberger.jmusicbot.JMusicBot
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.typeface.IIcon
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_player.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -67,8 +68,8 @@ class MainActivity : AppCompatActivity() {
             main_bottom_navigation.menu.forEachIndexed { idx, itm -> itm.icon = icons[idx].await() }
         }
 
-        if (!JMusicBot.state.hasServer) {
-            lifecycleScope.launch { JMusicBot.discoverHost() }
+        if (JMusicBot.isConnected) continueWithBot()
+        else if (!JMusicBot.state.hasServer) {
             showServerDiscoveryDialog(true)
         } else continueToLogin()
     }
@@ -173,16 +174,16 @@ class MainActivity : AppCompatActivity() {
      * @param duration: duration of the animation
      */
     private fun changePlayerCollapse(collapse: Boolean, duration: Long = 1000) = lifecycleScope.launch {
-        main_current_song.animation.awaitEnd()
+        current_song_container.animation.awaitEnd()
         if (mViewModel.playerCollapsed == collapse) return@launch
         Timber.d("Changing player collapse to $collapse")
-        val animation = main_current_song.animate().setDuration(duration)
-        val translateBy = main_current_song.height.toFloat()
+        val animation = current_song_container.animate().setDuration(duration)
+        val translateBy = current_song_container.height.toFloat()
         if (!mViewModel.playerCollapsed) animation.translationYBy(translateBy)
-            .withEndAction { main_current_song.visibility = View.GONE }
+            .withEndAction { current_song_container.visibility = View.GONE }
             .start()
         else animation.translationYBy(-translateBy)
-            .withStartAction { main_current_song.visibility = View.VISIBLE }
+            .withStartAction { current_song_container.visibility = View.VISIBLE }
             .start()
         mViewModel.playerCollapsed = collapse
     }
