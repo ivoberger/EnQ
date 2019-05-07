@@ -18,6 +18,7 @@ class FirebaseTree(
 ) : Timber.DebugTree() {
 
     init {
+        Timber.d("Initializing Crashlytics")
         // make sure crashlytics is initialized
         Fabric.with(context.applicationContext, Crashlytics())
     }

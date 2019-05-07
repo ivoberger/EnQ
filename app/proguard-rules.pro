@@ -1,3 +1,7 @@
+# currently necessart due to some bug in R8/AGP
+-dontobfuscate
+
+-keepattributes SourceFile,LineNumberTable
 -keep class .R
 -keep class **.R$* {
     <fields>;
