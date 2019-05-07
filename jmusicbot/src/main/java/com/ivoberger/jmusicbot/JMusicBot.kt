@@ -100,19 +100,17 @@ object JMusicBot {
     private var mQueueUpdateTimer: Timer? = null
     private var mPlayerUpdateTimer: Timer? = null
 
-    var user: User? = BotPreferences.user
-        get() = mUserSession?.user ?: field ?: BotPreferences.user
+    var user: User? = null
+        get() = mUserSession?.user ?: field
         internal set(value) {
             Timber.d("Setting user to ${value?.name}")
-            BotPreferences.user = value
             if (value == null) authToken = null
         }
 
-    internal var authToken: Auth.Token? = BotPreferences.authToken
-        get() = mUserSession?.authToken ?: field ?: BotPreferences.authToken
+    internal var authToken: Auth.Token? = null
+        get() = mUserSession?.authToken ?: field
         set(value) {
             Timber.d("Setting Token to $value")
-            BotPreferences.authToken = value
             if (value == null) stateMachine.transition(Event.OnAuthExpired)
             field = value
             field?.let {

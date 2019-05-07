@@ -7,7 +7,6 @@
     android:orientation="vertical">
 
     <ProgressBar
-        android:id="@+id/server_search_progress"
         style="@android:style/Widget.Material.ProgressBar"
         android:layout_width="match_parent"
         android:layout_height="50dp"

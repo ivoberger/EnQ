@@ -75,6 +75,7 @@ dependencies {
     implementation(Libs.material)
 
     implementation(project(":jmusicbot"))
+//    implementation("com.ivoberger:JMusicBotAndroid:0.6.1")
 
     // utils
     implementation(Libs.timber)

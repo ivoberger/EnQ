@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
 import com.ivoberger.enq.R
+import com.ivoberger.enq.persistence.Configuration
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.exceptions.AuthException
@@ -58,11 +59,11 @@ fun MainActivity.showServerDiscoveryDialog(searching: Boolean = false): Job = Gl
 
 @PotentialFutureAndroidXLifecycleKtxApi
 @ExperimentalSplittiesApi
-fun MainActivity.showLoginDialog(
+suspend fun MainActivity.showLoginDialog(
     loggingIn: Boolean = true,
-    userName: String? = null,
-    password: String? = null
-): Job = GlobalScope.launch {
+    userName: String? = Configuration.savedUsers?.first()?.name,
+    password: String? = Configuration.savedUsers?.first()?.password
+): Unit = withContext(Dispatchers.Default) {
     Timber.d("Showing Basic Dialog for user $userName, Logging in: $loggingIn")
     val loginDialogBuilder = AlertDialog.Builder(this@showLoginDialog)
         .setCancelable(false)
@@ -79,7 +80,7 @@ fun MainActivity.showLoginDialog(
                     dialogView.findViewById<EditText>(R.id.login_username)?.text.toString()
                 val passwordInput =
                     dialogView.findViewById<EditText>(R.id.login_password)?.text.toString()
-                showLoginDialog(true, userNameInput, passwordInput)
+                MainScope().launch { showLoginDialog(true, userNameInput, passwordInput) }
                 dialog.dismiss()
             }
     }
@@ -90,7 +91,7 @@ fun MainActivity.showLoginDialog(
         loginDialog.show()
         if (!loggingIn) return@withContext
         try {
-            withContext(Dispatchers.Default) { JMusicBot.authorize(userName, password) }
+            JMusicBot.authorize(userName, password)
             continueWithBot()
             this@showLoginDialog.toast(getString(R.string.msg_logged_in, JMusicBot.user!!.name))
             loginDialog.dismiss()
