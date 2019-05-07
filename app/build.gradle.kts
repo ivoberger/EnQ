@@ -31,7 +31,7 @@ android {
     }
     buildTypes {
         getByName("debug") {
-            //            applicationIdSuffix = ".debug"
+            applicationIdSuffix = ".debug"
             versionNameSuffix = " (debug)"
             ext["enableCrashlytics"] = false
         }
