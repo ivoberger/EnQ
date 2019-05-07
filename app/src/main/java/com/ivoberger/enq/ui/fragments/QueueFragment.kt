@@ -92,11 +92,12 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
 
     }
 
-    private fun updateQueue(newQueue: List<QueueEntry>) = lifecycleScope.launch(Dispatchers.IO) {
+    private fun updateQueue(newQueue: List<QueueEntry>) = lifecycleScope.launch {
+        if (isHidden) return@launch
         val diff = FastAdapterDiffUtil.calculateDiff(
             mFastItemAdapter.itemAdapter, newQueue.map { QueueItem(it) }, QueueItem.DiffCallback()
         )
-        withContext(Dispatchers.Main) { FastAdapterDiffUtil.set(mFastItemAdapter.itemAdapter, diff) }
+        FastAdapterDiffUtil.set(mFastItemAdapter.itemAdapter, diff)
     }
 
     override fun itemSwiped(position: Int, direction: Int) {

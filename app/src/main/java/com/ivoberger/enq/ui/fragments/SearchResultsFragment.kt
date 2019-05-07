@@ -63,7 +63,7 @@ class SearchResultsFragment : ResultsFragment() {
     }
 
     override fun onDetach() {
-        Timber.d("DETACHING")
+        Timber.d("Detaching $mProviderID")
         mQueryChanged = true
         super.onDetach()
     }
