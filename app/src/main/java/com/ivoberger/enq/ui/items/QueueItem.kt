@@ -6,7 +6,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.ivoberger.enq.R
 import com.ivoberger.enq.persistence.Configuration
-import com.ivoberger.enq.persistence.GlideApp
+import com.ivoberger.enq.utils.bindView
 import com.ivoberger.enq.utils.icon
 import com.ivoberger.enq.utils.secondaryColor
 import com.ivoberger.jmusicbot.model.QueueEntry
@@ -31,24 +31,14 @@ class QueueItem(
 
     override fun bindView(holder: ViewHolder, payloads: MutableList<Any>) {
         super.bindView(holder, payloads)
-        val context = holder.itemView.context
-
-        holder.txtTitle.isSelected = true
-        holder.txtDescription.isSelected = true
-        holder.txtTitle.text = song.title
-        holder.txtDescription.text = song.description
-
-        song.albumArtUrl?.also { GlideApp.with(holder.itemView).load(it).into(holder.imgAlbumArt) }
-        song.duration?.also {
-            holder.txtDuration.text = String.format("%02d:%02d", it / 60, it % 60)
-        }
+        song.bindView(holder)
+        val ctx = holder.itemView.context
         holder.txtChosenBy.setText(R.string.txt_suggested)
         model.userName.also { holder.txtChosenBy.text = it }
 
         holder.txtDuration.compoundDrawablePadding = 20
         if (song in Configuration.favorites) holder.txtDuration.setCompoundDrawables(
-            context.icon(CommunityMaterial.Icon2.cmd_star)
-                .color(context.secondaryColor()).sizeDp(10),
+            ctx.icon(CommunityMaterial.Icon2.cmd_star).color(ctx.secondaryColor()).sizeDp(10),
             null, null, null
         )
     }

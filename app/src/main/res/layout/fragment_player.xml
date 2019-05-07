@@ -32,8 +32,8 @@
 
     <ImageView
         android:id="@+id/song_album_art"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="@dimen/song_albumArt_size"
+        android:layout_height="@dimen/song_albumArt_size"
         android:layout_marginStart="@dimen/song_albumArt_margin"
         android:layout_marginTop="@dimen/song_albumArt_margin"
         android:layout_marginBottom="@dimen/song_albumArt_margin"

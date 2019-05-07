@@ -8,7 +8,7 @@ import com.mikepenz.community_material_typeface_library.CommunityMaterial
 
 class ResultItem(song: Song) : SongItem(song) {
 
-    override fun bindView(holder: ViewHolder, payloads: MutableList<Any>) {
+    override fun bindView(holder: QueueItem.ViewHolder, payloads: MutableList<Any>) {
         super.bindView(holder, payloads)
         val context = holder.itemView.context
 

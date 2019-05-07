@@ -32,6 +32,8 @@ import kotlinx.coroutines.withContext
 import splitties.experimental.ExperimentalSplittiesApi
 import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
 import splitties.lifecycle.coroutines.lifecycleScope
+import splitties.resources.dimen
+import splitties.resources.str
 import splitties.toast.toast
 import timber.log.Timber
 
@@ -70,6 +72,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     private lateinit var mStoppedDrawable: IconicsDrawable
     private lateinit var mSkipDrawable: IconicsDrawable
     private lateinit var mErrorDrawable: IconicsDrawable
+    private lateinit var mAlbumArtPlaceholderDrawable: IconicsDrawable
 
     private lateinit var mNotInFavoritesDrawable: IconicsDrawable
     private lateinit var mInFavoritesDrawable: IconicsDrawable
@@ -86,6 +89,8 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             mErrorDrawable = icon(CommunityMaterial.Icon.cmd_alert_circle_outline).color(color)
             mNotInFavoritesDrawable = icon(CommunityMaterial.Icon2.cmd_star_outline).color(color)
             mInFavoritesDrawable = icon(CommunityMaterial.Icon2.cmd_star).color(context.secondaryColor())
+            mAlbumArtPlaceholderDrawable =
+                icon(CommunityMaterial.Icon.cmd_album).color(color).sizeDp(dimen(R.dimen.song_albumArt_size).toInt())
         }
     }
 
@@ -174,22 +179,22 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             // fill in song metadata
             song_title.text = song.title
             song_description.text = song.description
-            if (song.albumArtUrl != null)
-                GlideApp.with(this@PlayerFragment).load(song.albumArtUrl).into(song_album_art)
-            else GlideApp.with(this@PlayerFragment).clear(song_album_art)
+            GlideApp.with(this@PlayerFragment)
+                .load(song.albumArtUrl)
+                .placeholder(mAlbumArtPlaceholderDrawable)
+                .into(song_album_art)
             song.duration?.also {
                 song_duration.text = String.format("%02d:%02d", it / 60, it % 60)
                 song_progress.max = it
             }
-            song_chosen_by.setText(R.string.txt_suggested)
-            songEntry.userName?.also { song_chosen_by.text = it }
+            song_progress.progress = mPlayerState.progress
+
+            song_chosen_by.text = songEntry.userName ?: str(R.string.txt_suggested)
             // set fav status
             song_favorite.setImageDrawable(
                 if (song in Configuration.favorites) mInFavoritesDrawable
                 else mNotInFavoritesDrawable
             )
-            song_progress.progress = mPlayerState.progress
-
         }
     }
 }
