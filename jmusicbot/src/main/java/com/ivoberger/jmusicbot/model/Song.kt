@@ -28,6 +28,5 @@ data class Song(
 @JsonClass(generateAdapter = true)
 data class SongEntry(
     @Json(name = "song") val song: Song,
-    @Json(name = "duration") val duration: Int = 0,
     @Json(name = "userName") val userName: String?
 )

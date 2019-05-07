@@ -179,6 +179,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             else GlideApp.with(this@PlayerFragment).clear(song_album_art)
             song.duration?.also {
                 song_duration.text = String.format("%02d:%02d", it / 60, it % 60)
+                song_progress.max = it
             }
             song_chosen_by.setText(R.string.txt_suggested)
             songEntry.userName?.also { song_chosen_by.text = it }
@@ -187,6 +188,8 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 if (song in Configuration.favorites) mInFavoritesDrawable
                 else mNotInFavoritesDrawable
             )
+            song_progress.progress = mPlayerState.progress
+
         }
     }
 }
