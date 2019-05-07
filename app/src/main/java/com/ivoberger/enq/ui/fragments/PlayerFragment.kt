@@ -45,10 +45,10 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     private val mViewModel by lazy { ViewModelProviders.of(context as MainActivity).get(MainViewModel::class.java) }
 
     private var mPlayerState: PlayerState = PlayerState(PlayerStates.STOP, null)
-    private var mShowSkip = false
 
     private val mFlingListener by lazy {
         object : GestureDetector.SimpleOnGestureListener() {
+
             override fun onFling(
                 motionEventStart: MotionEvent?,
                 motionEventEnd: MotionEvent?,
@@ -70,10 +70,8 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     private lateinit var mPlayDrawable: IconicsDrawable
     private lateinit var mPauseDrawable: IconicsDrawable
     private lateinit var mStoppedDrawable: IconicsDrawable
-    private lateinit var mSkipDrawable: IconicsDrawable
     private lateinit var mErrorDrawable: IconicsDrawable
     private lateinit var mAlbumArtPlaceholderDrawable: IconicsDrawable
-
     private lateinit var mNotInFavoritesDrawable: IconicsDrawable
     private lateinit var mInFavoritesDrawable: IconicsDrawable
 
@@ -85,7 +83,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             mPlayDrawable = icon(CommunityMaterial.Icon2.cmd_play).color(color)
             mPauseDrawable = icon(CommunityMaterial.Icon2.cmd_pause).color(color)
             mStoppedDrawable = icon(CommunityMaterial.Icon2.cmd_stop).color(color)
-            mSkipDrawable = icon(CommunityMaterial.Icon.cmd_fast_forward).color(color)
             mErrorDrawable = icon(CommunityMaterial.Icon.cmd_alert_circle_outline).color(color)
             mNotInFavoritesDrawable = icon(CommunityMaterial.Icon2.cmd_star_outline).color(color)
             mInFavoritesDrawable = icon(CommunityMaterial.Icon2.cmd_star).color(context.secondaryColor())
@@ -115,16 +112,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     private fun changePlaybackState() = lifecycleScope.launch(Dispatchers.IO) {
         if (!JMusicBot.isConnected) return@launch
-        if (mShowSkip) {
-            try {
-                JMusicBot.skip()
-            } catch (e: Exception) {
-                Timber.e(e)
-                withContext(Dispatchers.Main) { context?.toast(R.string.msg_no_permission) }
-            } finally {
-                return@launch
-            }
-        }
         tryWithErrorToast {
             runBlocking {
                 when (mPlayerState.state) {
@@ -173,15 +160,13 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                     return@launch
                 }
             }
-            if (mShowSkip) song_play_pause.setImageDrawable(mSkipDrawable)
             val songEntry = newState.songEntry!!
             val song = songEntry.song
             // fill in song metadata
             song_title.text = song.title
             song_description.text = song.description
             GlideApp.with(this@PlayerFragment)
-                .load(song.albumArtUrl)
-                .placeholder(mAlbumArtPlaceholderDrawable)
+                .load(song.albumArtUrl ?: mAlbumArtPlaceholderDrawable)
                 .into(song_album_art)
             song.duration?.also {
                 song_duration.text = String.format("%02d:%02d", it / 60, it % 60)
