@@ -40,6 +40,9 @@ inline fun Animation.setAnimationListener(func: KotlinAnimationListener.() -> Un
     setAnimationListener(listener)
 }
 
-suspend inline fun Animation.awaitEnd() = suspendCoroutine<Unit?> { continuation ->
-    setAnimationListener { onAnimationEnd { continuation.resume(null) } }
+suspend inline fun Animation?.awaitEnd() = suspendCoroutine<Unit?> { continuation ->
+    if (this != null)
+        if (this.hasEnded()) continuation.resume(null)
+        else setAnimationListener { onAnimationEnd { continuation.resume(null) } }
+    else continuation.resume(null)
 }

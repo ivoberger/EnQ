@@ -27,6 +27,8 @@ class QueueItem(
     override fun getViewHolder(v: View) = ViewHolder(v)
     override var isDraggable = true
 
+    override fun toString(): String = model.toString()
+
     override fun bindView(holder: ViewHolder, payloads: MutableList<Any>) {
         super.bindView(holder, payloads)
         val context = holder.itemView.context
@@ -73,7 +75,6 @@ class QueueItem(
 
         override fun areContentsTheSame(oldItem: QueueItem, newItem: QueueItem): Boolean =
             oldItem.model == newItem.model
-
     }
 
 }
