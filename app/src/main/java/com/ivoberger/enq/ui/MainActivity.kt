@@ -175,6 +175,7 @@ class MainActivity : AppCompatActivity() {
     private fun changePlayerCollapse(collapse: Boolean, duration: Long = 1000) = lifecycleScope.launch {
         main_current_song.animation.awaitEnd()
         if (mViewModel.playerCollapsed == collapse) return@launch
+        Timber.d("Changing player collapse to $collapse")
         val animation = main_current_song.animate().setDuration(duration)
         val translateBy = main_current_song.height.toFloat()
         if (!mViewModel.playerCollapsed) animation.translationYBy(translateBy)
@@ -192,10 +193,11 @@ class MainActivity : AppCompatActivity() {
      * @param duration: duration of the animation
      */
     private fun changeBottomNavCollapse(collapse: Boolean, duration: Long = 1000) = lifecycleScope.launch {
-        main_current_song.animation.awaitEnd()
+        main_bottom_navigation.animation.awaitEnd()
         if (mViewModel.bottomNavCollapsed == collapse) return@launch
-        val animation = main_current_song.animate().setDuration(duration)
-        val translateBy = main_current_song.height.toFloat()
+        Timber.d("Changing bottom nav collapse to $collapse")
+        val animation = main_bottom_navigation.animate().setDuration(duration)
+        val translateBy = main_bottom_navigation.height.toFloat()
         if (!mViewModel.bottomNavCollapsed) animation.translationYBy(translateBy)
             .withEndAction { main_bottom_navigation.visibility = View.GONE }
             .start()
