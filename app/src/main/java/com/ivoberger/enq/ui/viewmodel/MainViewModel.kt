@@ -21,6 +21,7 @@ class MainViewModel : ViewModel(), ConnectionChangeListener {
 
     init {
         JMusicBot.connectionListeners.add(this)
+        viewModelScope.launch { JMusicBot.discoverHost() }
     }
 
     override fun onConnectionLost(e: Exception?) {
