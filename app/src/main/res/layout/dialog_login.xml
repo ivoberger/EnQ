@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:autofillHints="password"
         android:inputType="textPassword"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/login_recent_users"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/login_lbl_password"
         app:layout_constraintTop_toBottomOf="@id/login_username" />
@@ -73,5 +73,14 @@
         app:layout_constraintBottom_toBottomOf="@id/login_password"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/login_password" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/login_recent_users"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/login_password" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
