@@ -20,7 +20,6 @@ class MainViewModel : ViewModel(), ConnectionChangeListener {
     val queue: LiveData<List<QueueEntry>>by lazy { JMusicBot.getQueue() }
 
     init {
-        JMusicBot.connectionListeners.add(this)
         viewModelScope.launch { JMusicBot.discoverHost() }
     }
 

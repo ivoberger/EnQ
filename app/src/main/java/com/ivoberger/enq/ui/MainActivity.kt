@@ -87,6 +87,7 @@ class MainActivity : AppCompatActivity() {
      */
     fun continueWithBot() = lifecycleScope.launch(Dispatchers.Default) {
         JMusicBot.connectionListeners.add((ConnectionListener(this@MainActivity)))
+        JMusicBot.connectionListeners.add(mViewModel)
         mNavController.setGraph(R.navigation.nav_graph)
         supportFragmentManager.commit {
             replace(R.id.main_current_song, PlayerFragment(), null)

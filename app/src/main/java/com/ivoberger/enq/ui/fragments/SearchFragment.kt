@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import com.ivoberger.enq.persistence.Configuration
+import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.fragments.parents.TabbedResultsFragment
 import com.ivoberger.jmusicbot.JMusicBot
@@ -30,7 +30,7 @@ class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
         JMusicBot.connectionListeners.add(this@SearchFragment)
         lifecycleScope.launch(Dispatchers.IO) {
             mProviderPlugins.await() ?: return@launch
-            Configuration.lastProvider?.also {
+            AppSettings.lastProvider?.also {
                 if (mProviderPlugins.await()!!.contains(it)) mSelectedPlugin = it
             }
         }
@@ -88,7 +88,7 @@ class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        Configuration.lastProvider = mSelectedPlugin
+        AppSettings.lastProvider = mSelectedPlugin
         JMusicBot.connectionListeners.remove(this)
     }
 

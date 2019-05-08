@@ -14,7 +14,7 @@ import splitties.init.appCtx
 import splitties.toast.toast
 import timber.log.Timber
 
-object Configuration {
+object AppSettings {
 
     private val preferences: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(appCtx) }
 

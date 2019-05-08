@@ -104,6 +104,7 @@ object JMusicBot {
         get() = mUserSession?.user ?: field
         internal set(value) {
             Timber.d("Setting user to ${value?.name}")
+            field = value
             if (value == null) authToken = null
         }
 
@@ -143,23 +144,30 @@ object JMusicBot {
     }
 
     @Throws(
-        InvalidParametersException::class,
-        NotFoundException::class,
-        ServerErrorException::class,
-        IllegalStateException::class
+        InvalidParametersException::class, NotFoundException::class,
+        ServerErrorException::class, IllegalStateException::class
+    )
+    suspend fun authorize(authUser: User?) = withContext(Dispatchers.IO) {
+        user = authUser
+        authorize()
+    }
+
+    @Throws(
+        InvalidParametersException::class, NotFoundException::class,
+        ServerErrorException::class, IllegalStateException::class
     )
     suspend fun authorize(userName: String? = null, password: String? = null) = withContext(Dispatchers.IO) {
         state.serverCheck()
         Timber.d("Starting authorization")
         if (tokenValid()) return@withContext
-        if (userName == null && user == null) throw IllegalStateException("No username stored or supplied")
+        if (userName.isNullOrBlank() && user == null) throw IllegalStateException("No username stored or supplied")
         try {
             register(userName)
             if (!password.isNullOrBlank()) changePassword(password)
             return@withContext
         } catch (e: UsernameTakenException) {
             Timber.w(e)
-            if (password.isNullOrBlank() && user?.password == null) {
+            if (password.isNullOrBlank() && user?.password.isNullOrBlank()) {
                 Timber.d("No passwords found, throwing exception, $password, $user")
                 throw e
             }
@@ -200,11 +208,8 @@ object JMusicBot {
     }
 
     @Throws(
-        InvalidParametersException::class,
-        AuthException::class,
-        NotFoundException::class,
-        ServerErrorException::class,
-        IllegalStateException::class
+        InvalidParametersException::class, AuthException::class,
+        NotFoundException::class, ServerErrorException::class, IllegalStateException::class
     )
     private suspend fun register(userName: String? = null) = withContext(Dispatchers.IO) {
         Timber.d("Registering ${userName?.let { User(it) } ?: user}")
@@ -224,11 +229,8 @@ object JMusicBot {
     }
 
     @Throws(
-        InvalidParametersException::class,
-        AuthException::class,
-        NotFoundException::class,
-        ServerErrorException::class,
-        IllegalStateException::class
+        InvalidParametersException::class, AuthException::class,
+        NotFoundException::class, ServerErrorException::class, IllegalStateException::class
     )
     private suspend fun login(userName: String? = null, password: String? = null) = withContext(Dispatchers.IO) {
         Timber.d("Logging in $user")
@@ -267,11 +269,8 @@ object JMusicBot {
     }
 
     @Throws(
-        InvalidParametersException::class,
-        AuthException::class,
-        NotFoundException::class,
-        ServerErrorException::class,
-        IllegalStateException::class
+        InvalidParametersException::class, AuthException::class,
+        NotFoundException::class, ServerErrorException::class, IllegalStateException::class
     )
     suspend fun deleteUser() = withContext(Dispatchers.IO) {
         state.connectionCheck()

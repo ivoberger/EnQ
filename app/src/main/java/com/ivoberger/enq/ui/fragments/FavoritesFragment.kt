@@ -5,7 +5,7 @@ import android.view.View
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.ivoberger.enq.R
-import com.ivoberger.enq.persistence.Configuration
+import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.fragments.parents.SongListFragment
 import com.ivoberger.enq.ui.items.SongItem
@@ -38,10 +38,10 @@ class FavoritesFragment : SongListFragment<SongItem>(), SimpleSwipeCallback.Item
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Configuration.getFavoritesLiveData().observe(this, Observer { favorites ->
+        AppSettings.getFavoritesLiveData().observe(this, Observer { favorites ->
             FastAdapterDiffUtil[songAdapter] = favorites.map { SongItem(it) }
         })
-        songAdapter.add(Configuration.favorites)
+        songAdapter.add(AppSettings.favorites)
 
         val swipeToDeleteIcon =
             context!!.icon(CommunityMaterial.Icon.cmd_delete).color(context!!.onPrimaryColor()).sizeDp(24)
@@ -69,7 +69,7 @@ class FavoritesFragment : SongListFragment<SongItem>(), SimpleSwipeCallback.Item
     override fun itemSwiped(position: Int, direction: Int) {
         val item = songAdapter.getAdapterItem(position)
         if (direction == ItemTouchHelper.RIGHT || direction == ItemTouchHelper.LEFT) {
-            Configuration.changeFavoriteStatus(context!!, item.model)
+            AppSettings.changeFavoriteStatus(context!!, item.model)
         }
     }
 }

@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.ivoberger.enq.R
-import com.ivoberger.enq.persistence.Configuration
+import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.persistence.GlideApp
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
@@ -125,10 +125,10 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     }
 
     private fun addToFavorites() = lifecycleScope.launch(Dispatchers.IO) {
-        Configuration.changeFavoriteStatus(context!!, mPlayerState.songEntry!!.song).join()
+        AppSettings.changeFavoriteStatus(context!!, mPlayerState.songEntry!!.song).join()
         withContext(Dispatchers.Main) {
             song_favorite.setImageDrawable(
-                if (mPlayerState.songEntry!!.song in Configuration.favorites) mInFavoritesDrawable
+                if (mPlayerState.songEntry!!.song in AppSettings.favorites) mInFavoritesDrawable
                 else mNotInFavoritesDrawable
             )
         }
@@ -177,7 +177,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             song_chosen_by.text = songEntry.userName ?: str(R.string.txt_suggested)
             // set fav status
             song_favorite.setImageDrawable(
-                if (song in Configuration.favorites) mInFavoritesDrawable
+                if (song in AppSettings.favorites) mInFavoritesDrawable
                 else mNotInFavoritesDrawable
             )
         }
