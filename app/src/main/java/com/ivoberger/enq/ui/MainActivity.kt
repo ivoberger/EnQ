@@ -79,6 +79,7 @@ class MainActivity : AppCompatActivity() {
      * continueWithBot is called by showLoginDialog after loginUser is complete
      */
     fun continueWithBot() = lifecycleScope.launch(Dispatchers.Default) {
+        Timber.d("Continuing")
         AppSettings.addUser(JMusicBot.user!!)
         JMusicBot.connectionListeners.add((ConnectionListener(this@MainActivity)))
         JMusicBot.connectionListeners.add(mViewModel)

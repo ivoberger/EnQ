@@ -37,6 +37,7 @@ import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.resources.dimen
 import splitties.resources.str
 import splitties.toast.toast
+import splitties.views.onClick
 import timber.log.Timber
 
 
@@ -106,8 +107,9 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         super.onViewCreated(view, savedInstanceState)
         song_title.isSelected = true
         song_description.isSelected = true
-        song_play_pause.setOnClickListener { changePlaybackState() }
-        song_favorite.setOnClickListener { addToFavorites() }
+
+        song_play_pause.onClick { changePlaybackState() }
+        song_favorite.onClick { changeFavoriteStatus() }
         view.setOnTouchListener { _, event ->
             mGestureDetector.onTouchEvent(event)
             true
@@ -129,7 +131,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
     }
 
-    private fun addToFavorites() = lifecycleScope.launch(Dispatchers.IO) {
+    private fun changeFavoriteStatus() = lifecycleScope.launch(Dispatchers.IO) {
         AppSettings.changeFavoriteStatus(context!!, mPlayerState.songEntry!!.song).join()
         withContext(Dispatchers.Main) {
             song_favorite.setImageDrawable(
