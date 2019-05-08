@@ -5,21 +5,21 @@
  *
  * YOU are responsible for updating manually the dependency version. */
 object Versions {
-    const val appcompat: String = "1.1.0-alpha04"
+    const val appcompat: String = "1.1.0-alpha05"
 
     const val constraintlayout: String = "2.0.0-alpha2"
 
     const val androidx_core_core_ktx: String = "1.1.0-alpha05"
 
-    const val fragment_ktx: String = "1.1.0-alpha07"
+    const val fragment_ktx: String = "1.1.0-alpha08"
 
-    const val lifecycle_extensions: String = "2.1.0-alpha04"
+    const val lifecycle_extensions: String = "2.2.0-alpha01"
 
-    const val androidx_navigation: String = "2.1.0-alpha01"
+    const val androidx_navigation: String = "2.1.0-alpha03"
 
-    const val preference_ktx: String = "1.1.0-alpha04"
+    const val preference_ktx: String = "1.1.0-alpha05"
 
-    const val recyclerview: String = "1.1.0-alpha04"
+    const val recyclerview: String = "1.1.0-alpha05"
 
     const val aapt2: String = "3.5.0-beta01-5435860"
 

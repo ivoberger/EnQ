@@ -72,9 +72,8 @@ abstract class TabbedResultsFragment : Fragment(R.layout.fragment_results), View
         lifecycleScope.launch(Dispatchers.IO) { mSelectedPlugin = mProviderPlugins.await()?.get(position) }
     }
 
-    abstract inner class SongListFragmentPager(
-        fm: FragmentManager, val provider: List<MusicBotPlugin>
-    ) : FragmentStatePagerAdapter(fm, RESUME_ONLY_CURRENT_FRAGMENT) {
+    abstract inner class SongListFragmentPager(fm: FragmentManager, val provider: List<MusicBotPlugin>) :
+        FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
         val resultFragments: MutableList<ResultsFragment> = mutableListOf()
 
