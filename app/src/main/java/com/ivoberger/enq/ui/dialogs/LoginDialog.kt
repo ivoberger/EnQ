@@ -13,7 +13,6 @@ import com.ivoberger.jmusicbot.exceptions.InvalidParametersException
 import com.ivoberger.jmusicbot.exceptions.ServerErrorException
 import com.ivoberger.jmusicbot.exceptions.UsernameTakenException
 import com.ivoberger.jmusicbot.model.User
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.onShow
@@ -64,7 +63,7 @@ class LoginDialog(
             )
             mLoginProgressViews = listOf(findViewById(R.id.login_progress))
 
-            if (loggingIn && user != null) activity?.lifecycleScope?.launch { attemptLogin() }
+            if (loggingIn && user != null) attemptLogin()
             else showLoginMask()
         }
 
@@ -80,7 +79,7 @@ class LoginDialog(
         }
     }
 
-    private fun attemptLogin() = MainScope().launch {
+    private fun attemptLogin() = activity?.lifecycleScope?.launch {
         try {
             // ui setup
             dialog?.apply {

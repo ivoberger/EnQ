@@ -71,15 +71,7 @@ class MainActivity : AppCompatActivity() {
         if (JMusicBot.isConnected) continueWithBot()
         else if (!JMusicBot.state.hasServer) {
             showServerDiscoveryDialog(true)
-        } else continueToLogin()
-    }
-
-    /**
-     * continueToLogin is called by showServerDiscoveryDialog after a server was found
-     */
-    fun continueToLogin() = lifecycleScope.launch(Dispatchers.Default) {
-        Timber.d("Continuing with login")
-        showLoginDialog()
+        } else showLoginDialog()
     }
 
     /**
