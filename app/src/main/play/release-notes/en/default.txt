@@ -1,1 +1,4 @@
-- Bugfixes
+- Fixes a bug that would crash the app when rotation the phone
+- Fixes a bug with automatic login
+- Slightly modified icon
+- Animated song progress
