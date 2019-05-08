@@ -15,7 +15,7 @@ android {
         minSdkVersion(21)
         targetSdkVersion(28)
         versionCode = 2
-        versionName = "0.6.6"
+        versionName = "0.7.0"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -75,6 +75,7 @@ dependencies {
     implementation(Libs.material)
 
     implementation(project(":jmusicbot"))
+//    implementation("com.ivoberger:JMusicBotAndroid:0.6.1")
 
     // utils
     implementation(Libs.timber)

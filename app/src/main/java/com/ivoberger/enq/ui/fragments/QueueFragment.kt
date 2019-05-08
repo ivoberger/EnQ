@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ivoberger.enq.R
-import com.ivoberger.enq.persistence.Configuration
+import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.items.QueueItem
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
@@ -117,7 +117,7 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
                     }
                 }
                 ItemTouchHelper.LEFT -> {
-                    Configuration.changeFavoriteStatus(context!!, entry.song)
+                    AppSettings.changeFavoriteStatus(context!!, entry.song)
                     withContext(Dispatchers.Main) {
                         mFastItemAdapter.notifyAdapterItemChanged(position)
                     }

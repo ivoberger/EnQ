@@ -14,7 +14,7 @@ import splitties.init.appCtx
 import splitties.toast.toast
 import timber.log.Timber
 
-object Configuration {
+object AppSettings {
 
     private val preferences: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(appCtx) }
 
@@ -25,7 +25,7 @@ object Configuration {
 
     private val mMoshi by lazy { Moshi.Builder().build() }
     private val mMusicBotPluginAdapter: MusicBotPluginJsonAdapter by lazy { MusicBotPluginJsonAdapter(mMoshi) }
-    private val mUserListAdapter by lazy { mMoshi.adapter<List<User>>(List::class.java) }
+    private val mUserListAdapter by lazy { mMoshi.adapter<List<User>>(MoshiTypes.UserList) }
     private val mFavoritesAdapter by lazy { mMoshi.adapter<List<Song>>(MoshiTypes.SongList) }
 
     var lastProvider: MusicBotPlugin?
@@ -63,9 +63,19 @@ object Configuration {
         }
     }
 
-    var savedUsers: List<User>?
-        get() = loadString(KEY_SAVED_USERS)?.let { mUserListAdapter.fromJson(it) }
-        set(value) = saveString(KEY_SAVED_USERS, mUserListAdapter.toJson(value ?: listOf()))
+    private var savedUsers: List<User>
+        get() = loadString(KEY_SAVED_USERS)?.let { mUserListAdapter.fromJson(it) } ?: listOf()
+        set(value) = saveString(KEY_SAVED_USERS, mUserListAdapter.toJson(value))
+
+    fun addUser(newUser: User) {
+        if (!savedUsers.contains(newUser)) savedUsers = savedUsers + newUser
+    }
+
+    fun getLatestUser(): User? = savedUsers.lastOrNull()
+
+    fun clearSavedUsers() {
+        savedUsers = listOf()
+    }
 
     private fun saveString(key: String, value: String) = preferences.edit { putString(key, value) }
     private fun loadString(key: String): String? = preferences.getString(key, null)

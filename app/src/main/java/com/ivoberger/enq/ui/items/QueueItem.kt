@@ -5,7 +5,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.ivoberger.enq.R
-import com.ivoberger.enq.persistence.Configuration
+import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.utils.bindView
 import com.ivoberger.enq.utils.icon
 import com.ivoberger.enq.utils.secondaryColor
@@ -37,7 +37,7 @@ class QueueItem(
         model.userName.also { holder.txtChosenBy.text = it }
 
         holder.txtDuration.compoundDrawablePadding = 20
-        if (song in Configuration.favorites) holder.txtDuration.setCompoundDrawables(
+        if (song in AppSettings.favorites) holder.txtDuration.setCompoundDrawables(
             ctx.icon(CommunityMaterial.Icon2.cmd_star).color(ctx.secondaryColor()).sizeDp(10),
             null, null, null
         )

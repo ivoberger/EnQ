@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.ivoberger.enq.BuildConfig
 import com.ivoberger.enq.R
+import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.fragments.PlayerFragment
 import com.ivoberger.enq.ui.listener.ConnectionListener
 import com.ivoberger.enq.ui.listener.MainNavigationListener
@@ -71,22 +72,16 @@ class MainActivity : AppCompatActivity() {
         if (JMusicBot.isConnected) continueWithBot()
         else if (!JMusicBot.state.hasServer) {
             showServerDiscoveryDialog(true)
-        } else continueToLogin()
-    }
-
-    /**
-     * continueToLogin is called by showServerDiscoveryDialog after a server was found
-     */
-    fun continueToLogin() = lifecycleScope.launch(Dispatchers.Default) {
-        Timber.d("Continuing with login")
-        showLoginDialog()
+        } else showLoginDialog()
     }
 
     /**
      * continueWithBot is called by showLoginDialog after loginUser is complete
      */
     fun continueWithBot() = lifecycleScope.launch(Dispatchers.Default) {
+        AppSettings.addUser(JMusicBot.user!!)
         JMusicBot.connectionListeners.add((ConnectionListener(this@MainActivity)))
+        JMusicBot.connectionListeners.add(mViewModel)
         mNavController.setGraph(R.navigation.nav_graph)
         supportFragmentManager.commit {
             replace(R.id.main_current_song, PlayerFragment(), null)
