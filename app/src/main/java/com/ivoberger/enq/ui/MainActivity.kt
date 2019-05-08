@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.ivoberger.enq.BuildConfig
 import com.ivoberger.enq.R
+import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.fragments.PlayerFragment
 import com.ivoberger.enq.ui.listener.ConnectionListener
 import com.ivoberger.enq.ui.listener.MainNavigationListener
@@ -78,6 +79,7 @@ class MainActivity : AppCompatActivity() {
      * continueWithBot is called by showLoginDialog after loginUser is complete
      */
     fun continueWithBot() = lifecycleScope.launch(Dispatchers.Default) {
+        AppSettings.addUser(JMusicBot.user!!)
         JMusicBot.connectionListeners.add((ConnectionListener(this@MainActivity)))
         JMusicBot.connectionListeners.add(mViewModel)
         mNavController.setGraph(R.navigation.nav_graph)

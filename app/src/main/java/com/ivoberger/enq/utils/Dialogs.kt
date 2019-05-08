@@ -16,5 +16,5 @@ fun MainActivity.showServerDiscoveryDialog(searching: Boolean = false) =
 @ExperimentalSplittiesApi
 @PotentialFutureAndroidXLifecycleKtxApi
 fun MainActivity.showLoginDialog(
-    loggingIn: Boolean = true, user: User? = AppSettings.savedUsers?.first()
+    loggingIn: Boolean = true, user: User? = AppSettings.getLatestUser()
 ) = LoginDialog(loggingIn, user) { continueWithBot() }.show(supportFragmentManager, null)

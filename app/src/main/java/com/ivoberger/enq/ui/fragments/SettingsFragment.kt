@@ -14,7 +14,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         screen.addPreference(Preference(context).apply {
             title = "Clear saved users"
             onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                AppSettings.savedUsers = null
+                AppSettings.clearSavedUsers()
                 context.toast("Cleared saved users")
                 return@OnPreferenceClickListener true
             }
