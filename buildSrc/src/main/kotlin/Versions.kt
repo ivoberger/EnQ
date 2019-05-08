@@ -21,11 +21,11 @@ object Versions {
 
     const val recyclerview: String = "1.1.0-alpha04"
 
-    const val aapt2: String = "3.5.0-alpha13-5435860"
+    const val aapt2: String = "3.5.0-beta01-5435860"
 
-    const val com_android_tools_build_gradle: String = "3.5.0-alpha13"
+    const val com_android_tools_build_gradle: String = "3.5.0-beta01"
 
-    const val lint_gradle: String = "26.5.0-alpha13"
+    const val lint_gradle: String = "26.5.0-beta01"
 
     const val jwtdecode: String = "1.3.0"
 
@@ -41,7 +41,7 @@ object Versions {
 
     const val com_google_dagger: String = "2.22.1"
 
-    const val firebase_core: String = "16.0.8"
+    const val firebase_core: String = "16.0.8" // available: "16.0.9"
 
     const val google_services: String = "4.2.0"
 
@@ -97,7 +97,7 @@ object Versions {
 
         const val currentVersion: String = "5.4.1"
 
-        const val nightlyVersion: String = "5.5-20190505000026+0000"
+        const val nightlyVersion: String = "5.5-20190508000038+0000"
 
         const val releaseCandidate: String = ""
     }
