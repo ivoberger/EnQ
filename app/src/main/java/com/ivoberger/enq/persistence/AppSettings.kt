@@ -68,7 +68,10 @@ object AppSettings {
         set(value) = saveString(KEY_SAVED_USERS, mUserListAdapter.toJson(value))
 
     fun addUser(newUser: User) {
-        if (!savedUsers.contains(newUser)) savedUsers = savedUsers + newUser
+        if (!savedUsers.contains(newUser)) {
+            Timber.d("Adding user ${newUser.name}")
+            savedUsers = savedUsers + newUser
+        }
     }
 
     fun getLatestUser(): User? = savedUsers.lastOrNull()

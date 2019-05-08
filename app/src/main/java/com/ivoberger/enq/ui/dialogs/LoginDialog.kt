@@ -49,7 +49,10 @@ class LoginDialog(
             positiveButton(R.string.btn_login) {}
         }
         dialog?.onShow {
-            positiveButton.onClick { attemptLogin() }
+            positiveButton.onClick {
+                user = User(mUserNameInput?.text.toString(), mPasswordInput?.text.toString())
+                attemptLogin()
+            }
             positiveButton.setTextColor(context.secondaryColor())
 
             mUserNameInput = findViewById(R.id.login_username)
@@ -88,7 +91,6 @@ class LoginDialog(
                 mLoginProgressViews.forEach { it?.visibility = View.VISIBLE }
             }
             // actual login
-            user = User(mUserNameInput?.text.toString(), mPasswordInput?.text.toString())
             JMusicBot.authorize(user)
             context?.toast(getString(R.string.msg_logged_in, JMusicBot.user!!.name))
             onLoggedIn()

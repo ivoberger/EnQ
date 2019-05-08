@@ -1,10 +1,12 @@
 package com.ivoberger.enq.ui.fragments
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.LinearInterpolator
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -35,6 +37,7 @@ import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.resources.dimen
 import splitties.resources.str
 import splitties.toast.toast
+import splitties.views.onClick
 import timber.log.Timber
 
 
@@ -66,6 +69,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
     }
     private val mGestureDetector by lazy { GestureDetectorCompat(context, mFlingListener) }
+    private val mProgressMultiplier = 1000
 
     private lateinit var mPlayDrawable: IconicsDrawable
     private lateinit var mPauseDrawable: IconicsDrawable
@@ -77,6 +81,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        retainInstance = true
         // pre-load drawables for player buttons
         lifecycleScope.launch(Dispatchers.IO) {
             val color = context.onPrimaryColor()
@@ -102,12 +107,14 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         super.onViewCreated(view, savedInstanceState)
         song_title.isSelected = true
         song_description.isSelected = true
-        song_play_pause.setOnClickListener { changePlaybackState() }
-        song_favorite.setOnClickListener { addToFavorites() }
+
+        song_play_pause.onClick { changePlaybackState() }
+        song_favorite.onClick { changeFavoriteStatus() }
         view.setOnTouchListener { _, event ->
             mGestureDetector.onTouchEvent(event)
             true
         }
+        song_progress.progress = mPlayerState.progress
     }
 
     private fun changePlaybackState() = lifecycleScope.launch(Dispatchers.IO) {
@@ -124,7 +131,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
     }
 
-    private fun addToFavorites() = lifecycleScope.launch(Dispatchers.IO) {
+    private fun changeFavoriteStatus() = lifecycleScope.launch(Dispatchers.IO) {
         AppSettings.changeFavoriteStatus(context!!, mPlayerState.songEntry!!.song).join()
         withContext(Dispatchers.Main) {
             song_favorite.setImageDrawable(
@@ -135,33 +142,41 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     }
 
 
-    private fun onPlayerStateChanged(newState: PlayerState) {
-        if (newState == mPlayerState || view == null) return
-        lifecycleScope.launch {
-            mPlayerState = newState
-            when (newState.state) {
-                PlayerStates.STOP -> {
+    private fun onPlayerStateChanged(newState: PlayerState) = lifecycleScope.launch(Dispatchers.Default) {
+        if (newState == mPlayerState || view == null) return@launch
+        mPlayerState = newState
+        when (newState.state) {
+            PlayerStates.STOP -> {
+                withContext(Dispatchers.Main) {
                     song_title.setText(R.string.msg_nothing_playing)
                     song_description.setText(R.string.msg_queue_smth)
                     song_play_pause.setImageDrawable(mStoppedDrawable)
                     song_favorite.visibility = View.GONE
-                    return@launch
                 }
-                PlayerStates.PLAY -> {
+                return@launch
+            }
+            PlayerStates.PLAY -> {
+                withContext(Dispatchers.Main) {
                     song_favorite.visibility = View.VISIBLE
                     song_play_pause.setImageDrawable(mPauseDrawable)
                 }
-                PlayerStates.PAUSE -> {
+            }
+            PlayerStates.PAUSE -> {
+                withContext(Dispatchers.Main) {
                     song_favorite.visibility = View.VISIBLE
                     song_play_pause.setImageDrawable(mPlayDrawable)
                 }
-                PlayerStates.ERROR -> {
-                    song_play_pause.setImageDrawable(mErrorDrawable)
-                    return@launch
-                }
             }
-            val songEntry = newState.songEntry!!
-            val song = songEntry.song
+            PlayerStates.ERROR -> {
+                withContext(Dispatchers.Main) {
+                    song_play_pause.setImageDrawable(mErrorDrawable)
+                }
+                return@launch
+            }
+        }
+        val songEntry = newState.songEntry!!
+        val song = songEntry.song
+        withContext(Dispatchers.Main) {
             // fill in song metadata
             song_title.text = song.title
             song_description.text = song.description
@@ -170,16 +185,22 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 .into(song_album_art)
             song.duration?.also {
                 song_duration.text = String.format("%02d:%02d", it / 60, it % 60)
-                song_progress.max = it
+                song_progress.max = it * mProgressMultiplier
             }
-            song_progress.progress = mPlayerState.progress
-
             song_chosen_by.text = songEntry.userName ?: str(R.string.txt_suggested)
             // set fav status
             song_favorite.setImageDrawable(
                 if (song in AppSettings.favorites) mInFavoritesDrawable
                 else mNotInFavoritesDrawable
             )
+            ObjectAnimator.ofInt(
+                song_progress, "progress", mPlayerState.progress * mProgressMultiplier
+            ).apply {
+                setAutoCancel(true)
+                duration = 1000
+                interpolator = LinearInterpolator()
+                start()
+            }
         }
     }
 }
