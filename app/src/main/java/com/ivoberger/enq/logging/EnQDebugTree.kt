@@ -1,4 +1,4 @@
-package com.ivoberger.enq.utils
+package com.ivoberger.enq.logging
 
 import timber.log.Timber
 

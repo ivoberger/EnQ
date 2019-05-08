@@ -15,12 +15,17 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.ivoberger.enq.BuildConfig
 import com.ivoberger.enq.R
+import com.ivoberger.enq.logging.EnQDebugTree
+import com.ivoberger.enq.logging.FirebaseTree
 import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.fragments.PlayerFragment
 import com.ivoberger.enq.ui.listener.ConnectionListener
 import com.ivoberger.enq.ui.listener.MainNavigationListener
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
-import com.ivoberger.enq.utils.*
+import com.ivoberger.enq.utils.awaitEnd
+import com.ivoberger.enq.utils.icon
+import com.ivoberger.enq.utils.showLoginDialog
+import com.ivoberger.enq.utils.showServerDiscoveryDialog
 import com.ivoberger.jmusicbot.JMusicBot
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.typeface.IIcon
@@ -54,7 +59,11 @@ class MainActivity : AppCompatActivity() {
         // general setup
         lifecycleScope.launch(Dispatchers.Default) {
             // logging (and crash reporting)
-            Timber.plant(if (BuildConfig.DEBUG) EnQDebugTree() else FirebaseTree(this@MainActivity))
+            Timber.plant(
+                if (BuildConfig.DEBUG) EnQDebugTree() else FirebaseTree(
+                    this@MainActivity
+                )
+            )
         }
 
         mNavController.addOnDestinationChangedListener(MainNavigationListener(this))
