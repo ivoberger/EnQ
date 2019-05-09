@@ -27,7 +27,10 @@ object Libs {
     /**
      * https://developer.android.com/topic/libraries/architecture/index.html */
     const val lifecycle_extensions: String = "androidx.lifecycle:lifecycle-extensions:" +
-            Versions.lifecycle_extensions
+            Versions.androidx_lifecycle
+
+    const val lifecycle_livedata_ktx: String = "androidx.lifecycle:lifecycle-livedata-ktx:" +
+            Versions.androidx_lifecycle
 
     /**
      * https://developer.android.com/topic/libraries/architecture/index.html */

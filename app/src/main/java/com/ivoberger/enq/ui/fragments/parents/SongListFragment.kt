@@ -3,10 +3,9 @@ package com.ivoberger.enq.ui.fragments.parents
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ivoberger.enq.R
-import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.items.SongItem
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
 import com.ivoberger.jmusicbot.JMusicBot
@@ -27,7 +26,7 @@ import splitties.toast.toast
 @ExperimentalSplittiesApi
 abstract class SongListFragment<T : SongItem> : Fragment(R.layout.fragment_queue) {
 
-    val mViewModel by lazy { ViewModelProviders.of(context as MainActivity).get(MainViewModel::class.java) }
+    val mViewModel: MainViewModel by viewModels({ activity!! })
 
     abstract val songAdapter: ModelAdapter<Song, T>
     open lateinit var fastAdapter: FastAdapter<T>

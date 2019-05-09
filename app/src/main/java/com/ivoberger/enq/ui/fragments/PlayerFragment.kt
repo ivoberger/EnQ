@@ -9,12 +9,11 @@ import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import com.ivoberger.enq.R
 import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.persistence.GlideApp
-import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
 import com.ivoberger.enq.utils.icon
 import com.ivoberger.enq.utils.onPrimaryColor
@@ -45,7 +44,7 @@ import timber.log.Timber
 @ExperimentalSplittiesApi
 class PlayerFragment : Fragment(R.layout.fragment_player) {
 
-    private val mViewModel by lazy { ViewModelProviders.of(context as MainActivity).get(MainViewModel::class.java) }
+    private val mViewModel: MainViewModel by viewModels({ activity!! })
 
     private var mPlayerState: PlayerState = PlayerState(PlayerStates.STOP, null)
 
@@ -99,7 +98,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mViewModel.playerState.observe(this, Observer { onPlayerStateChanged(it) })
+        mViewModel.playerState.observe(this) { onPlayerStateChanged(it) }
         Timber.d("Player created")
     }
 

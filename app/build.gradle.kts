@@ -68,6 +68,7 @@ dependencies {
     implementation(Libs.appcompat)
     implementation(Libs.recyclerview)
     implementation(Libs.lifecycle_extensions)
+    implementation(Libs.lifecycle_livedata_ktx)
     implementation(Libs.preference_ktx)
     implementation(Libs.navigation_fragment_ktx)
     implementation(Libs.navigation_ui_ktx)
