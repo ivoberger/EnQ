@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity() {
         AppSettings.addUser(JMusicBot.user!!)
         JMusicBot.connectionListeners.add((ConnectionListener(this@MainActivity)))
         JMusicBot.connectionListeners.add(mViewModel)
-        mNavController.setGraph(R.navigation.nav_graph)
+        mNavController.setGraph(R.navigation.main)
         supportFragmentManager.commit {
             replace(R.id.main_current_song, PlayerFragment(), null)
         }
@@ -104,14 +104,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.options_main, menu)
+        menuInflater.inflate(R.menu.mainOptions, menu)
         // save menu for use in SearchFragment
         searchView = menu.findItem(R.id.app_bar_search).actionView as SearchView
 
         var playerCollapse = mViewModel.playerCollapsed
         // set listener to iconify the SearchView when back is pressed
         mNavController.addOnDestinationChangedListener { _, dest, _ ->
-            if (dest.id != R.id.Search && !searchView.isIconified) {
+            if (dest.id != R.id.dest_search && !searchView.isIconified) {
                 Timber.d("Closing Search View")
                 searchView.isIconified = true
             }
@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity() {
 
         searchView.setOnSearchClickListener {
             if (!JMusicBot.isConnected) return@setOnSearchClickListener
-            mNavController.navigate(R.id.Search)
+            mNavController.navigate(R.id.dest_search)
             // save player collapse state
             playerCollapse = mViewModel.playerCollapsed
             // collapse bottom UI
@@ -141,17 +141,17 @@ class MainActivity : AppCompatActivity() {
         item ?: return false
         return when (item.itemId) {
             R.id.app_bar_about -> {
-                mNavController.navigate(R.id.About)
+                mNavController.navigate(R.id.dest_about)
                 true
             }
 
             R.id.app_bar_search -> false
             R.id.app_bar_user_options -> {
-                mNavController.navigate(R.id.UserInfo)
+                mNavController.navigate(R.id.dest_userInfo)
                 true
             }
             R.id.app_bar_settings -> {
-                mNavController.navigate(R.id.Settings)
+                mNavController.navigate(R.id.dest_settings)
                 true
             }
             else -> false
@@ -169,7 +169,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.commitNow {
             supportFragmentManager.fragments.forEach { if (it is PlayerFragment) remove(it) }
         }
-        mNavController.popBackStack(R.id.Queue, false)
+        mNavController.popBackStack(R.id.dest_queue, false)
         showLoginDialog(false)
     }
 

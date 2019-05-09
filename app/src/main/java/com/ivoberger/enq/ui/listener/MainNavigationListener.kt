@@ -20,9 +20,9 @@ class MainNavigationListener(private val mainActivity: MainActivity) : NavContro
     override fun onDestinationChanged(controller: NavController, destination: NavDestination, arguments: Bundle?) {
         Timber.d("Navigated to ${destination.label}")
         when (destination.id) {
-            R.id.Queue -> checkIfNotChecked(0)
-            R.id.Suggestions -> checkIfNotChecked(1)
-            R.id.Favorites -> checkIfNotChecked(2)
+            R.id.dest_queue -> checkIfNotChecked(0)
+            R.id.dest_suggestions -> checkIfNotChecked(1)
+            R.id.dest_favorites -> checkIfNotChecked(2)
             else -> mainActivity.main_bottom_navigation.menu.setGroupCheckable(0, false, true)
         }
     }
