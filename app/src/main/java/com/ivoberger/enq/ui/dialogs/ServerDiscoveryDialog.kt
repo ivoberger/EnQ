@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
 import com.ivoberger.enq.R
+import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.utils.secondaryColor
 import com.ivoberger.jmusicbot.JMusicBot
 import kotlinx.coroutines.launch
@@ -61,7 +62,13 @@ class ServerDiscoveryDialog(private var discovering: Boolean, private val onServ
             mDiscoveringViews.forEach { it?.visibility = View.VISIBLE }
             mRetryViews.forEach { it?.visibility = View.GONE }
         }
-        JMusicBot.discoverHost()
+        JMusicBot.discoverHost(AppSettings.getLatestServer()?.baseUrl)
+        // check if saved url works
+        try {
+            JMusicBot.getVersionInfo()
+        } catch (e: Exception) {
+            Timber.w(e)
+        }
         if (JMusicBot.state.hasServer) {
             dialog?.dismiss()
             onServerFound()

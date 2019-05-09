@@ -15,7 +15,7 @@ import timber.log.Timber
 
 @ExperimentalSplittiesApi
 @PotentialFutureAndroidXLifecycleKtxApi
-fun MainActivity.showServerDiscoveryDialog(searching: Boolean = false) =
+fun MainActivity.showServerDiscoveryDialog(searching: Boolean = true) =
     ServerDiscoveryDialog(searching) {
         lifecycleScope.launch {
             try {

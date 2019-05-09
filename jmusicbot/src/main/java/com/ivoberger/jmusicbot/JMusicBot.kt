@@ -120,14 +120,24 @@ object JMusicBot {
             }
         }
 
-    suspend fun discoverHost() = withContext(Dispatchers.IO) {
+    @Throws(
+        InvalidParametersException::class, NotFoundException::class,
+        ServerErrorException::class, IllegalStateException::class
+    )
+    suspend fun connect(authUser: User, host: String) = withContext(Dispatchers.IO) {
+        Timber.d("Quick connect")
+        discoverHost(host)
+        authorize(authUser)
+    }
+
+    suspend fun discoverHost(knownHost: String? = null) = withContext(Dispatchers.IO) {
         Timber.d("Discovering host")
         if (state.isDiscovering) return@withContext
         if (!state.isDisconnected) stateMachine.transition(Event.OnDisconnect())
         stateMachine.transition(Event.OnStartDiscovery)
-        val hostAdress = mWifiManager.discoverHost()
-        hostAdress?.let {
-            baseUrl = "http://$it:$PORT/"
+        val hostAddress = knownHost ?: mWifiManager.discoverHost()
+        hostAddress?.let {
+            baseUrl = knownHost ?: "http://$it:$PORT/"
             Timber.d("Found host: $baseUrl")
             stateMachine.transition(Event.OnServerFound(baseUrl!!))
             return@withContext

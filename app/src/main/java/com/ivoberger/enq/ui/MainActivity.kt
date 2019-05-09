@@ -14,10 +14,8 @@ import androidx.lifecycle.SavedStateVMFactory
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
-import com.ivoberger.enq.BuildConfig
 import com.ivoberger.enq.R
-import com.ivoberger.enq.logging.EnQDebugTree
-import com.ivoberger.enq.logging.FirebaseTree
+import com.ivoberger.enq.model.ServerInfo
 import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.fragments.PlayerFragment
 import com.ivoberger.enq.ui.listener.ConnectionListener
@@ -49,26 +47,17 @@ class MainActivity : AppCompatActivity() {
     lateinit var searchView: SearchView
 
     private val mViewModel: MainViewModel by viewModels { SavedStateVMFactory(this) }
-    private val mNavController: NavController by lazy {
-        main_content.findNavController()
-    }
+    private val mNavController: NavController by lazy { main_content.findNavController() }
+    private val KEY_CURRENT_SERVER = "currentServer"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         // general setup
-        lifecycleScope.launch(Dispatchers.Default) {
-            // logging (and crash reporting)
-            Timber.plant(
-                if (BuildConfig.DEBUG) EnQDebugTree() else FirebaseTree(
-                    this@MainActivity
-                )
-            )
-        }
-
         mNavController.addOnDestinationChangedListener(MainNavigationListener(this))
         main_bottom_navigation.setupWithNavController(mNavController)
+
         // load bottom navigation icons async
         val icons = listOf<IIcon>(
             CommunityMaterial.Icon2.cmd_playlist_play,
@@ -80,9 +69,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (JMusicBot.isConnected) continueWithBot()
-        else if (!JMusicBot.state.hasServer) {
-            showServerDiscoveryDialog(true)
-        } else showLoginDialog()
+        else if (!JMusicBot.state.hasServer && savedInstanceState != null && AppSettings.getLatestUser() != null) {
+            savedInstanceState.getParcelable<ServerInfo>(KEY_CURRENT_SERVER)?.let {
+                lifecycleScope.launch {
+                    try {
+                        JMusicBot.connect(AppSettings.getLatestUser()!!, it.baseUrl)
+                        continueWithBot()
+                    } catch (e: Exception) {
+                        Timber.w(e)
+                        showServerDiscoveryDialog()
+                    }
+                }
+            }
+        } else if (!JMusicBot.state.hasServer) showServerDiscoveryDialog()
+        else showLoginDialog()
     }
 
     /**
@@ -212,5 +212,10 @@ class MainActivity : AppCompatActivity() {
             .withStartAction { main_bottom_navigation.visibility = View.VISIBLE }
             .start()
         mViewModel.bottomNavCollapsed = collapse
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putParcelable(KEY_CURRENT_SERVER, AppSettings.getLatestServer())
+        super.onSaveInstanceState(outState)
     }
 }

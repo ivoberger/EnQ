@@ -9,7 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.ivoberger.enq.R
 import com.ivoberger.enq.model.ServerInfo
-import com.ivoberger.enq.utils.addIfNotExistent
+import com.ivoberger.enq.utils.addToEnd
 import com.ivoberger.jmusicbot.model.*
 import com.squareup.moshi.Moshi
 import kotlinx.android.parcel.Parceler
@@ -80,7 +80,7 @@ object AppSettings {
 
     fun addUser(newUser: User) {
         Timber.d("Adding user ${newUser.name}")
-        savedUsers = savedUsers.addIfNotExistent(newUser)
+        savedUsers = savedUsers.addToEnd(newUser)
     }
 
     fun getLatestUser(): User? = savedUsers.lastOrNull()
@@ -94,8 +94,9 @@ object AppSettings {
         get() = loadString(KEY_SAVED_SERVERS)?.let { mServerInfoListAdapter.fromJson(it) } ?: listOf()
         set(value) = saveString(KEY_SAVED_SERVERS, mServerInfoListAdapter.toJson(value))
 
-    fun addServer(newServer: ServerInfo) = run { savedServers = savedServers.addIfNotExistent(newServer) }
+    fun addServer(newServer: ServerInfo) = run { savedServers = savedServers.addToEnd(newServer) }
     fun isServerKnown(toCheck: ServerInfo) = savedServers.contains(toCheck)
+    fun getLatestServer(): ServerInfo? = savedServers.lastOrNull()
 
 
     // utils
