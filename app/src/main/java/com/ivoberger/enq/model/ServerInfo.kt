@@ -1,16 +1,18 @@
 package com.ivoberger.enq.model
 
+import android.os.Parcelable
+import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.jmusicbot.model.VersionInfo
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Types
+import kotlinx.android.parcel.Parcelize
+import kotlinx.android.parcel.TypeParceler
 import java.lang.reflect.Type
 
-@JsonClass(generateAdapter = true)
+@Parcelize
+@TypeParceler<VersionInfo, AppSettings.VersionInfoParceler>()
 data class ServerInfo(
-    @Json(name = "baseUrl") val baseUrl: String,
-    @Json(name = "versionInfo") val versionInfo: VersionInfo
-) {
+    val baseUrl: String, val versionInfo: VersionInfo
+) : Parcelable {
     companion object {
         val listMoshiType: Type = Types.newParameterizedType(List::class.java, ServerInfo::class.java)
     }

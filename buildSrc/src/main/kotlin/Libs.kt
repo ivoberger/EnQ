@@ -27,10 +27,14 @@ object Libs {
     /**
      * https://developer.android.com/topic/libraries/architecture/index.html */
     const val lifecycle_extensions: String = "androidx.lifecycle:lifecycle-extensions:" +
-            Versions.androidx_lifecycle
+            Versions.lifecycle_extensions
 
     const val lifecycle_livedata_ktx: String = "androidx.lifecycle:lifecycle-livedata-ktx:" +
-            Versions.androidx_lifecycle
+            Versions.lifecycle_livedata_ktx
+
+    const val lifecycle_viewmodel_savedstate: String =
+            "androidx.lifecycle:lifecycle-viewmodel-savedstate:" +
+            Versions.lifecycle_viewmodel_savedstate
 
     /**
      * https://developer.android.com/topic/libraries/architecture/index.html */
@@ -50,6 +54,8 @@ object Libs {
     /**
      * http://developer.android.com/tools/extras/support-library.html */
     const val recyclerview: String = "androidx.recyclerview:recyclerview:" + Versions.recyclerview
+
+    const val savedstate: String = "androidx.savedstate:savedstate:" + Versions.savedstate
 
     /**
      * https://developer.android.com/studio */

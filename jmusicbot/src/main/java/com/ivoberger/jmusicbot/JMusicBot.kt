@@ -86,8 +86,9 @@ object JMusicBot {
     private var mServerSession: ServerSession? = null
     private var mUserSession: UserSession? = null
 
-    private var baseUrl: String? = null
+    var baseUrl: String? = null
         get() = mServerSession?.baseUrl() ?: field
+        private set
 
     private var mServiceClient: MusicBotService? = null
 
@@ -337,6 +338,11 @@ object JMusicBot {
     suspend fun getSuggesters(): List<MusicBotPlugin> = withContext(Dispatchers.IO) {
         state.connectionCheck()
         return@withContext mServiceClient!!.getSuggesters().process() ?: listOf()
+    }
+
+    suspend fun getVersionInfo(): VersionInfo = withContext(Dispatchers.IO) {
+        state.serverCheck()
+        return@withContext mServiceClient!!.getVersionInfo().process()!!
     }
 
     fun getQueue(period: Long = 500): LiveData<List<QueueEntry>> {

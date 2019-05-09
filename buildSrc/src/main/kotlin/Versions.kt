@@ -15,13 +15,19 @@ object Versions {
 
     const val fragment_ktx: String = "1.1.0-alpha08" 
 
-    const val androidx_lifecycle: String = "2.2.0-alpha01" 
+    const val lifecycle_extensions: String = "2.2.0-alpha01" 
+
+    const val lifecycle_livedata_ktx: String = "2.2.0-alpha01" 
+
+    const val lifecycle_viewmodel_savedstate: String = "1.0.0-alpha01" 
 
     const val androidx_navigation: String = "2.1.0-alpha03" 
 
     const val preference_ktx: String = "1.1.0-alpha05" 
 
     const val recyclerview: String = "1.1.0-alpha05" 
+
+    const val savedstate: String = "1.0.0-beta01" 
 
     const val aapt2: String = "3.5.0-beta01-5435860" 
 

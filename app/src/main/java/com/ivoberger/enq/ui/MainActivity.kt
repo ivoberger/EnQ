@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.forEachIndexed
 import androidx.fragment.app.commit
 import androidx.fragment.app.commitNow
+import androidx.lifecycle.SavedStateVMFactory
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -47,7 +48,7 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var searchView: SearchView
 
-    private val mViewModel: MainViewModel by viewModels()
+    private val mViewModel: MainViewModel by viewModels { SavedStateVMFactory(this) }
     private val mNavController: NavController by lazy {
         main_content.findNavController()
     }
@@ -104,7 +105,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.mainOptions, menu)
+        menuInflater.inflate(R.menu.main_options, menu)
         // save menu for use in SearchFragment
         searchView = menu.findItem(R.id.app_bar_search).actionView as SearchView
 

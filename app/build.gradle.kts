@@ -58,6 +58,10 @@ play {
     resolutionStrategy = "auto"
 }
 
+androidExtensions {
+    isExperimental = true
+}
+
 dependencies {
     // Kotlin (extensions)
     implementation(Libs.kotlin_stdlib_jdk8)
@@ -69,6 +73,7 @@ dependencies {
     implementation(Libs.recyclerview)
     implementation(Libs.lifecycle_extensions)
     implementation(Libs.lifecycle_livedata_ktx)
+    implementation(Libs.lifecycle_viewmodel_savedstate)
     implementation(Libs.preference_ktx)
     implementation(Libs.navigation_fragment_ktx)
     implementation(Libs.navigation_ui_ktx)
