@@ -16,13 +16,13 @@ import splitties.views.backgroundColor
 class ConnectionListener(private val mainActivity: MainActivity) : ConnectionChangeListener {
     override fun onConnectionLost(e: Exception?) {
         mainActivity.lifecycleScope.launch {
-            mainActivity.main_bottom_navigation.setBackgroundResource(R.color.red_500)
+            mainActivity.bottom_navigation.setBackgroundResource(R.color.red_500)
         }
     }
 
     override fun onConnectionRecovered() {
         mainActivity.lifecycleScope.launch {
-            mainActivity.main_bottom_navigation.backgroundColor = mainActivity.attributeColor(R.attr.colorPrimary)
+            mainActivity.bottom_navigation.backgroundColor = mainActivity.attributeColor(R.attr.colorPrimary)
         }
     }
 }

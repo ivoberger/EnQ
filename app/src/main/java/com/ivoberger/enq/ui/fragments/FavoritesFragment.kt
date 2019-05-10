@@ -2,7 +2,7 @@ package com.ivoberger.enq.ui.fragments
 
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.ivoberger.enq.R
 import com.ivoberger.enq.persistence.AppSettings
@@ -38,9 +38,9 @@ class FavoritesFragment : SongListFragment<SongItem>(), SimpleSwipeCallback.Item
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        AppSettings.getFavoritesLiveData().observe(this, Observer { favorites ->
+        AppSettings.getFavoritesLiveData().observe(this) { favorites ->
             FastAdapterDiffUtil[songAdapter] = favorites.map { SongItem(it) }
-        })
+        }
         songAdapter.add(AppSettings.favorites)
 
         val swipeToDeleteIcon =

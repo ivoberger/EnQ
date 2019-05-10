@@ -98,4 +98,7 @@ internal interface MusicBotService {
 
     @PUT(URL_PLAYER)
     fun skip(@Body playerStateChange: PlayerStateChange = PlayerStateChange(PlayerAction.SKIP)): Deferred<Response<PlayerState>>
+
+    @GET("version")
+    fun getVersionInfo(): Deferred<Response<VersionInfo>>
 }

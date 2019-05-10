@@ -11,13 +11,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class MainViewModel : ViewModel(), ConnectionChangeListener {
+class MainViewModel() : ViewModel(), ConnectionChangeListener {
 
     var playerCollapsed = false
     var bottomNavCollapsed = false
 
     val playerState: LiveData<PlayerState> by lazy { JMusicBot.getPlayerState() }
     val queue: LiveData<List<QueueEntry>>by lazy { JMusicBot.getQueue() }
+
+    init {
+        Timber.d("MainViewModel initialized")
+    }
 
     override fun onConnectionLost(e: Exception?) {
         viewModelScope.launch(Dispatchers.IO) {

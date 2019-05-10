@@ -6,6 +6,7 @@ plugins {
     id("com.google.gms.google-services")
     id("io.fabric")
     id("com.github.triplet.play")
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -15,7 +16,7 @@ android {
         minSdkVersion(21)
         targetSdkVersion(28)
         versionCode = 2
-        versionName = "0.7.1"
+        versionName = "0.7.3"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -58,6 +59,10 @@ play {
     resolutionStrategy = "auto"
 }
 
+androidExtensions {
+    isExperimental = true
+}
+
 dependencies {
     // Kotlin (extensions)
     implementation(Libs.kotlin_stdlib_jdk8)
@@ -68,6 +73,7 @@ dependencies {
     implementation(Libs.appcompat)
     implementation(Libs.recyclerview)
     implementation(Libs.lifecycle_extensions)
+    implementation(Libs.lifecycle_livedata_ktx)
     implementation(Libs.preference_ktx)
     implementation(Libs.navigation_fragment_ktx)
     implementation(Libs.navigation_ui_ktx)

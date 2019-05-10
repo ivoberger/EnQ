@@ -2,12 +2,14 @@ package com.ivoberger.jmusicbot.model
 
 import com.ivoberger.jmusicbot.di.ServerModule
 import com.ivoberger.jmusicbot.di.UserModule
+import kotlinx.coroutines.Job
 
 /**
  * Possible states for the musicBotService bot client to be in
  */
 sealed class State {
     override fun toString(): String = this::class.java.simpleName
+    var running: Job? = null
 
     /** Client has no server connection */
     object Disconnected : State()
@@ -44,12 +46,12 @@ sealed class State {
 sealed class Event {
     override fun toString(): String = this::class.java.simpleName
 
-    object OnStartDiscovery : Event()
-    class OnServerFound(baseUrl: String) : Event() {
+    object StartDiscovery : Event()
+    class ServerFound(baseUrl: String) : Event() {
         internal val serverModule: ServerModule = ServerModule(baseUrl)
     }
 
-    class OnAuthorize(
+    class Authorize(
         user: User,
         authToken: Auth.Token
     ) : Event() {
@@ -61,8 +63,8 @@ sealed class Event {
         }
     }
 
-    object OnAuthExpired : Event()
-    class OnDisconnect(val reason: Exception? = null) : Event()
+    object AuthExpired : Event()
+    class Disconnect(val reason: Exception? = null) : Event()
 }
 
 sealed class SideEffect {

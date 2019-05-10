@@ -1,4 +1,4 @@
-package com.ivoberger.enq.utils
+package com.ivoberger.enq.logging
 
 import android.content.Context
 import android.util.Log

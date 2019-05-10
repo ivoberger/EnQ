@@ -5,7 +5,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import androidx.navigation.fragment.navArgs
 import com.ivoberger.enq.R
+import com.ivoberger.enq.persistence.AppSettings
+import com.ivoberger.enq.ui.MainActivity
+import com.ivoberger.enq.utils.hideKeyboard
 import com.ivoberger.enq.utils.secondaryColor
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.exceptions.AuthException
@@ -28,17 +32,20 @@ import timber.log.Timber
 
 @ExperimentalSplittiesApi
 @PotentialFutureAndroidXLifecycleKtxApi
-class LoginDialog(
-    startLoggingIn: Boolean,
-    private var user: User?,
-    private val onLoggedIn: () -> Unit
-) :
-    DialogFragment() {
-    private var loggingIn = startLoggingIn
+class LoginDialog : DialogFragment() {
+
+    private var loggingIn: Boolean = true
+    private var user: User? = AppSettings.getLatestUser()
     private lateinit var mLoginMaskViews: List<View?>
     private lateinit var mLoginProgressViews: List<View?>
     private var mUserNameInput: TextView? = null
     private var mPasswordInput: TextView? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        val arguments: LoginDialogArgs by navArgs()
+        loggingIn = arguments.startLoggingIn
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         Timber.d("Showing login dialog")
@@ -69,7 +76,6 @@ class LoginDialog(
             if (loggingIn && user != null) attemptLogin()
             else showLoginMask()
         }
-
         return dialog ?: throw IllegalStateException("Context cannot be null")
     }
 
@@ -82,9 +88,10 @@ class LoginDialog(
         }
     }
 
-    private fun attemptLogin() = activity?.lifecycleScope?.launch {
+    private fun attemptLogin() = lifecycleScope.launch {
         try {
             // ui setup
+            hideKeyboard()
             dialog?.apply {
                 setTitle(R.string.tlt_logging_in)
                 mLoginMaskViews.forEach { it?.visibility = View.GONE }
@@ -93,9 +100,9 @@ class LoginDialog(
             // actual login
             JMusicBot.authorize(user)
             context?.toast(getString(R.string.msg_logged_in, JMusicBot.user!!.name))
-            onLoggedIn()
-            Timber.d("Dismissing Dialog")
-            dialog?.dismiss()
+            val mainActivity = activity as MainActivity
+            mainActivity.continueWithBot()
+            dismiss()
         } catch (e: UsernameTakenException) {
             Timber.w(e)
             context?.toast(R.string.msg_username_taken)

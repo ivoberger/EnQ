@@ -3,13 +3,12 @@ package com.ivoberger.enq.ui.fragments
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ivoberger.enq.R
 import com.ivoberger.enq.persistence.AppSettings
-import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.items.QueueItem
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
 import com.ivoberger.enq.utils.attributeColor
@@ -44,7 +43,7 @@ import timber.log.Timber
 @ExperimentalSplittiesApi
 class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.ItemSwipeCallback, ItemTouchCallback {
 
-    private val mViewModel by lazy { ViewModelProviders.of(context as MainActivity).get(MainViewModel::class.java) }
+    private val mViewModel: MainViewModel by viewModels({ activity!! })
     private val mFastItemAdapter: FastItemAdapter<QueueItem> by lazy { FastItemAdapter<QueueItem>() }
     private val mQueueUpdateChannel = Channel<List<QueueEntry>>(Channel.CONFLATED)
 
@@ -56,7 +55,7 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mViewModel.queue.observe(this, Observer { mQueueUpdateChannel.sendBlocking(it) })
+        mViewModel.queue.observe(this) { mQueueUpdateChannel.sendBlocking(it) }
 
         recycler_queue.layoutManager = LinearLayoutManager(context).apply { reverseLayout = true }
         recycler_queue.adapter = mFastItemAdapter

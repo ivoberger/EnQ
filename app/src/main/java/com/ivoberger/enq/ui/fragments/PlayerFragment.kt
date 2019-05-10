@@ -9,12 +9,11 @@ import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import com.ivoberger.enq.R
 import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.persistence.GlideApp
-import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
 import com.ivoberger.enq.utils.icon
 import com.ivoberger.enq.utils.onPrimaryColor
@@ -29,7 +28,6 @@ import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_player.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import splitties.experimental.ExperimentalSplittiesApi
 import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
@@ -45,7 +43,7 @@ import timber.log.Timber
 @ExperimentalSplittiesApi
 class PlayerFragment : Fragment(R.layout.fragment_player) {
 
-    private val mViewModel by lazy { ViewModelProviders.of(context as MainActivity).get(MainViewModel::class.java) }
+    private val mViewModel: MainViewModel by viewModels({ activity!! })
 
     private var mPlayerState: PlayerState = PlayerState(PlayerStates.STOP, null)
 
@@ -59,7 +57,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 velocityY: Float
             ): Boolean {
                 if (velocityX > Math.abs(velocityY) * 2) if (JMusicBot.user!!.permissions.contains(Permissions.SKIP)) {
-                    lifecycleScope.launch(Dispatchers.IO) { JMusicBot.skip() }
+                    lifecycleScope.launch { tryWithErrorToast { JMusicBot.skip() } }
                     return true
                 } else {
                     context!!.toast(R.string.msg_no_permission)
@@ -99,7 +97,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mViewModel.playerState.observe(this, Observer { onPlayerStateChanged(it) })
+        mViewModel.playerState.observe(this) { onPlayerStateChanged(it) }
         Timber.d("Player created")
     }
 
@@ -120,13 +118,11 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     private fun changePlaybackState() = lifecycleScope.launch(Dispatchers.IO) {
         if (!JMusicBot.isConnected) return@launch
         tryWithErrorToast {
-            runBlocking {
-                when (mPlayerState.state) {
-                    PlayerStates.STOP -> JMusicBot.play()
-                    PlayerStates.PLAY -> JMusicBot.pause()
-                    PlayerStates.PAUSE -> JMusicBot.play()
-                    PlayerStates.ERROR -> JMusicBot.play()
-                }
+            when (mPlayerState.state) {
+                PlayerStates.STOP -> JMusicBot.play()
+                PlayerStates.PLAY -> JMusicBot.pause()
+                PlayerStates.PAUSE -> JMusicBot.play()
+                PlayerStates.ERROR -> JMusicBot.play()
             }
         }
     }

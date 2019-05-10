@@ -13,6 +13,7 @@ import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
 import com.ivoberger.jmusicbot.model.*
 import com.tinder.StateMachine
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import okhttp3.logging.HttpLoggingInterceptor
@@ -25,18 +26,18 @@ object JMusicBot {
 
     internal val stateMachine = StateMachine.create<State, Event, SideEffect> {
         initialState(State.Disconnected)
-        state<State.Disconnected> { on<Event.OnStartDiscovery> { transitionTo(State.Discovering) } }
+        state<State.Disconnected> { on<Event.StartDiscovery> { transitionTo(State.Discovering) } }
         state<State.Discovering> {
-            on<Event.OnServerFound> { transitionTo(State.AuthRequired, SideEffect.StartServerSession) }
-            on<Event.OnDisconnect> { transitionTo(State.Disconnected, SideEffect.EndServerSession) }
+            on<Event.ServerFound> { transitionTo(State.AuthRequired, SideEffect.StartServerSession) }
+            on<Event.Disconnect> { transitionTo(State.Disconnected, SideEffect.EndServerSession) }
         }
         state<State.AuthRequired> {
-            on<Event.OnAuthorize> { transitionTo(State.Connected, SideEffect.StartUserSession) }
-            on<Event.OnDisconnect> { transitionTo(State.Disconnected, SideEffect.EndServerSession) }
+            on<Event.Authorize> { transitionTo(State.Connected, SideEffect.StartUserSession) }
+            on<Event.Disconnect> { transitionTo(State.Disconnected, SideEffect.EndServerSession) }
         }
         state<State.Connected> {
-            on<Event.OnAuthExpired> { transitionTo(State.AuthRequired, SideEffect.EndUserSession) }
-            on<Event.OnDisconnect> { transitionTo(State.Disconnected, SideEffect.EndServerSession) }
+            on<Event.AuthExpired> { transitionTo(State.AuthRequired, SideEffect.EndUserSession) }
+            on<Event.Disconnect> { transitionTo(State.Disconnected, SideEffect.EndServerSession) }
         }
         onTransition { transition ->
             val validTransition = transition as? StateMachine.Transition.Valid
@@ -44,25 +45,29 @@ object JMusicBot {
                 Timber.d("State transition from ${trans.fromState} to ${trans.toState} by ${trans.event}")
                 when (trans.sideEffect) {
                     is SideEffect.StartServerSession -> {
-                        val event = trans.event as Event.OnServerFound
+                        val event = trans.event as Event.ServerFound
                         mServerSession = mBaseComponent.serverSession(event.serverModule)
                         mServiceClient = mServerSession!!.musicBotService()
                     }
                     is SideEffect.StartUserSession -> {
-                        val event = trans.event as Event.OnAuthorize
+                        val event = trans.event as Event.Authorize
                         mUserSession = mServerSession!!.userSession(event.userModule)
                         mServiceClient = mUserSession!!.musicBotService()
                         connectionListeners.forEach { it.onConnectionRecovered() }
                     }
                     SideEffect.EndUserSession -> {
-                        authToken = null
+                        user = null
+                        Timber.d("CLIENTS 1: SERVER ${mServerSession?.musicBotService()}, USER ${mUserSession?.musicBotService()}, USED ${mServiceClient}")
                         mUserSession = null
+                        mServiceClient = mServerSession!!.musicBotService()
+                        Timber.d("CLIENTS 2: SERVER ${mServerSession?.musicBotService()}, USER ${mUserSession?.musicBotService()}, USED ${mServiceClient}")
                     }
                     SideEffect.EndServerSession -> {
-                        authToken = null
+                        user = null
                         mUserSession = null
                         mServerSession = null
-                        val event = trans.event as Event.OnDisconnect
+                        if (trans.fromState is State.Discovering) return@onTransition
+                        val event = trans.event as Event.Disconnect
                         connectionListeners.forEach { it.onConnectionLost(event.reason) }
                     }
                 }
@@ -86,8 +91,9 @@ object JMusicBot {
     private var mServerSession: ServerSession? = null
     private var mUserSession: UserSession? = null
 
-    private var baseUrl: String? = null
+    var baseUrl: String? = null
         get() = mServerSession?.baseUrl() ?: field
+        private set
 
     private var mServiceClient: MusicBotService? = null
 
@@ -111,33 +117,46 @@ object JMusicBot {
     internal var authToken: Auth.Token? = null
         get() = mUserSession?.authToken ?: field
         set(value) {
-            Timber.d("Setting Token to $value")
-            if (value == null) stateMachine.transition(Event.OnAuthExpired)
+            Timber.d("Setting token to $value")
             field = value
             field?.let {
                 user?.permissions = it.permissions
             }
         }
 
-    suspend fun discoverHost() = withContext(Dispatchers.IO) {
+    @Throws(
+        InvalidParametersException::class, NotFoundException::class,
+        ServerErrorException::class, IllegalStateException::class
+    )
+    suspend fun connect(authUser: User, host: String) = withContext(Dispatchers.IO) {
+        Timber.d("Quick connect")
+        if (!state.hasServer) discoverHost(host)
+        if (!state.isConnected) authorize(authUser)
+    }
+
+    suspend fun discoverHost(knownHost: String? = null) = withContext(Dispatchers.IO) {
+        if (state.isDiscovering || state.running != null) return@withContext
         Timber.d("Discovering host")
-        if (state.isDiscovering) return@withContext
-        if (!state.isDisconnected) stateMachine.transition(Event.OnDisconnect())
-        stateMachine.transition(Event.OnStartDiscovery)
-        val hostAdress = mWifiManager.discoverHost()
-        hostAdress?.let {
-            baseUrl = "http://$it:$PORT/"
-            Timber.d("Found host: $baseUrl")
-            stateMachine.transition(Event.OnServerFound(baseUrl!!))
-            return@withContext
+        if (!state.isDisconnected) stateMachine.transition(Event.Disconnect())
+        stateMachine.transition(Event.StartDiscovery)
+        state.running = launch {
+            val hostAddress = knownHost ?: mWifiManager.discoverHost()
+            hostAddress?.let {
+                baseUrl = knownHost ?: "http://$it:$PORT/"
+                Timber.d("Found host: $baseUrl")
+                stateMachine.transition(Event.ServerFound(baseUrl!!))
+                return@launch
+            }
+            Timber.d("No host found")
+            stateMachine.transition(Event.Disconnect())
         }
-        Timber.d("No host found")
-        stateMachine.transition(Event.OnDisconnect())
+        state.running?.join()
     }
 
     suspend fun recoverConnection() = withContext(Dispatchers.IO) {
         Timber.d("Reconnecting")
         while (!state.hasServer) {
+            state.running?.join()
             discoverHost()
         }
         authorize()
@@ -168,7 +187,7 @@ object JMusicBot {
         } catch (e: UsernameTakenException) {
             Timber.w(e)
             if (password.isNullOrBlank() && user?.password.isNullOrBlank()) {
-                Timber.d("No passwords found, throwing exception, $password, $user")
+                Timber.d("No passwords found, throwing exception, $password, ${user?.name}")
                 throw e
             }
         }
@@ -195,8 +214,8 @@ object JMusicBot {
             }
             val tmpUser = mServiceClient!!.testToken(authToken!!.toAuthHeader()).process()
             if (tmpUser?.name == user?.name) {
-                Timber.d("Valid Token: $user")
-                stateMachine.transition(Event.OnAuthorize(user!!, authToken!!))
+                Timber.d("Valid Token: ${user?.name}")
+                stateMachine.transition(Event.Authorize(user!!, authToken!!))
                 return true
             }
             Timber.d("Invalid Token: User changed")
@@ -225,7 +244,7 @@ object JMusicBot {
         val token = mServiceClient!!.registerUser(credentials).process()!!
         Timber.d("Registered $user")
         authToken = Auth.Token(token)
-        stateMachine.transition(Event.OnAuthorize(user!!, authToken!!))
+        stateMachine.transition(Event.Authorize(user!!, authToken!!))
     }
 
     @Throws(
@@ -233,7 +252,7 @@ object JMusicBot {
         NotFoundException::class, ServerErrorException::class, IllegalStateException::class
     )
     private suspend fun login(userName: String? = null, password: String? = null) = withContext(Dispatchers.IO) {
-        Timber.d("Logging in $user")
+        Timber.d("Logging in ${userName ?: user?.name}")
         state.serverCheck()
         val credentials = when {
             (!(userName.isNullOrBlank() || password.isNullOrBlank())) -> {
@@ -245,9 +264,9 @@ object JMusicBot {
         }
         Timber.d("Auth: $credentials")
         val token = mServiceClient!!.loginUser(credentials).process()!!
-        Timber.d("Logged in $user")
+        Timber.d("Logged in ${user?.name}")
         authToken = Auth.Token(token)
-        stateMachine.transition(Event.OnAuthorize(user!!, authToken!!))
+        stateMachine.transition(Event.Authorize(user!!, authToken!!))
     }
 
     @Throws(InvalidParametersException::class, AuthException::class)
@@ -257,14 +276,14 @@ object JMusicBot {
         authToken?.also { user?.password = newPassword }
     }
 
-    suspend fun logout() = withContext(Dispatchers.Main) {
+    suspend fun logout() = withContext(Dispatchers.IO) {
         stopQueueUpdates()
         stopPlayerUpdates()
-        user = null
+        stateMachine.transition(Event.AuthExpired)
     }
 
     suspend fun reloadPermissions() = withContext(Dispatchers.IO) {
-        stateMachine.transition(Event.OnAuthExpired)
+        stateMachine.transition(Event.AuthExpired)
         recoverConnection()
     }
 
@@ -278,7 +297,7 @@ object JMusicBot {
         authToken ?: throw IllegalStateException("Auth token is null")
         mServiceClient!!.deleteUser().process()
         user = null
-        stateMachine.transition(Event.OnAuthExpired)
+        stateMachine.transition(Event.AuthExpired)
     }
 
     @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class)
@@ -337,6 +356,11 @@ object JMusicBot {
     suspend fun getSuggesters(): List<MusicBotPlugin> = withContext(Dispatchers.IO) {
         state.connectionCheck()
         return@withContext mServiceClient!!.getSuggesters().process() ?: listOf()
+    }
+
+    suspend fun getVersionInfo(): VersionInfo = withContext(Dispatchers.IO) {
+        state.serverCheck()
+        return@withContext mServiceClient!!.getVersionInfo().process()!!
     }
 
     fun getQueue(period: Long = 500): LiveData<List<QueueEntry>> {

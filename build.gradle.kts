@@ -12,6 +12,7 @@ buildscript {
         classpath(Libs.google_services)
         classpath(Libs.com_github_triplet_play_gradle_plugin)
         classpath(Libs.io_fabric_tools_gradle)
+        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${Versions.androidx_navigation}")
     }
 }
 

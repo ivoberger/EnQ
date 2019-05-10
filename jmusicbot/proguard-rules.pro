@@ -22,9 +22,7 @@
 
 # don't obfuscate data classes
 -keep @kotlin.Metadata class com.ivoberger.jmusicbot.model.**
--keep class com.ivoberger.jmusicbot.model.** {
-    <fields>;
-}
+-keep class com.ivoberger.jmusicbot.model.** {*;}
 
 #### RETROFIT ####
 # Retrofit does reflection on generic parameters. InnerClasses is required to use Signature and

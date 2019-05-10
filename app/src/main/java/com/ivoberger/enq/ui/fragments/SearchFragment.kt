@@ -81,7 +81,7 @@ class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
     }
 
     override fun onConnectionLost(e: Exception?) {
-        activity?.supportFragmentManager?.popBackStack()
+        (activity as MainActivity).navController.navigateUp()
     }
 
     override fun onConnectionRecovered() {}

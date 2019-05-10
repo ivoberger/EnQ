@@ -1,7 +1,6 @@
 package com.ivoberger.jmusicbot.di
 
 import android.net.wifi.WifiManager
-import com.ivoberger.jmusicbot.api.TokenAuthenticator
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -26,15 +25,13 @@ internal class BaseModule(private val logLevel: HttpLoggingInterceptor.Level = H
     fun moshi(): Moshi = Moshi.Builder().build()
 
     @Provides
-    @Singleton
-    fun okHttpClientBuilder(): OkHttpClient.Builder = OkHttpClient.Builder().cache(null).addInterceptor(
+    fun okHttpClient(): OkHttpClient.Builder = OkHttpClient.Builder().cache(null).addInterceptor(
         HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { msg ->
             Timber.tag("BotSDKNetworking").v(msg)
         }).setLevel(logLevel)
-    ).authenticator(TokenAuthenticator())
+    )
 
     @Provides
-    @Singleton
     @Named(NameKeys.BUILDER_RETROFIT_BASE)
     fun retrofitBuilder(okHttpClientBuilder: OkHttpClient.Builder, moshi: Moshi): Retrofit.Builder = Retrofit.Builder()
         .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
