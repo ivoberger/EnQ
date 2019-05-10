@@ -63,6 +63,7 @@ class ServerDiscoveryDialog(private var discovering: Boolean, private val onServ
             mRetryViews.forEach { it?.visibility = View.GONE }
         }
         JMusicBot.discoverHost(AppSettings.getLatestServer()?.baseUrl)
+        JMusicBot.state.running?.join()
         // check if saved url works
         try {
             JMusicBot.getVersionInfo()
