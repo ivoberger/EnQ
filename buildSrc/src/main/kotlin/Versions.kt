@@ -5,21 +5,18 @@ import kotlin.String
  *     `$ ./gradlew buildSrcVersions`
  * This will only update the comments.
  *
- * YOU are responsible for updating manually the dependency version. */
+ * YOU are responsible for updating manually the dependency version.
+ */
 object Versions {
     const val appcompat: String = "1.1.0-alpha05" 
 
-    const val constraintlayout: String = "2.0.0-alpha2" 
+    const val constraintlayout: String = "2.0.0-beta1" 
 
     const val androidx_core_core_ktx: String = "1.1.0-alpha05" 
 
     const val fragment_ktx: String = "1.1.0-alpha08" 
 
-    const val lifecycle_extensions: String = "2.2.0-alpha01" 
-
-    const val lifecycle_livedata_ktx: String = "2.2.0-alpha01" 
-
-    const val lifecycle_viewmodel_savedstate: String = "1.0.0-alpha01" 
+    const val androidx_lifecycle: String = "2.2.0-alpha01" 
 
     const val androidx_navigation: String = "2.1.0-alpha03" 
 
