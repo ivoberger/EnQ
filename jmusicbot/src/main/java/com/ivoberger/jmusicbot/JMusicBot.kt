@@ -126,8 +126,8 @@ object JMusicBot {
     )
     suspend fun connect(authUser: User, host: String) = withContext(Dispatchers.IO) {
         Timber.d("Quick connect")
-        discoverHost(host)
-        authorize(authUser)
+        if (!state.hasServer) discoverHost(host)
+        if (!state.isConnected) authorize(authUser)
     }
 
     suspend fun discoverHost(knownHost: String? = null) = withContext(Dispatchers.IO) {

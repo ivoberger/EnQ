@@ -27,8 +27,6 @@ object Versions {
 
     const val recyclerview: String = "1.1.0-alpha05" 
 
-    const val savedstate: String = "1.0.0-beta01" 
-
     const val aapt2: String = "3.5.0-beta01-5435860" 
 
     const val com_android_tools_build_gradle: String = "3.5.0-beta01" 
@@ -43,7 +41,7 @@ object Versions {
 
     const val statemachine: String = "0.1.2" 
 
-    const val com_github_triplet_play_gradle_plugin: String = "2.2.0" 
+    const val com_github_triplet_play_gradle_plugin: String = "2.2.1" 
 
     const val material: String = "1.1.0-alpha01" 
 
@@ -105,7 +103,7 @@ object Versions {
 
         const val currentVersion: String = "5.4.1"
 
-        const val nightlyVersion: String = "5.5-20190509000038+0000"
+        const val nightlyVersion: String = "5.5-20190510000040+0000"
 
         const val releaseCandidate: String = ""
     }

@@ -55,8 +55,6 @@ object Libs {
      * http://developer.android.com/tools/extras/support-library.html */
     const val recyclerview: String = "androidx.recyclerview:recyclerview:" + Versions.recyclerview
 
-    const val savedstate: String = "androidx.savedstate:savedstate:" + Versions.savedstate
-
     /**
      * https://developer.android.com/studio */
     const val aapt2: String = "com.android.tools.build:aapt2:" + Versions.aapt2
