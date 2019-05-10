@@ -1,7 +1,6 @@
 package com.ivoberger.enq.ui.viewmodel
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ivoberger.jmusicbot.JMusicBot
@@ -12,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class MainViewModel(private val handle: SavedStateHandle) : ViewModel(), ConnectionChangeListener {
+class MainViewModel() : ViewModel(), ConnectionChangeListener {
 
     var playerCollapsed = false
     var bottomNavCollapsed = false

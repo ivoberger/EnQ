@@ -33,9 +33,9 @@
         android:id="@+id/dest_loginDialog"
         android:name="com.ivoberger.enq.ui.dialogs.LoginDialog"
         android:label="LoginDialog">
-        <action
-            android:id="@+id/action_loginDialog_to_queue"
-            app:destination="@id/dest_queue" />
+        <argument
+            android:name="startLoggingIn"
+            app:argType="boolean" />
     </dialog>
     <dialog
         android:id="@+id/dest_serverDiscoveryDialog"

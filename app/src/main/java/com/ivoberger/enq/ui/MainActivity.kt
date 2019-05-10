@@ -10,21 +10,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.forEachIndexed
 import androidx.fragment.app.commit
 import androidx.fragment.app.commitNow
-import androidx.lifecycle.SavedStateVMFactory
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.ivoberger.enq.R
 import com.ivoberger.enq.model.ServerInfo
 import com.ivoberger.enq.persistence.AppSettings
+import com.ivoberger.enq.ui.dialogs.ServerDiscoveryDialogDirections
 import com.ivoberger.enq.ui.fragments.PlayerFragment
+import com.ivoberger.enq.ui.fragments.UserInfoFragmentDirections
 import com.ivoberger.enq.ui.listener.ConnectionListener
 import com.ivoberger.enq.ui.listener.MainNavigationListener
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
 import com.ivoberger.enq.utils.awaitEnd
 import com.ivoberger.enq.utils.icon
-import com.ivoberger.enq.utils.showLoginDialog
-import com.ivoberger.enq.utils.showServerDiscoveryDialog
 import com.ivoberger.jmusicbot.JMusicBot
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.typeface.IIcon
@@ -46,8 +45,8 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var searchView: SearchView
 
-    private val mViewModel: MainViewModel by viewModels { SavedStateVMFactory(this) }
-    private val mNavController: NavController by lazy { main_content.findNavController() }
+    private val mViewModel: MainViewModel by viewModels()
+    val navController: NavController by lazy { main_content.findNavController() }
     private val KEY_CURRENT_SERVER = "currentServer"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,8 +54,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // general setup
-        mNavController.addOnDestinationChangedListener(MainNavigationListener(this))
-        main_bottom_navigation.setupWithNavController(mNavController)
+        navController.addOnDestinationChangedListener(MainNavigationListener(this))
+        main_bottom_navigation.setupWithNavController(navController)
 
         // load bottom navigation icons async
         val icons = listOf<IIcon>(
@@ -77,12 +76,12 @@ class MainActivity : AppCompatActivity() {
                         continueWithBot()
                     } catch (e: Exception) {
                         Timber.w(e)
-                        showServerDiscoveryDialog()
+                        navController.navigate(R.id.dest_serverDiscoveryDialog)
                     }
                 }
             }
-        } else if (!JMusicBot.state.hasServer) showServerDiscoveryDialog()
-        else showLoginDialog()
+        } else if (!JMusicBot.state.hasServer) navController.navigate(R.id.dest_serverDiscoveryDialog)
+        else navController.navigate(ServerDiscoveryDialogDirections.actionServerDiscoveryDialogToLoginDialog(true))
     }
 
     /**
@@ -93,7 +92,7 @@ class MainActivity : AppCompatActivity() {
         AppSettings.addUser(JMusicBot.user!!)
         JMusicBot.connectionListeners.add((ConnectionListener(this@MainActivity)))
         JMusicBot.connectionListeners.add(mViewModel)
-        mNavController.setGraph(R.navigation.main)
+        navController.navigate(R.id.dest_queue)
         supportFragmentManager.commit {
             replace(R.id.main_current_song, PlayerFragment(), null)
         }
@@ -111,7 +110,7 @@ class MainActivity : AppCompatActivity() {
 
         var playerCollapse = mViewModel.playerCollapsed
         // set listener to iconify the SearchView when back is pressed
-        mNavController.addOnDestinationChangedListener { _, dest, _ ->
+        navController.addOnDestinationChangedListener { _, dest, _ ->
             if (dest.id != R.id.dest_search && !searchView.isIconified) {
                 Timber.d("Closing Search View")
                 searchView.isIconified = true
@@ -120,7 +119,7 @@ class MainActivity : AppCompatActivity() {
 
         searchView.setOnSearchClickListener {
             if (!JMusicBot.isConnected) return@setOnSearchClickListener
-            mNavController.navigate(R.id.dest_search)
+            navController.navigate(R.id.dest_search)
             // save player collapse state
             playerCollapse = mViewModel.playerCollapsed
             // collapse bottom UI
@@ -132,7 +131,7 @@ class MainActivity : AppCompatActivity() {
             changeBottomNavCollapse(false)
             changePlayerCollapse(playerCollapse)
             // remove search fragment
-            mNavController.navigateUp()
+            navController.navigateUp()
             return@setOnCloseListener false
         }
         return true
@@ -142,17 +141,17 @@ class MainActivity : AppCompatActivity() {
         item ?: return false
         return when (item.itemId) {
             R.id.app_bar_about -> {
-                mNavController.navigate(R.id.dest_about)
+                navController.navigate(R.id.dest_about)
                 true
             }
 
             R.id.app_bar_search -> false
             R.id.app_bar_user_options -> {
-                mNavController.navigate(R.id.dest_userInfo)
+                navController.navigate(R.id.dest_userInfo)
                 true
             }
             R.id.app_bar_settings -> {
-                mNavController.navigate(R.id.dest_settings)
+                navController.navigate(R.id.dest_settings)
                 true
             }
             else -> false
@@ -167,11 +166,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun reset() = lifecycleScope.launch {
+        JMusicBot.logout()
+        navController.navigate(UserInfoFragmentDirections.actionUserInfoToLoginDialog(false))
         supportFragmentManager.commitNow {
             supportFragmentManager.fragments.forEach { if (it is PlayerFragment) remove(it) }
         }
-        mNavController.popBackStack(R.id.dest_queue, false)
-        showLoginDialog(false)
     }
 
     /**

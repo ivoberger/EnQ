@@ -5,7 +5,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import androidx.navigation.fragment.navArgs
 import com.ivoberger.enq.R
+import com.ivoberger.enq.persistence.AppSettings
+import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.utils.secondaryColor
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.exceptions.AuthException
@@ -28,17 +31,21 @@ import timber.log.Timber
 
 @ExperimentalSplittiesApi
 @PotentialFutureAndroidXLifecycleKtxApi
-class LoginDialog(
-    startLoggingIn: Boolean,
-    private var user: User?,
-    private val onLoggedIn: () -> Unit
-) :
-    DialogFragment() {
-    private var loggingIn = startLoggingIn
+class LoginDialog : DialogFragment() {
+
+    private var loggingIn: Boolean = true
+    private var user: User? = AppSettings.getLatestUser()
+    private val onLoggedIn: () -> Unit = { (activity as MainActivity).continueWithBot() }
     private lateinit var mLoginMaskViews: List<View?>
     private lateinit var mLoginProgressViews: List<View?>
     private var mUserNameInput: TextView? = null
     private var mPasswordInput: TextView? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        val arguments: LoginDialogArgs by navArgs()
+        loggingIn = arguments.startLoggingIn
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         Timber.d("Showing login dialog")

@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
 import com.ivoberger.enq.R
+import com.ivoberger.enq.model.ServerInfo
 import com.ivoberger.enq.persistence.AppSettings
+import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.utils.secondaryColor
 import com.ivoberger.jmusicbot.JMusicBot
 import kotlinx.coroutines.launch
@@ -21,8 +23,23 @@ import timber.log.Timber
 
 @ExperimentalSplittiesApi
 @PotentialFutureAndroidXLifecycleKtxApi
-class ServerDiscoveryDialog(private var discovering: Boolean, private val onServerFound: () -> Unit) :
-    DialogFragment() {
+class ServerDiscoveryDialog : DialogFragment() {
+
+    private var isDiscovering = true
+    private val onServerFound: () -> Unit = {
+        lifecycleScope.launch {
+            try {
+                val serverInfo = ServerInfo(JMusicBot.baseUrl!!, JMusicBot.getVersionInfo())
+                AppSettings.addServer(serverInfo)
+                Timber.d("Added server $serverInfo")
+            } catch (e: Exception) {
+                Timber.w(e)
+            }
+        }
+        (activity as MainActivity).navController.navigate(
+            ServerDiscoveryDialogDirections.actionServerDiscoveryDialogToLoginDialog(true)
+        )
+    }
     private lateinit var mDiscoveringViews: List<View?>
     private lateinit var mRetryViews: List<View?>
 
@@ -41,7 +58,7 @@ class ServerDiscoveryDialog(private var discovering: Boolean, private val onServ
             mDiscoveringViews = listOf(findViewById(R.id.discovery_progress))
             mRetryViews = listOf(positiveButton)
 
-            if (discovering) activity?.lifecycleScope?.launch { attemptDiscovery() }
+            if (isDiscovering) lifecycleScope.launch { attemptDiscovery() }
             else showRetryOption()
         }
 
