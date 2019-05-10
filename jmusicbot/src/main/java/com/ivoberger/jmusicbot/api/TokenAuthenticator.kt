@@ -16,7 +16,6 @@ import timber.log.Timber
 class TokenAuthenticator : Authenticator {
 
     override fun authenticate(route: Route?, response: Response): Request? = runBlocking(Dispatchers.IO) {
-        if (!JMusicBot.isConnected) return@runBlocking null
         Timber.d("Re-authorizing")
         var auth: String? = null
         response.body()?.let { body ->

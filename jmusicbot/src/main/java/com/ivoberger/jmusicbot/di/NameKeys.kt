@@ -8,6 +8,7 @@ internal object NameKeys {
 
     const val RETROFIT_AUTHENTICATED = "authenticatedRetrofit"
 
+    const val OKHTTP_BASE = "basicOkHttp"
     const val OKHTTP_AUTHENTICATED = "authenticatedOkHttp"
 
     const val SERVICE_BASE = "baseService"

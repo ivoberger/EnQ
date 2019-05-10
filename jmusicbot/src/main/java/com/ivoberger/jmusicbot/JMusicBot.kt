@@ -56,9 +56,14 @@ object JMusicBot {
                         connectionListeners.forEach { it.onConnectionRecovered() }
                     }
                     SideEffect.EndUserSession -> {
+                        user = null
+                        Timber.d("CLIENTS 1: SERVER ${mServerSession?.musicBotService()}, USER ${mUserSession?.musicBotService()}, USED ${mServiceClient}")
                         mUserSession = null
+                        mServiceClient = mServerSession!!.musicBotService()
+                        Timber.d("CLIENTS 2: SERVER ${mServerSession?.musicBotService()}, USER ${mUserSession?.musicBotService()}, USED ${mServiceClient}")
                     }
                     SideEffect.EndServerSession -> {
+                        user = null
                         mUserSession = null
                         mServerSession = null
                         if (trans.fromState is State.Discovering) return@onTransition
@@ -112,8 +117,7 @@ object JMusicBot {
     internal var authToken: Auth.Token? = null
         get() = mUserSession?.authToken ?: field
         set(value) {
-            Timber.d("Setting Token to $value")
-            if (value == null) stateMachine.transition(Event.AuthExpired)
+            Timber.d("Setting token to $value")
             field = value
             field?.let {
                 user?.permissions = it.permissions
@@ -272,10 +276,10 @@ object JMusicBot {
         authToken?.also { user?.password = newPassword }
     }
 
-    suspend fun logout() = withContext(Dispatchers.Main) {
+    suspend fun logout() = withContext(Dispatchers.IO) {
         stopQueueUpdates()
         stopPlayerUpdates()
-        user = null
+        stateMachine.transition(Event.AuthExpired)
     }
 
     suspend fun reloadPermissions() = withContext(Dispatchers.IO) {
