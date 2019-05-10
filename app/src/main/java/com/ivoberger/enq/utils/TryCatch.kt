@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import splitties.toast.toast
 import timber.log.Timber
 
-fun <T> Context.tryWithErrorToast(default: T? = null, toTry: () -> T): T? = try {
+inline fun <T> Context.tryWithErrorToast(default: T? = null, toTry: () -> T): T? = try {
     toTry()
 } catch (e: ServerErrorException) {
     Timber.w(e)
@@ -21,4 +21,5 @@ fun <T> Context.tryWithErrorToast(default: T? = null, toTry: () -> T): T? = try 
     default
 }
 
-fun <T> Fragment.tryWithErrorToast(default: T? = null, toTry: () -> T): T? = context?.tryWithErrorToast(default, toTry)
+inline fun <T> Fragment.tryWithErrorToast(default: T? = null, toTry: () -> T): T? =
+    context?.tryWithErrorToast(default, toTry)

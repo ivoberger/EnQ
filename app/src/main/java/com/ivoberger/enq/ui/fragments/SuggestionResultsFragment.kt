@@ -17,7 +17,6 @@ import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
 import com.mikepenz.fastadapter.ui.items.ProgressItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import splitties.experimental.ExperimentalSplittiesApi
 import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
@@ -50,9 +49,9 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
         getSuggestions()
         if (mCanDislike) fastAdapter.onLongClickListener = { _, _, item: ResultItem, position: Int ->
             if (JMusicBot.isConnected) {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    tryWithErrorToast { runBlocking { JMusicBot.deleteSuggestion(mSuggesterId, item.model) } }
-                    withContext(Dispatchers.Main) { songAdapter.remove(position) }
+                lifecycleScope.launch {
+                    tryWithErrorToast { JMusicBot.deleteSuggestion(mSuggesterId, item.model) }
+                    songAdapter.remove(position)
                 }
                 true
             } else false
@@ -61,9 +60,7 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
 
     private fun getSuggestions() = lifecycleScope.launch(Dispatchers.IO) {
         Timber.d("Getting suggestions for suggester $mSuggesterId")
-        val suggestions = tryWithErrorToast(listOf()) {
-            runBlocking { JMusicBot.suggestions(mSuggesterId) }
-        }
+        val suggestions = tryWithErrorToast(listOf()) { JMusicBot.suggestions(mSuggesterId) }
         displayResults(suggestions)
     }
 
@@ -74,11 +71,11 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
                 ItemTouchHelper.RIGHT -> {
                     tryWithErrorToast {
                         try {
-                            runBlocking { JMusicBot.deleteSuggestion(mSuggesterId, entry.model) }
+                            JMusicBot.deleteSuggestion(mSuggesterId, entry.model)
                             getSuggestions()
                         } catch (e: AuthException) {
                             Timber.e("AuthException with reason ${e.reason}")
-                            lifecycleScope.launch {
+                            withContext(Dispatchers.Main) {
                                 context!!.toast(R.string.msg_no_permission)
                                 fastAdapter.notifyAdapterItemChanged(position)
                             }

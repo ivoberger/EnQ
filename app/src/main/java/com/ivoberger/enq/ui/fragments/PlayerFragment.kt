@@ -28,7 +28,6 @@ import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_player.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import splitties.experimental.ExperimentalSplittiesApi
 import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
@@ -58,7 +57,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 velocityY: Float
             ): Boolean {
                 if (velocityX > Math.abs(velocityY) * 2) if (JMusicBot.user!!.permissions.contains(Permissions.SKIP)) {
-                    lifecycleScope.launch(Dispatchers.IO) { JMusicBot.skip() }
+                    lifecycleScope.launch { tryWithErrorToast { JMusicBot.skip() } }
                     return true
                 } else {
                     context!!.toast(R.string.msg_no_permission)
@@ -119,13 +118,11 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     private fun changePlaybackState() = lifecycleScope.launch(Dispatchers.IO) {
         if (!JMusicBot.isConnected) return@launch
         tryWithErrorToast {
-            runBlocking {
-                when (mPlayerState.state) {
-                    PlayerStates.STOP -> JMusicBot.play()
-                    PlayerStates.PLAY -> JMusicBot.pause()
-                    PlayerStates.PAUSE -> JMusicBot.play()
-                    PlayerStates.ERROR -> JMusicBot.play()
-                }
+            when (mPlayerState.state) {
+                PlayerStates.STOP -> JMusicBot.play()
+                PlayerStates.PLAY -> JMusicBot.pause()
+                PlayerStates.PAUSE -> JMusicBot.play()
+                PlayerStates.ERROR -> JMusicBot.play()
             }
         }
     }
