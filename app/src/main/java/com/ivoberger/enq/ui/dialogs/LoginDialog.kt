@@ -9,6 +9,7 @@ import androidx.navigation.fragment.navArgs
 import com.ivoberger.enq.R
 import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.MainActivity
+import com.ivoberger.enq.utils.hideKeyboard
 import com.ivoberger.enq.utils.secondaryColor
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.exceptions.AuthException
@@ -35,7 +36,6 @@ class LoginDialog : DialogFragment() {
 
     private var loggingIn: Boolean = true
     private var user: User? = AppSettings.getLatestUser()
-    private val onLoggedIn: () -> Unit = { (activity as MainActivity).continueWithBot() }
     private lateinit var mLoginMaskViews: List<View?>
     private lateinit var mLoginProgressViews: List<View?>
     private var mUserNameInput: TextView? = null
@@ -76,7 +76,6 @@ class LoginDialog : DialogFragment() {
             if (loggingIn && user != null) attemptLogin()
             else showLoginMask()
         }
-
         return dialog ?: throw IllegalStateException("Context cannot be null")
     }
 
@@ -89,9 +88,10 @@ class LoginDialog : DialogFragment() {
         }
     }
 
-    private fun attemptLogin() = activity?.lifecycleScope?.launch {
+    private fun attemptLogin() = lifecycleScope.launch {
         try {
             // ui setup
+            hideKeyboard()
             dialog?.apply {
                 setTitle(R.string.tlt_logging_in)
                 mLoginMaskViews.forEach { it?.visibility = View.GONE }
@@ -100,9 +100,9 @@ class LoginDialog : DialogFragment() {
             // actual login
             JMusicBot.authorize(user)
             context?.toast(getString(R.string.msg_logged_in, JMusicBot.user!!.name))
-            onLoggedIn()
-            Timber.d("Dismissing Dialog")
-            dialog?.dismiss()
+            val mainActivity = activity as MainActivity
+            mainActivity.continueWithBot()
+            dismiss()
         } catch (e: UsernameTakenException) {
             Timber.w(e)
             context?.toast(R.string.msg_username_taken)

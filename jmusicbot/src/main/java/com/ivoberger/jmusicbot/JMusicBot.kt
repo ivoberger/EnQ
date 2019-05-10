@@ -187,7 +187,7 @@ object JMusicBot {
         } catch (e: UsernameTakenException) {
             Timber.w(e)
             if (password.isNullOrBlank() && user?.password.isNullOrBlank()) {
-                Timber.d("No passwords found, throwing exception, $password, $user")
+                Timber.d("No passwords found, throwing exception, $password, ${user?.name}")
                 throw e
             }
         }
@@ -214,7 +214,7 @@ object JMusicBot {
             }
             val tmpUser = mServiceClient!!.testToken(authToken!!.toAuthHeader()).process()
             if (tmpUser?.name == user?.name) {
-                Timber.d("Valid Token: $user")
+                Timber.d("Valid Token: ${user?.name}")
                 stateMachine.transition(Event.Authorize(user!!, authToken!!))
                 return true
             }
@@ -252,7 +252,7 @@ object JMusicBot {
         NotFoundException::class, ServerErrorException::class, IllegalStateException::class
     )
     private suspend fun login(userName: String? = null, password: String? = null) = withContext(Dispatchers.IO) {
-        Timber.d("Logging in $user")
+        Timber.d("Logging in ${userName ?: user?.name}")
         state.serverCheck()
         val credentials = when {
             (!(userName.isNullOrBlank() || password.isNullOrBlank())) -> {
@@ -264,7 +264,7 @@ object JMusicBot {
         }
         Timber.d("Auth: $credentials")
         val token = mServiceClient!!.loginUser(credentials).process()!!
-        Timber.d("Logged in $user")
+        Timber.d("Logged in ${user?.name}")
         authToken = Auth.Token(token)
         stateMachine.transition(Event.Authorize(user!!, authToken!!))
     }

@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
+import com.ivoberger.enq.MainDirections
 import com.ivoberger.enq.R
 import com.ivoberger.enq.model.ServerInfo
 import com.ivoberger.enq.persistence.AppSettings
@@ -26,25 +27,12 @@ import timber.log.Timber
 class ServerDiscoveryDialog : DialogFragment() {
 
     private var isDiscovering = true
-    private val onServerFound: () -> Unit = {
-        lifecycleScope.launch {
-            try {
-                val serverInfo = ServerInfo(JMusicBot.baseUrl!!, JMusicBot.getVersionInfo())
-                AppSettings.addServer(serverInfo)
-                Timber.d("Added server $serverInfo")
-            } catch (e: Exception) {
-                Timber.w(e)
-            }
-        }
-        (activity as MainActivity).navController.navigate(
-            ServerDiscoveryDialogDirections.actionServerDiscoveryDialogToLoginDialog(true)
-        )
-    }
+    private var triedLatestServer = false
     private lateinit var mDiscoveringViews: List<View?>
     private lateinit var mRetryViews: List<View?>
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        Timber.d("Showing login dialog")
+        Timber.d("Showing server discovery dialog")
         val dialog = context?.alertDialog {
             titleResource = R.string.tlt_server_discovery
             isCancelable = false
@@ -52,7 +40,7 @@ class ServerDiscoveryDialog : DialogFragment() {
             positiveButton(R.string.btn_retry) {}
         }
         dialog?.onShow {
-            positiveButton.onClick { attemptDiscovery() }
+            positiveButton.onClick { lifecycleScope.launch { attemptDiscovery() } }
             positiveButton.setTextColor(context.secondaryColor())
 
             mDiscoveringViews = listOf(findViewById(R.id.discovery_progress))
@@ -73,23 +61,39 @@ class ServerDiscoveryDialog : DialogFragment() {
         }
     }
 
-    private fun attemptDiscovery() = activity?.lifecycleScope?.launch {
+    private suspend fun attemptDiscovery() {
         dialog?.apply {
             setTitle(R.string.tlt_server_discovery)
             mDiscoveringViews.forEach { it?.visibility = View.VISIBLE }
             mRetryViews.forEach { it?.visibility = View.GONE }
         }
-        JMusicBot.discoverHost(AppSettings.getLatestServer()?.baseUrl)
+        JMusicBot.discoverHost(if (!triedLatestServer) AppSettings.getLatestServer()?.baseUrl else null)
         JMusicBot.state.running?.join()
         // check if saved url works
-        try {
+        val versionInfo = try {
             JMusicBot.getVersionInfo()
         } catch (e: Exception) {
             Timber.w(e)
+            if (!triedLatestServer) {
+                JMusicBot.discoverHost()
+                JMusicBot.state.running?.join()
+                triedLatestServer = true
+            }
+            null
         }
         if (JMusicBot.state.hasServer) {
-            dialog?.dismiss()
-            onServerFound()
+            (activity as MainActivity).navController.navigate(MainDirections.actionGlobalLoginDialog(true))
+            Timber.d("Found server")
+            activity?.lifecycleScope?.launch {
+                try {
+                    val serverInfo = ServerInfo(JMusicBot.baseUrl!!, versionInfo ?: JMusicBot.getVersionInfo())
+                    AppSettings.addServer(serverInfo)
+                    Timber.d("Added server $serverInfo")
+                } catch (e: Exception) {
+                    Timber.w(e)
+                }
+            }
+            dismiss()
         } else showRetryOption()
     }
 }

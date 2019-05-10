@@ -17,19 +17,24 @@ import timber.log.Timber
 @ExperimentalSplittiesApi
 class MainNavigationListener(private val mainActivity: MainActivity) : NavController.OnDestinationChangedListener {
 
+    init {
+        Timber.d("Initializing MainNavigationListener")
+    }
+
     override fun onDestinationChanged(controller: NavController, destination: NavDestination, arguments: Bundle?) {
-        Timber.d("Navigated to ${destination.label}")
+        Timber.d("Navigated to ${destination.label} with id ${destination.id}")
         when (destination.id) {
             R.id.dest_queue -> checkIfNotChecked(0)
             R.id.dest_suggestions -> checkIfNotChecked(1)
             R.id.dest_favorites -> checkIfNotChecked(2)
-            else -> mainActivity.main_bottom_navigation.menu.setGroupCheckable(0, false, true)
+            // remove highlight from bottom navigation if none of its menu points is selected (e.g. user info)
+            else -> mainActivity.bottom_navigation.menu.setGroupCheckable(0, false, true)
         }
     }
 
     private fun checkIfNotChecked(idx: Int) = mainActivity.lifecycleScope.launch {
-        mainActivity.main_bottom_navigation.menu.setGroupCheckable(0, true, true)
-        if (!mainActivity.main_bottom_navigation.menu[idx].isChecked)
-            mainActivity.main_bottom_navigation.menu[idx].isChecked = true
+        mainActivity.bottom_navigation.menu.setGroupCheckable(0, true, true)
+        if (!mainActivity.bottom_navigation.menu[idx].isChecked)
+            mainActivity.bottom_navigation.menu[idx].isChecked = true
     }
 }

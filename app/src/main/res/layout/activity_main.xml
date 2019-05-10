@@ -16,19 +16,19 @@
         app:layout_dodgeInsetEdges="bottom">
 
         <FrameLayout
-            android:id="@+id/main_current_song"
+            android:id="@+id/container_current_song"
             android:name="com.ivoberger.enq.ui.fragments.PlayerFragment"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:tag="player_fragment"
-            app:layout_constraintBottom_toTopOf="@id/main_bottom_navigation"
+            app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             tools:layout="@layout/fragment_player" />
 
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/main_bottom_navigation"
+            android:id="@+id/bottom_navigation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:paddingTop="3dp"
@@ -38,13 +38,13 @@
             app:menu="@menu/bottom_nav" />
 
         <fragment
-            android:id="@+id/main_content"
+            android:id="@+id/container_main_content"
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:tag="content_fragment"
             app:defaultNavHost="true"
-            app:layout_constraintBottom_toTopOf="@+id/main_current_song"
+            app:layout_constraintBottom_toTopOf="@+id/container_current_song"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

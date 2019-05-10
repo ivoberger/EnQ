@@ -11,7 +11,7 @@
         android:id="@+id/action_global_suggestions"
         app:destination="@id/dest_suggestions" />
     <action
-        android:id="@id/nav_favorites"
+        android:id="@id/action_global_favorites"
         app:destination="@id/dest_favorites" />
     <action
         android:id="@+id/action_global_search"
@@ -27,8 +27,11 @@
         app:destination="@id/dest_about" />
 
     <action
-        android:id="@+id/nav_action_global_serverDiscoveryDialog"
+        android:id="@+id/action_global_serverDiscoveryDialog"
         app:destination="@id/dest_serverDiscoveryDialog" />
+    <action
+        android:id="@+id/action_global_loginDialog"
+        app:destination="@id/dest_loginDialog" />
     <dialog
         android:id="@+id/dest_loginDialog"
         android:name="com.ivoberger.enq.ui.dialogs.LoginDialog"
@@ -40,11 +43,7 @@
     <dialog
         android:id="@+id/dest_serverDiscoveryDialog"
         android:name="com.ivoberger.enq.ui.dialogs.ServerDiscoveryDialog"
-        android:label="ServerDiscoveryDialog">
-        <action
-            android:id="@+id/action_serverDiscoveryDialog_to_loginDialog"
-            app:destination="@id/dest_loginDialog" />
-    </dialog>
+        android:label="ServerDiscoveryDialog" />
     <fragment
         android:id="@+id/dest_queue"
         android:name="com.ivoberger.enq.ui.fragments.QueueFragment"
@@ -73,11 +72,7 @@
         android:id="@+id/dest_userInfo"
         android:name="com.ivoberger.enq.ui.fragments.UserInfoFragment"
         android:label="UserInfoFragment"
-        tools:layout="@layout/fragment_user_info">
-        <action
-            android:id="@+id/action_userInfo_to_loginDialog"
-            app:destination="@id/dest_loginDialog" />
-    </fragment>
+        tools:layout="@layout/fragment_user_info" />
     <fragment
         android:id="@+id/dest_about"
         android:name="com.ivoberger.enq.ui.fragments.AboutFragment"

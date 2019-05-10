@@ -13,16 +13,16 @@ import androidx.fragment.app.commitNow
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
+import com.ivoberger.enq.MainDirections
 import com.ivoberger.enq.R
 import com.ivoberger.enq.model.ServerInfo
 import com.ivoberger.enq.persistence.AppSettings
-import com.ivoberger.enq.ui.dialogs.ServerDiscoveryDialogDirections
 import com.ivoberger.enq.ui.fragments.PlayerFragment
-import com.ivoberger.enq.ui.fragments.UserInfoFragmentDirections
 import com.ivoberger.enq.ui.listener.ConnectionListener
 import com.ivoberger.enq.ui.listener.MainNavigationListener
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
 import com.ivoberger.enq.utils.awaitEnd
+import com.ivoberger.enq.utils.hideKeyboard
 import com.ivoberger.enq.utils.icon
 import com.ivoberger.jmusicbot.JMusicBot
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var searchView: SearchView
 
     private val mViewModel: MainViewModel by viewModels()
-    val navController: NavController by lazy { main_content.findNavController() }
+    val navController: NavController by lazy { container_main_content.findNavController() }
     private val KEY_CURRENT_SERVER = "currentServer"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
 
         // general setup
         navController.addOnDestinationChangedListener(MainNavigationListener(this))
-        main_bottom_navigation.setupWithNavController(navController)
+        bottom_navigation.setupWithNavController(navController)
 
         // load bottom navigation icons async
         val icons = listOf<IIcon>(
@@ -63,25 +63,27 @@ class MainActivity : AppCompatActivity() {
             CommunityMaterial.Icon.cmd_all_inclusive,
             CommunityMaterial.Icon2.cmd_star_outline
         ).map { lifecycleScope.async(Dispatchers.Default) { icon(it).color(colorSL(R.color.bottom_navigation)) } }
-        lifecycleScope.launch {
-            main_bottom_navigation.menu.forEachIndexed { idx, itm -> itm.icon = icons[idx].await() }
-        }
+        lifecycleScope.launch { bottom_navigation.menu.forEachIndexed { idx, itm -> itm.icon = icons[idx].await() } }
 
-        if (JMusicBot.isConnected) continueWithBot()
-        else if (!JMusicBot.state.hasServer && savedInstanceState != null && AppSettings.getLatestUser() != null) {
-            savedInstanceState.getParcelable<ServerInfo>(KEY_CURRENT_SERVER)?.let {
-                lifecycleScope.launch {
-                    try {
-                        JMusicBot.connect(AppSettings.getLatestUser()!!, it.baseUrl)
-                        continueWithBot()
-                    } catch (e: Exception) {
-                        Timber.w(e)
-                        navController.navigate(R.id.dest_serverDiscoveryDialog)
+        when {
+            JMusicBot.isConnected -> continueWithBot()
+            savedInstanceState != null && AppSettings.getLatestUser() != null -> {
+                Timber.d("Resuming from saved state")
+                savedInstanceState.getParcelable<ServerInfo>(KEY_CURRENT_SERVER)?.let {
+                    lifecycleScope.launch {
+                        try {
+                            JMusicBot.connect(AppSettings.getLatestUser()!!, it.baseUrl)
+                            continueWithBot()
+                        } catch (e: Exception) {
+                            Timber.w(e)
+                            navController.navigate(MainDirections.actionGlobalServerDiscoveryDialog())
+                        }
                     }
                 }
             }
-        } else if (!JMusicBot.state.hasServer) navController.navigate(R.id.dest_serverDiscoveryDialog)
-        else navController.navigate(ServerDiscoveryDialogDirections.actionServerDiscoveryDialogToLoginDialog(true))
+            JMusicBot.state.hasServer -> navController.navigate(MainDirections.actionGlobalLoginDialog(true))
+            else -> navController.navigate(MainDirections.actionGlobalServerDiscoveryDialog())
+        }
     }
 
     /**
@@ -89,18 +91,14 @@ class MainActivity : AppCompatActivity() {
      */
     fun continueWithBot() = lifecycleScope.launch(Dispatchers.Default) {
         Timber.d("Continuing")
+        supportFragmentManager.commit { replace(R.id.container_current_song, PlayerFragment(), null) }
+        if (navController.currentDestination?.id != R.id.dest_queue) navController.popBackStack(R.id.dest_queue, false)
+        // hide keyboard in case is wasn't hidden after login
+        hideKeyboard()
         AppSettings.addUser(JMusicBot.user!!)
         JMusicBot.connectionListeners.add((ConnectionListener(this@MainActivity)))
         JMusicBot.connectionListeners.add(mViewModel)
-        navController.navigate(R.id.dest_queue)
-        supportFragmentManager.commit {
-            replace(R.id.main_current_song, PlayerFragment(), null)
-        }
-    }
 
-    override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount == 0) super.onBackPressed()
-        else supportFragmentManager.popBackStack()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -119,7 +117,7 @@ class MainActivity : AppCompatActivity() {
 
         searchView.setOnSearchClickListener {
             if (!JMusicBot.isConnected) return@setOnSearchClickListener
-            navController.navigate(R.id.dest_search)
+            navController.navigate(MainDirections.actionGlobalSearch())
             // save player collapse state
             playerCollapse = mViewModel.playerCollapsed
             // collapse bottom UI
@@ -141,17 +139,17 @@ class MainActivity : AppCompatActivity() {
         item ?: return false
         return when (item.itemId) {
             R.id.app_bar_about -> {
-                navController.navigate(R.id.dest_about)
+                navController.navigate(MainDirections.actionGlobalAbout())
                 true
             }
 
             R.id.app_bar_search -> false
-            R.id.app_bar_user_options -> {
-                navController.navigate(R.id.dest_userInfo)
+            R.id.app_bar_user_info -> {
+                navController.navigate(MainDirections.actionGlobalUserInfo())
                 true
             }
             R.id.app_bar_settings -> {
-                navController.navigate(R.id.dest_settings)
+                navController.navigate(MainDirections.actionGlobalSettings())
                 true
             }
             else -> false
@@ -167,7 +165,7 @@ class MainActivity : AppCompatActivity() {
 
     fun reset() = lifecycleScope.launch {
         JMusicBot.logout()
-        navController.navigate(UserInfoFragmentDirections.actionUserInfoToLoginDialog(false))
+        navController.navigate(MainDirections.actionGlobalLoginDialog(false))
         supportFragmentManager.commitNow {
             supportFragmentManager.fragments.forEach { if (it is PlayerFragment) remove(it) }
         }
@@ -199,16 +197,16 @@ class MainActivity : AppCompatActivity() {
      * @param duration: duration of the animation
      */
     private fun changeBottomNavCollapse(collapse: Boolean, duration: Long = 1000) = lifecycleScope.launch {
-        main_bottom_navigation.animation.awaitEnd()
+        bottom_navigation.animation.awaitEnd()
         if (mViewModel.bottomNavCollapsed == collapse) return@launch
         Timber.d("Changing bottom nav collapse to $collapse")
-        val animation = main_bottom_navigation.animate().setDuration(duration)
-        val translateBy = main_bottom_navigation.height.toFloat()
+        val animation = bottom_navigation.animate().setDuration(duration)
+        val translateBy = bottom_navigation.height.toFloat()
         if (!mViewModel.bottomNavCollapsed) animation.translationYBy(translateBy)
-            .withEndAction { main_bottom_navigation.visibility = View.GONE }
+            .withEndAction { bottom_navigation.visibility = View.GONE }
             .start()
         else animation.translationYBy(-translateBy)
-            .withStartAction { main_bottom_navigation.visibility = View.VISIBLE }
+            .withStartAction { bottom_navigation.visibility = View.VISIBLE }
             .start()
         mViewModel.bottomNavCollapsed = collapse
     }
