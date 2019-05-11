@@ -1,4 +1,3 @@
-- Fixes a bug that would crash the app when rotation the phone
-- Fixes a bug with automatic login
-- Slightly modified icon
-- Animated song progress
+- Fixes crash when the authorization expired
+- Fixes 2 crashes in search and suggestions when the providers couldn't be successfully fetched
+- Fixes crash when a network request timed out

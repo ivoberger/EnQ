@@ -1,7 +1,5 @@
 package com.ivoberger.enq.utils
 
-import android.content.Context
-import androidx.fragment.app.Fragment
 import com.ivoberger.enq.R
 import com.ivoberger.jmusicbot.exceptions.ServerErrorException
 import kotlinx.coroutines.MainScope
@@ -9,7 +7,7 @@ import kotlinx.coroutines.launch
 import splitties.toast.toast
 import timber.log.Timber
 
-inline fun <T> Context.tryWithErrorToast(default: T? = null, toTry: () -> T): T? = try {
+inline fun <T> tryWithErrorToast(default: T? = null, toTry: () -> T): T? = try {
     toTry()
 } catch (e: ServerErrorException) {
     Timber.w(e)
@@ -21,5 +19,19 @@ inline fun <T> Context.tryWithErrorToast(default: T? = null, toTry: () -> T): T?
     default
 }
 
-inline fun <T> Fragment.tryWithErrorToast(default: T? = null, toTry: () -> T): T? =
-    context?.tryWithErrorToast(default, toTry)
+inline fun <T> tryWithDefault(default: T? = null, toTry: () -> T) = try {
+    toTry()
+} catch (e: Exception) {
+    Timber.w(e)
+    default
+}
+
+inline fun <T> retryOnError(maxAttempts: Int = 5, toTry: () -> T): T? {
+    var res = tryWithDefault { toTry() }
+    var attempts = 1
+    while (res == null && attempts <= maxAttempts) {
+        res = tryWithDefault { toTry() }
+        attempts++
+    }
+    return res
+}
