@@ -22,6 +22,7 @@ inline fun <T> tryWithErrorToast(default: T? = null, toTry: () -> T): T? = try {
 inline fun <T> tryWithDefault(default: T? = null, toTry: () -> T) = try {
     toTry()
 } catch (e: Exception) {
+    Timber.w(e)
     default
 }
 
