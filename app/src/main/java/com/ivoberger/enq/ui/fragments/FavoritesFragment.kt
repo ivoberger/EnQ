@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import com.ivoberger.enq.R
 import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.MainActivity
-import com.ivoberger.enq.ui.fragments.parents.SongListFragment
+import com.ivoberger.enq.ui.fragments.base.SongListFragment
 import com.ivoberger.enq.ui.items.SongItem
 import com.ivoberger.enq.utils.attributeColor
 import com.ivoberger.enq.utils.icon

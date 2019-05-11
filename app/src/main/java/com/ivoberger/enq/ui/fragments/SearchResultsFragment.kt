@@ -2,7 +2,7 @@ package com.ivoberger.enq.ui.fragments
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
-import com.ivoberger.enq.ui.fragments.parents.ResultsFragment
+import com.ivoberger.enq.ui.fragments.base.ResultsFragment
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.KEY_PROVIDER_ID
 import com.ivoberger.jmusicbot.model.Song

@@ -6,7 +6,7 @@ import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.ivoberger.enq.R
 import com.ivoberger.enq.persistence.AppSettings
-import com.ivoberger.enq.ui.fragments.parents.ResultsFragment
+import com.ivoberger.enq.ui.fragments.base.ResultsFragment
 import com.ivoberger.enq.ui.items.ResultItem
 import com.ivoberger.enq.utils.tryWithErrorToast
 import com.ivoberger.jmusicbot.JMusicBot

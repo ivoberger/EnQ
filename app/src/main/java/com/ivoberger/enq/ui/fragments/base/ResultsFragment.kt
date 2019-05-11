@@ -1,4 +1,4 @@
-package com.ivoberger.enq.ui.fragments.parents
+package com.ivoberger.enq.ui.fragments.base
 
 import android.os.Bundle
 import android.view.View
