@@ -14,6 +14,7 @@ import java.io.IOException
 import java.net.DatagramPacket
 import java.net.InetAddress
 import java.net.MulticastSocket
+import java.net.SocketTimeoutException
 
 private const val GROUP_ADDRESS = "224.0.0.142"
 internal const val PORT = 42945
@@ -60,6 +61,9 @@ internal suspend inline fun <reified T> Deferred<Response<T>>.process(
     try {
         response = await()
     } catch (e: IOException) {
+        JMusicBot.stateMachine.transition(Event.Disconnect(e))
+        throw e
+    } catch (e: SocketTimeoutException) {
         JMusicBot.stateMachine.transition(Event.Disconnect(e))
         throw e
     }
