@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <ConstraintSet android:id="@+id/collapsed">
+        <Constraint
+            android:id="@id/fragment_container_current_song"
+            android:layout_height="70dp"
+            motion:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent" />
+        <Constraint android:id="@id/fragment_container_content">
+            <CustomAttribute
+                motion:attributeName="alpha"
+                motion:customFloatValue="1" />
+        </Constraint>
+        <Constraint
+            android:id="@id/bottom_navigation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/expanded">
+        <Constraint
+            android:id="@id/fragment_container_current_song"
+            android:layout_height="0dp"
+            motion:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent" />
+        <Constraint android:id="@id/fragment_container_content">
+            <CustomAttribute
+                motion:attributeName="alpha"
+                motion:customFloatValue="0" />
+        </Constraint>
+        <Constraint
+            android:id="@id/bottom_navigation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="parent" />
+    </ConstraintSet>
+
+    <Transition
+        motion:constraintSetEnd="@id/expanded"
+        motion:constraintSetStart="@id/collapsed"
+        motion:motionInterpolator="linear">
+        <OnSwipe
+            motion:dragDirection="dragUp"
+            motion:touchAnchorId="@id/fragment_container_current_song"
+            motion:touchAnchorSide="top"
+            motion:touchRegionId="@id/fragment_container_current_song" />
+    </Transition>
+
+</MotionScene>

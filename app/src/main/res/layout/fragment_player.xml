@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/current_song_container"
+    android:id="@+id/player_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorSurface"
+    app:layoutDescription="@xml/player_scene"
     tools:ignore="MissingPrefix,UnusedAttribute,ContentDescription">
 
     <ImageButton
         android:id="@+id/song_play_pause"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/song_imgButton_size"
+        android:layout_height="@dimen/song_imgButton_size"
         android:layout_marginHorizontal="@dimen/song_imgButton_margin"
         android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="@id/song_album_art"
@@ -21,8 +22,8 @@
 
     <ImageButton
         android:id="@+id/song_favorite"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/song_imgButton_size"
+        android:layout_height="@dimen/song_imgButton_size"
         android:layout_marginHorizontal="@dimen/song_imgButton_margin"
         android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="@id/song_album_art"
@@ -32,26 +33,17 @@
 
     <ImageView
         android:id="@+id/song_album_art"
-        android:layout_width="@dimen/song_albumArt_size"
-        android:layout_height="@dimen/song_albumArt_size"
-        android:layout_marginStart="@dimen/song_albumArt_margin"
-        android:layout_marginTop="@dimen/song_albumArt_margin"
-        android:layout_marginBottom="@dimen/song_albumArt_margin"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:contentDescription="@string/lbl_album_art"
-        app:layout_constraintBottom_toTopOf="@id/song_progress"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:maxWidth="100dp"
         tools:src="@tools:sample/avatars" />
 
     <ProgressBar
         android:id="@+id/song_progress"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="0dp"
-        android:layout_height="1dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/song_album_art" />
+        android:layout_height="1dp" />
 
     <TextView
         android:id="@+id/song_duration"
@@ -68,12 +60,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/song_info_margin"
-        android:singleLine="true"
-        android:textAppearance="?textAppearanceSubtitle1"
-        app:layout_constraintBottom_toTopOf="@id/song_description"
-        app:layout_constraintEnd_toStartOf="@id/song_chosen_by"
-        app:layout_constraintStart_toEndOf="@id/song_album_art"
-        app:layout_constraintTop_toTopOf="@id/song_album_art" />
+        android:textAppearance="?textAppearanceSubtitle1" />
 
     <TextView
         android:id="@+id/song_description"
@@ -81,11 +68,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="3dp"
         android:singleLine="true"
-        android:textAppearance="?textAppearanceBody1"
-        app:layout_constraintBottom_toBottomOf="@id/song_album_art"
-        app:layout_constraintEnd_toStartOf="@id/song_duration"
-        app:layout_constraintStart_toStartOf="@id/song_title"
-        app:layout_constraintTop_toBottomOf="@id/song_title" />
+        android:textAppearance="?textAppearanceBody1" />
 
     <TextView
         android:id="@+id/song_chosen_by"
@@ -99,4 +82,4 @@
         app:layout_constraintBottom_toTopOf="@id/song_duration"
         app:layout_constraintEnd_toStartOf="@id/song_play_pause"
         app:layout_constraintTop_toTopOf="@id/song_album_art" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.motion.widget.MotionLayout>

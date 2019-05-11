@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <ConstraintSet android:id="@+id/player_collapsed">
+        <Constraint
+            android:id="@id/song_album_art"
+            motion:layout_constraintBottom_toTopOf="@id/song_progress"
+            motion:layout_constraintDimensionRatio="1:1"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent" />
+        <Constraint
+            android:id="@id/song_title"
+            motion:layout_constraintBottom_toTopOf="@id/song_description"
+            motion:layout_constraintEnd_toStartOf="@id/song_chosen_by"
+            motion:layout_constraintStart_toEndOf="@id/song_album_art"
+            motion:layout_constraintTop_toTopOf="@id/song_album_art" />
+        <Constraint
+            android:id="@id/song_description"
+            motion:layout_constraintBottom_toBottomOf="@id/song_album_art"
+            motion:layout_constraintEnd_toStartOf="@id/song_duration"
+            motion:layout_constraintStart_toStartOf="@id/song_title"
+            motion:layout_constraintTop_toBottomOf="@id/song_title" />
+        <Constraint
+            android:id="@id/song_progress"
+            android:layout_height="1dp"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/player_expanded">
+        <Constraint
+            android:id="@id/song_album_art"
+            motion:layout_constraintDimensionRatio="1:1"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent" />
+        <Constraint
+            android:id="@id/song_title"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="@id/song_progress" />
+        <Constraint
+            android:id="@id/song_description"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="@id/song_title" />
+        <Constraint
+            android:id="@id/song_progress"
+            android:layout_height="5dp"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="@id/song_album_art" />
+    </ConstraintSet>
+
+    <Transition
+        motion:constraintSetEnd="@+id/player_expanded"
+        motion:constraintSetStart="@+id/player_collapsed"
+        motion:motionInterpolator="linear" />
+
+</MotionScene>

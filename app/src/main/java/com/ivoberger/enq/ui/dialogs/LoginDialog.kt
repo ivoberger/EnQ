@@ -89,14 +89,14 @@ class LoginDialog : DialogFragment() {
     }
 
     private fun attemptLogin() = lifecycleScope.launch {
+        // ui setup
+        hideKeyboard()
+        dialog?.apply {
+            setTitle(R.string.tlt_logging_in)
+            mLoginMaskViews.forEach { it?.visibility = View.GONE }
+            mLoginProgressViews.forEach { it?.visibility = View.VISIBLE }
+        }
         try {
-            // ui setup
-            hideKeyboard()
-            dialog?.apply {
-                setTitle(R.string.tlt_logging_in)
-                mLoginMaskViews.forEach { it?.visibility = View.GONE }
-                mLoginProgressViews.forEach { it?.visibility = View.VISIBLE }
-            }
             // actual login
             JMusicBot.authorize(user)
             context?.toast(getString(R.string.msg_logged_in, JMusicBot.user!!.name))

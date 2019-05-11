@@ -3,28 +3,28 @@ package com.ivoberger.enq.ui.fragments
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.os.Bundle
-import android.view.GestureDetector
-import android.view.MotionEvent
 import android.view.View
 import android.view.animation.LinearInterpolator
-import androidx.core.view.GestureDetectorCompat
+import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.constraintlayout.motion.widget.MotionScene
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import com.ivoberger.enq.R
 import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.persistence.GlideApp
+import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
 import com.ivoberger.enq.utils.icon
 import com.ivoberger.enq.utils.onPrimaryColor
 import com.ivoberger.enq.utils.secondaryColor
 import com.ivoberger.enq.utils.tryWithErrorToast
 import com.ivoberger.jmusicbot.JMusicBot
-import com.ivoberger.jmusicbot.model.Permissions
 import com.ivoberger.jmusicbot.model.PlayerState
 import com.ivoberger.jmusicbot.model.PlayerStates
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.iconics.IconicsDrawable
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_player.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,39 +34,16 @@ import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
 import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.resources.dimen
 import splitties.resources.str
-import splitties.toast.toast
 import splitties.views.onClick
 import timber.log.Timber
 
-
-@PotentialFutureAndroidXLifecycleKtxApi
 @ExperimentalSplittiesApi
-class PlayerFragment : Fragment(R.layout.fragment_player) {
+@PotentialFutureAndroidXLifecycleKtxApi
+class PlayerFragment : Fragment(R.layout.fragment_player), MotionLayout.TransitionListener {
 
     private val mViewModel: MainViewModel by viewModels({ activity!! })
 
     private var mPlayerState: PlayerState = PlayerState(PlayerStates.STOP, null)
-
-    private val mFlingListener by lazy {
-        object : GestureDetector.SimpleOnGestureListener() {
-
-            override fun onFling(
-                motionEventStart: MotionEvent?,
-                motionEventEnd: MotionEvent?,
-                velocityX: Float,
-                velocityY: Float
-            ): Boolean {
-                if (velocityX > Math.abs(velocityY) * 2) if (JMusicBot.user!!.permissions.contains(Permissions.SKIP)) {
-                    lifecycleScope.launch { tryWithErrorToast { JMusicBot.skip() } }
-                    return true
-                } else {
-                    context!!.toast(R.string.msg_no_permission)
-                }
-                return super.onFling(motionEventStart, motionEventEnd, velocityX, velocityY)
-            }
-        }
-    }
-    private val mGestureDetector by lazy { GestureDetectorCompat(context, mFlingListener) }
     private val mProgressMultiplier = 1000
 
     private lateinit var mPlayDrawable: IconicsDrawable
@@ -79,7 +56,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        retainInstance = true
+        (context as MainActivity).main_container.setTransitionListener(this)
         // pre-load drawables for player buttons
         lifecycleScope.launch(Dispatchers.IO) {
             val color = context.onPrimaryColor()
@@ -108,10 +85,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
         song_play_pause.onClick { changePlaybackState() }
         song_favorite.onClick { changeFavoriteStatus() }
-        view.setOnTouchListener { _, event ->
-            mGestureDetector.onTouchEvent(event)
-            true
-        }
         song_progress.progress = mPlayerState.progress
     }
 
@@ -198,5 +171,21 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 start()
             }
         }
+    }
+
+    override fun onTransitionTrigger(motionLayout: MotionLayout?, triggerId: Int, positive: Boolean, progress: Float) {}
+
+    override fun allowsTransition(motionLayout: MotionScene.Transition?): Boolean = true
+
+    override fun onTransitionStarted(motionLayout: MotionLayout?, startId: Int, endId: Int) {}
+
+    override fun onTransitionChange(motionLayout: MotionLayout?, startId: Int, endId: Int, progress: Float) {
+        player_container.progress = progress
+    }
+
+    override fun onTransitionCompleted(motionLayout: MotionLayout?, currentId: Int) {
+        GlideApp.with(this@PlayerFragment)
+            .load(mPlayerState.songEntry?.song?.albumArtUrl ?: mAlbumArtPlaceholderDrawable)
+            .into(song_album_art)
     }
 }

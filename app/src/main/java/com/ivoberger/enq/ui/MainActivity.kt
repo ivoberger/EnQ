@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var searchView: SearchView
 
     private val mViewModel: MainViewModel by viewModels()
-    val navController: NavController by lazy { container_main_content.findNavController() }
+    val navController: NavController by lazy { fragment_container_content.findNavController() }
     private val KEY_CURRENT_SERVER = "currentServer"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,14 +91,13 @@ class MainActivity : AppCompatActivity() {
      */
     fun continueWithBot() = lifecycleScope.launch(Dispatchers.Default) {
         Timber.d("Continuing")
-        supportFragmentManager.commit { replace(R.id.container_current_song, PlayerFragment(), null) }
+        supportFragmentManager.commit { replace(R.id.fragment_container_current_song, PlayerFragment(), null) }
         if (navController.currentDestination?.id != R.id.dest_queue) navController.popBackStack(R.id.dest_queue, false)
         // hide keyboard in case is wasn't hidden after login
         hideKeyboard()
         AppSettings.addUser(JMusicBot.user!!)
         JMusicBot.connectionListeners.add((ConnectionListener(this@MainActivity)))
         JMusicBot.connectionListeners.add(mViewModel)
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -177,16 +176,16 @@ class MainActivity : AppCompatActivity() {
      * @param duration: duration of the animation
      */
     private fun changePlayerCollapse(collapse: Boolean, duration: Long = 1000) = lifecycleScope.launch {
-        current_song_container.animation.awaitEnd()
+        player_container.animation.awaitEnd()
         if (mViewModel.playerCollapsed == collapse) return@launch
         Timber.d("Changing player collapse to $collapse")
-        val animation = current_song_container.animate().setDuration(duration)
-        val translateBy = current_song_container.height.toFloat()
+        val animation = player_container.animate().setDuration(duration)
+        val translateBy = player_container.height.toFloat()
         if (!mViewModel.playerCollapsed) animation.translationYBy(translateBy)
-            .withEndAction { current_song_container.visibility = View.GONE }
+            .withEndAction { player_container.visibility = View.GONE }
             .start()
         else animation.translationYBy(-translateBy)
-            .withStartAction { current_song_container.visibility = View.VISIBLE }
+            .withStartAction { player_container.visibility = View.VISIBLE }
             .start()
         mViewModel.playerCollapsed = collapse
     }

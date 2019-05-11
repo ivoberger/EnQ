@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="song_albumArt_margin">7dp</dimen>
-    <dimen name="song_albumArt_size">56dp</dimen>
+    <dimen name="song_albumArt_size">68dp</dimen>
     <dimen name="song_info_margin">10dp</dimen>
     <dimen name="song_imgButton_size">20dp</dimen>
     <dimen name="song_imgButton_margin">15dp</dimen>
