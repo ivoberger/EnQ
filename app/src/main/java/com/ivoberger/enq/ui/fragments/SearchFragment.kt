@@ -4,17 +4,23 @@ import android.os.Bundle
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.ivoberger.enq.R
 import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.MainActivity
-import com.ivoberger.enq.ui.fragments.parents.TabbedResultsFragment
+import com.ivoberger.enq.ui.fragments.base.TabbedResultsFragment
+import com.ivoberger.enq.utils.retryOnError
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
 import com.ivoberger.jmusicbot.model.MusicBotPlugin
 import kotlinx.android.synthetic.main.fragment_results.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
 import splitties.lifecycle.coroutines.lifecycleScope
+import splitties.toast.toast
 import timber.log.Timber
 
 
@@ -26,7 +32,7 @@ class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mProviderPlugins = lifecycleScope.async(Dispatchers.IO) { JMusicBot.getProvider() }
+        mProviderPlugins = lifecycleScope.async { retryOnError { JMusicBot.getProvider() } }
         JMusicBot.connectionListeners.add(this@SearchFragment)
         lifecycleScope.launch(Dispatchers.IO) {
             mProviderPlugins.await() ?: return@launch
@@ -61,23 +67,24 @@ class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
     }
 
     override fun initializeTabs() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            mProviderPlugins.await() ?: return@launch
-            mFragmentPagerAdapter = async {
+        lifecycleScope.launch {
+            mProviderPlugins.await() ?: run {
+                toast(R.string.msg_server_error)
+                return@launch
+            }
+            mFragmentPagerAdapter = async(Dispatchers.Default) {
                 SearchFragmentPager(childFragmentManager, mProviderPlugins.await()!!)
             }
-            withContext(Dispatchers.Main) { view_pager.adapter = mFragmentPagerAdapter.await() }
+            view_pager.adapter = mFragmentPagerAdapter.await()
         }
     }
 
-    fun search(query: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            if (query.isNotBlank()) (mFragmentPagerAdapter.await() as SearchFragmentPager).search(query)
-        }
+    fun search(query: String) = lifecycleScope.launch {
+        if (query.isNotBlank()) (mFragmentPagerAdapter.await() as SearchFragmentPager).search(query)
     }
 
     override fun onTabSelected(position: Int) {
-        lifecycleScope.launch(Dispatchers.IO) { mFragmentPagerAdapter.await().onTabSelected(position) }
+        lifecycleScope.launch { mFragmentPagerAdapter.await().onTabSelected(position) }
     }
 
     override fun onConnectionLost(e: Exception?) {
