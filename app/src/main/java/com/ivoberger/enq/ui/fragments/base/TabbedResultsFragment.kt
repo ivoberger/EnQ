@@ -34,7 +34,8 @@ abstract class TabbedResultsFragment : Fragment(R.layout.fragment_results), View
         super.onViewCreated(view, savedInstanceState)
         view_pager.addOnPageChangeListener(this)
         lifecycleScope.launch {
-            if (mSelectedPlugin == null) mSelectedPlugin = mProviderPlugins.await()?.get(0)
+            if (mSelectedPlugin == null) mSelectedPlugin =
+                if (mProviderPlugins.await()?.size ?: 0 > 0) mProviderPlugins.await()?.get(0) else null
             mSelectedPlugin?.let {
                 Timber.d("Setting tab to ${mProviderPlugins.await()!!.indexOf(it)}")
                 val idx = mProviderPlugins.await()!!.indexOf(it)
