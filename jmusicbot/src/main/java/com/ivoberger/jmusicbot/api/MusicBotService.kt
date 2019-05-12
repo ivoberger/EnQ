@@ -1,10 +1,44 @@
+/*
+* Copyright 2019 Ivo Berger
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package com.ivoberger.jmusicbot.api
 
-import com.ivoberger.jmusicbot.*
-import com.ivoberger.jmusicbot.model.*
+import com.ivoberger.jmusicbot.KEY_AUTHORIZATION
+import com.ivoberger.jmusicbot.KEY_PROVIDER_ID
+import com.ivoberger.jmusicbot.KEY_QUERY
+import com.ivoberger.jmusicbot.KEY_SONG_ID
+import com.ivoberger.jmusicbot.KEY_SUGGESTER_ID
+import com.ivoberger.jmusicbot.model.Auth
+import com.ivoberger.jmusicbot.model.MusicBotPlugin
+import com.ivoberger.jmusicbot.model.PlayerAction
+import com.ivoberger.jmusicbot.model.PlayerState
+import com.ivoberger.jmusicbot.model.PlayerStateChange
+import com.ivoberger.jmusicbot.model.QueueEntry
+import com.ivoberger.jmusicbot.model.Song
+import com.ivoberger.jmusicbot.model.User
+import com.ivoberger.jmusicbot.model.VersionInfo
 import kotlinx.coroutines.Deferred
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 internal interface MusicBotService {
     companion object {
@@ -51,9 +85,10 @@ internal interface MusicBotService {
 
     @PUT("$URL_PLAYER/$URL_QUEUE/order")
     fun moveEntry(
-        @Body entry: QueueEntry, @Query("providerId") providerId: String, @Query("songId") songId: String, @Query(
-            "index"
-        ) index: Int
+        @Body entry: QueueEntry,
+        @Query("providerId") providerId: String,
+        @Query("songId") songId: String,
+        @Query("index") index: Int
     ): Deferred<Response<List<QueueEntry>>>
 
     @GET("$URL_PLAYER/$URL_QUEUE")

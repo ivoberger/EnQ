@@ -5,7 +5,7 @@
     <string name="nav_favorites">Favorites</string>
     <string name="lbl_album_art">Album Art</string>
     <string name="tlt_login">Login</string>
-    <string name="msg_login">Please provide  a username and password (omit password to login as guest)</string>
+    <string name="msg_login">Please provide a username and password (omit password to login as guest)</string>
     <string name="btn_login">Login</string>
     <string name="tlt_no_server">Server not found</string>
     <string name="btn_retry">Retry</string>
@@ -24,7 +24,9 @@
     <string name="msg_nothing_playing">Nothing is playing at the moment</string>
     <string name="msg_queue_smth">EnQ something!</string>
     <string name="nav_suggestions">Suggestions</string>
-    <string name="txt_suggested"><i>Suggested</i></string>
+    <string name="txt_suggested">
+        <i>Suggested</i>
+    </string>
     <string name="msg_removed_from_favs">Removed %1$s from favorites</string>
     <string name="msg_no_permission">You can\'t do that</string>
     <string name="msg_added_to_favs">Added %1$s to favorites</string>
@@ -49,6 +51,9 @@
     <string name="msg_permissions_reloaded">Permissions successfully reloaded</string>
     <string name="msg_provider_not_found">Provider was not found, searchin song on existing providers</string>
     <string name="lbl_permissions">Permissions:</string>
-    <string name="txt_app_description" translatable="false">Open <a href="https://github.com/IIIuminator/EnQ">Source</a> client for <a href="https://github.com/BjoernPetersen/MusicBot">JMusicBot</a></string>
+    <string name="txt_app_description" translatable="false">Open <a href="https://github.com/IIIuminator/EnQ">Source</a> client
+        for
+        <a href="https://github.com/BjoernPetersen/MusicBot">JMusicBot</a>
+    </string>
     <string name="txt_developed_by">Developed by Ivo Berger</string>
 </resources>

@@ -1,81 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
-    app:startDestination="@id/dest_queue">
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/main"
+            app:startDestination="@id/dest_queue">
     <action
-        android:id="@+id/action_global_queue"
-        app:destination="@id/dest_queue" />
+            android:id="@+id/action_global_queue"
+            app:destination="@id/dest_queue"/>
     <action
-        android:id="@+id/action_global_suggestions"
-        app:destination="@id/dest_suggestions" />
+            android:id="@+id/action_global_suggestions"
+            app:destination="@id/dest_suggestions"/>
     <action
-        android:id="@id/action_global_favorites"
-        app:destination="@id/dest_favorites" />
+            android:id="@id/action_global_favorites"
+            app:destination="@id/dest_favorites"/>
     <action
-        android:id="@+id/action_global_search"
-        app:destination="@id/dest_search" />
+            android:id="@+id/action_global_search"
+            app:destination="@id/dest_search"/>
     <action
-        android:id="@+id/action_global_settings"
-        app:destination="@id/dest_settings" />
+            android:id="@+id/action_global_settings"
+            app:destination="@id/dest_settings"/>
     <action
-        android:id="@+id/action_global_userInfo"
-        app:destination="@id/dest_userInfo" />
+            android:id="@+id/action_global_userInfo"
+            app:destination="@id/dest_userInfo"/>
     <action
-        android:id="@+id/action_global_about"
-        app:destination="@id/dest_about" />
+            android:id="@+id/action_global_about"
+            app:destination="@id/dest_about"/>
 
     <action
-        android:id="@+id/action_global_serverDiscoveryDialog"
-        app:destination="@id/dest_serverDiscoveryDialog" />
+            android:id="@+id/action_global_serverDiscoveryDialog"
+            app:destination="@id/dest_serverDiscoveryDialog"/>
     <action
-        android:id="@+id/action_global_loginDialog"
-        app:destination="@id/dest_loginDialog" />
+            android:id="@+id/action_global_loginDialog"
+            app:destination="@id/dest_loginDialog"/>
     <dialog
-        android:id="@+id/dest_loginDialog"
-        android:name="com.ivoberger.enq.ui.dialogs.LoginDialog"
-        android:label="LoginDialog">
+            android:id="@+id/dest_loginDialog"
+            android:name="com.ivoberger.enq.ui.dialogs.LoginDialog"
+            android:label="LoginDialog">
         <argument
-            android:name="startLoggingIn"
-            app:argType="boolean" />
+                android:name="startLoggingIn"
+                app:argType="boolean"/>
     </dialog>
     <dialog
-        android:id="@+id/dest_serverDiscoveryDialog"
-        android:name="com.ivoberger.enq.ui.dialogs.ServerDiscoveryDialog"
-        android:label="ServerDiscoveryDialog" />
+            android:id="@+id/dest_serverDiscoveryDialog"
+            android:name="com.ivoberger.enq.ui.dialogs.ServerDiscoveryDialog"
+            android:label="ServerDiscoveryDialog"/>
     <fragment
-        android:id="@+id/dest_queue"
-        android:name="com.ivoberger.enq.ui.fragments.QueueFragment"
-        android:label="QueueFragment"
-        tools:layout="@layout/fragment_queue" />
+            android:id="@+id/dest_queue"
+            android:name="com.ivoberger.enq.ui.fragments.QueueFragment"
+            android:label="QueueFragment"
+            tools:layout="@layout/fragment_queue"/>
     <fragment
-        android:id="@+id/dest_favorites"
-        android:name="com.ivoberger.enq.ui.fragments.FavoritesFragment"
-        android:label="FavoritesFragment"
-        tools:layout="@layout/fragment_queue" />
+            android:id="@+id/dest_favorites"
+            android:name="com.ivoberger.enq.ui.fragments.FavoritesFragment"
+            android:label="FavoritesFragment"
+            tools:layout="@layout/fragment_queue"/>
     <fragment
-        android:id="@+id/dest_suggestions"
-        android:name="com.ivoberger.enq.ui.fragments.SuggestionsFragment"
-        android:label="SuggestionsFragment"
-        tools:layout="@layout/fragment_results" />
+            android:id="@+id/dest_suggestions"
+            android:name="com.ivoberger.enq.ui.fragments.SuggestionsFragment"
+            android:label="SuggestionsFragment"
+            tools:layout="@layout/fragment_results"/>
     <fragment
-        android:id="@+id/dest_search"
-        android:name="com.ivoberger.enq.ui.fragments.SearchFragment"
-        android:label="SearchFragment"
-        tools:layout="@layout/fragment_results" />
+            android:id="@+id/dest_search"
+            android:name="com.ivoberger.enq.ui.fragments.SearchFragment"
+            android:label="SearchFragment"
+            tools:layout="@layout/fragment_results"/>
     <fragment
-        android:id="@+id/dest_settings"
-        android:name="com.ivoberger.enq.ui.fragments.SettingsFragment"
-        android:label="SettingsFragment" />
+            android:id="@+id/dest_settings"
+            android:name="com.ivoberger.enq.ui.fragments.SettingsFragment"
+            android:label="SettingsFragment"/>
     <fragment
-        android:id="@+id/dest_userInfo"
-        android:name="com.ivoberger.enq.ui.fragments.UserInfoFragment"
-        android:label="UserInfoFragment"
-        tools:layout="@layout/fragment_user_info" />
+            android:id="@+id/dest_userInfo"
+            android:name="com.ivoberger.enq.ui.fragments.UserInfoFragment"
+            android:label="UserInfoFragment"
+            tools:layout="@layout/fragment_user_info"/>
     <fragment
-        android:id="@+id/dest_about"
-        android:name="com.ivoberger.enq.ui.fragments.AboutFragment"
-        android:label="AboutFragment"
-        tools:layout="@layout/fragment_about" />
+            android:id="@+id/dest_about"
+            android:name="com.ivoberger.enq.ui.fragments.AboutFragment"
+            android:label="AboutFragment"
+            tools:layout="@layout/fragment_about"/>
 </navigation>

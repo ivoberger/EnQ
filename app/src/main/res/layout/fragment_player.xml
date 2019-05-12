@@ -1,102 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/current_song_container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?colorSurface"
-    tools:ignore="MissingPrefix,UnusedAttribute,ContentDescription">
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:id="@+id/current_song_container"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent"
+                                                   android:background="?colorSurface"
+                                                   tools:ignore="MissingPrefix,UnusedAttribute,ContentDescription">
 
     <ImageButton
-        android:id="@+id/song_play_pause"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginHorizontal="@dimen/song_imgButton_margin"
-        android:background="@android:color/transparent"
-        app:layout_constraintBottom_toBottomOf="@id/song_album_art"
-        app:layout_constraintEnd_toStartOf="@id/song_favorite"
-        app:layout_constraintTop_toTopOf="@id/song_album_art"
-        tools:src="@drawable/ic_pause_white_24dp" />
+            android:id="@+id/song_play_pause"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginHorizontal="@dimen/song_imgButton_margin"
+            android:background="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="@id/song_album_art"
+            app:layout_constraintEnd_toStartOf="@id/song_favorite"
+            app:layout_constraintTop_toTopOf="@id/song_album_art"
+            tools:src="@drawable/ic_pause_white_24dp"/>
 
     <ImageButton
-        android:id="@+id/song_favorite"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginHorizontal="@dimen/song_imgButton_margin"
-        android:background="@android:color/transparent"
-        app:layout_constraintBottom_toBottomOf="@id/song_album_art"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/song_album_art"
-        tools:src="@drawable/ic_star_green_24dp" />
+            android:id="@+id/song_favorite"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginHorizontal="@dimen/song_imgButton_margin"
+            android:background="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="@id/song_album_art"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/song_album_art"
+            tools:src="@drawable/ic_star_green_24dp"/>
 
     <ImageView
-        android:id="@+id/song_album_art"
-        android:layout_width="@dimen/song_albumArt_size"
-        android:layout_height="@dimen/song_albumArt_size"
-        android:layout_marginStart="@dimen/song_albumArt_margin"
-        android:layout_marginTop="@dimen/song_albumArt_margin"
-        android:layout_marginBottom="@dimen/song_albumArt_margin"
-        android:contentDescription="@string/lbl_album_art"
-        app:layout_constraintBottom_toTopOf="@id/song_progress"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@tools:sample/avatars" />
+            android:id="@+id/song_album_art"
+            android:layout_width="@dimen/song_albumArt_size"
+            android:layout_height="@dimen/song_albumArt_size"
+            android:layout_marginStart="@dimen/song_albumArt_margin"
+            android:layout_marginTop="@dimen/song_albumArt_margin"
+            android:layout_marginBottom="@dimen/song_albumArt_margin"
+            android:contentDescription="@string/lbl_album_art"
+            app:layout_constraintBottom_toTopOf="@id/song_progress"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@tools:sample/avatars"/>
 
     <ProgressBar
-        android:id="@+id/song_progress"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/song_album_art" />
+            android:id="@+id/song_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/song_album_art"/>
 
     <TextView
-        android:id="@+id/song_duration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/song_info_margin"
-        android:textAppearance="?textAppearanceCaption"
-        app:layout_constraintBottom_toBottomOf="@id/song_album_art"
-        app:layout_constraintEnd_toEndOf="@id/song_chosen_by"
-        app:layout_constraintTop_toBottomOf="@id/song_chosen_by" />
+            android:id="@+id/song_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/song_info_margin"
+            android:textAppearance="?textAppearanceCaption"
+            app:layout_constraintBottom_toBottomOf="@id/song_album_art"
+            app:layout_constraintEnd_toEndOf="@id/song_chosen_by"
+            app:layout_constraintTop_toBottomOf="@id/song_chosen_by"/>
 
     <TextView
-        android:id="@+id/song_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/song_info_margin"
-        android:singleLine="true"
-        android:textAppearance="?textAppearanceSubtitle1"
-        app:layout_constraintBottom_toTopOf="@id/song_description"
-        app:layout_constraintEnd_toStartOf="@id/song_chosen_by"
-        app:layout_constraintStart_toEndOf="@id/song_album_art"
-        app:layout_constraintTop_toTopOf="@id/song_album_art" />
+            android:id="@+id/song_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/song_info_margin"
+            android:singleLine="true"
+            android:textAppearance="?textAppearanceSubtitle1"
+            app:layout_constraintBottom_toTopOf="@id/song_description"
+            app:layout_constraintEnd_toStartOf="@id/song_chosen_by"
+            app:layout_constraintStart_toEndOf="@id/song_album_art"
+            app:layout_constraintTop_toTopOf="@id/song_album_art"/>
 
     <TextView
-        android:id="@+id/song_description"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="3dp"
-        android:singleLine="true"
-        android:textAppearance="?textAppearanceBody1"
-        app:layout_constraintBottom_toBottomOf="@id/song_album_art"
-        app:layout_constraintEnd_toStartOf="@id/song_duration"
-        app:layout_constraintStart_toStartOf="@id/song_title"
-        app:layout_constraintTop_toBottomOf="@id/song_title" />
+            android:id="@+id/song_description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:singleLine="true"
+            android:textAppearance="?textAppearanceBody1"
+            app:layout_constraintBottom_toBottomOf="@id/song_album_art"
+            app:layout_constraintEnd_toStartOf="@id/song_duration"
+            app:layout_constraintStart_toStartOf="@id/song_title"
+            app:layout_constraintTop_toBottomOf="@id/song_title"/>
 
     <TextView
-        android:id="@+id/song_chosen_by"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/song_info_margin"
-        android:layout_marginEnd="15dp"
-        android:layout_marginBottom="1dp"
-        android:textAppearance="?textAppearanceCaption"
-        android:textStyle="italic"
-        app:layout_constraintBottom_toTopOf="@id/song_duration"
-        app:layout_constraintEnd_toStartOf="@id/song_play_pause"
-        app:layout_constraintTop_toTopOf="@id/song_album_art" />
+            android:id="@+id/song_chosen_by"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/song_info_margin"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="1dp"
+            android:textAppearance="?textAppearanceCaption"
+            android:textStyle="italic"
+            app:layout_constraintBottom_toTopOf="@id/song_duration"
+            app:layout_constraintEnd_toStartOf="@id/song_play_pause"
+            app:layout_constraintTop_toTopOf="@id/song_album_art"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

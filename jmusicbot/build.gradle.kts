@@ -47,5 +47,4 @@ dependencies {
     kapt(Libs.moshi_kotlin_codegen)
 
     testImplementation(Libs.assertj_core)
-
 }

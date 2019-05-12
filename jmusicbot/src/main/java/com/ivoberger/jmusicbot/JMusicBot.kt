@@ -1,3 +1,18 @@
+/*
+* Copyright 2019 Ivo Berger
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package com.ivoberger.jmusicbot
 
 import android.net.wifi.WifiManager
@@ -7,10 +22,28 @@ import com.ivoberger.jmusicbot.api.MusicBotService
 import com.ivoberger.jmusicbot.api.PORT
 import com.ivoberger.jmusicbot.api.discoverHost
 import com.ivoberger.jmusicbot.api.process
-import com.ivoberger.jmusicbot.di.*
-import com.ivoberger.jmusicbot.exceptions.*
+import com.ivoberger.jmusicbot.di.BaseComponent
+import com.ivoberger.jmusicbot.di.BaseModule
+import com.ivoberger.jmusicbot.di.DaggerBaseComponent
+import com.ivoberger.jmusicbot.di.ServerSession
+import com.ivoberger.jmusicbot.di.UserSession
+import com.ivoberger.jmusicbot.exceptions.AuthException
+import com.ivoberger.jmusicbot.exceptions.InvalidParametersException
+import com.ivoberger.jmusicbot.exceptions.NotFoundException
+import com.ivoberger.jmusicbot.exceptions.ServerErrorException
+import com.ivoberger.jmusicbot.exceptions.UsernameTakenException
 import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
-import com.ivoberger.jmusicbot.model.*
+import com.ivoberger.jmusicbot.model.Auth
+import com.ivoberger.jmusicbot.model.Event
+import com.ivoberger.jmusicbot.model.MusicBotPlugin
+import com.ivoberger.jmusicbot.model.PlayerState
+import com.ivoberger.jmusicbot.model.PlayerStates
+import com.ivoberger.jmusicbot.model.QueueEntry
+import com.ivoberger.jmusicbot.model.SideEffect
+import com.ivoberger.jmusicbot.model.Song
+import com.ivoberger.jmusicbot.model.State
+import com.ivoberger.jmusicbot.model.User
+import com.ivoberger.jmusicbot.model.VersionInfo
 import com.tinder.StateMachine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,9 +51,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import okhttp3.logging.HttpLoggingInterceptor
 import timber.log.Timber
-import java.util.*
+import java.util.Timer
 import kotlin.concurrent.timer
-
 
 object JMusicBot {
 
@@ -57,10 +89,10 @@ object JMusicBot {
                     }
                     SideEffect.EndUserSession -> {
                         user = null
-                        Timber.d("CLIENTS 1: SERVER ${mServerSession?.musicBotService()}, USER ${mUserSession?.musicBotService()}, USED ${mServiceClient}")
+                        Timber.d("CLIENTS 1: SERVER ${mServerSession?.musicBotService()}, USER ${mUserSession?.musicBotService()}, USED $mServiceClient")
                         mUserSession = null
                         mServiceClient = mServerSession!!.musicBotService()
-                        Timber.d("CLIENTS 2: SERVER ${mServerSession?.musicBotService()}, USER ${mUserSession?.musicBotService()}, USED ${mServiceClient}")
+                        Timber.d("CLIENTS 2: SERVER ${mServerSession?.musicBotService()}, USER ${mUserSession?.musicBotService()}, USED $mServiceClient")
                     }
                     SideEffect.EndServerSession -> {
                         user = null
@@ -98,7 +130,6 @@ object JMusicBot {
     private var mServiceClient: MusicBotService? = null
 
     val connectionListeners: MutableList<ConnectionChangeListener> = mutableListOf()
-
 
     private val mQueue: MutableLiveData<List<QueueEntry>> = MutableLiveData()
     private val mPlayerState: MutableLiveData<PlayerState> = MutableLiveData()
@@ -408,7 +439,8 @@ object JMusicBot {
         if (playerState != null) Timber.d("Manual Player Update")
         try {
             state.connectionCheck()
-            val state = playerState ?: mServiceClient!!.getPlayerState().process() ?: PlayerState(PlayerStates.ERROR)
+            val state = playerState ?: mServiceClient!!.getPlayerState().process()
+            ?: PlayerState(PlayerStates.ERROR)
             withContext(Dispatchers.Main) { mPlayerState.value = state }
         } catch (e: Exception) {
             Timber.w(e)

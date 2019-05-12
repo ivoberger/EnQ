@@ -31,8 +31,11 @@ jobs:
           name: Disable Pre-Dexing
           command: cp .circleci/init.gradle $GRADLE_USER_HOME/init.gradle
       - run:
-          name: Lint & Test
-          command: ./gradlew lint test
+          name: Lint
+          command: ./gradlew spotlessCheck
+      - run:
+          name: Test
+          command: ./gradlew test
       - run:
           name: Dependency Updates check
           command: ./gradlew dependencyUpdates

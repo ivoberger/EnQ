@@ -1,86 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingHorizontal="25dp"
-    tools:ignore="UnusedAttribute">
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent"
+                                                   android:orientation="vertical"
+                                                   android:paddingHorizontal="25dp"
+                                                   tools:ignore="UnusedAttribute">
 
     <EditText
-        android:id="@+id/login_username"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:autofillHints="username"
-        android:inputType="textNoSuggestions"
-        app:layout_constraintBottom_toTopOf="@id/login_password"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/login_lbl_username"
-        app:layout_constraintTop_toBottomOf="@id/login_message" />
+            android:id="@+id/login_username"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autofillHints="username"
+            android:inputType="textNoSuggestions"
+            app:layout_constraintBottom_toTopOf="@id/login_password"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/login_lbl_username"
+            app:layout_constraintTop_toBottomOf="@id/login_message"/>
 
     <EditText
-        android:id="@+id/login_password"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:autofillHints="password"
-        android:inputType="textPassword"
-        app:layout_constraintBottom_toTopOf="@id/login_recent_users"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/login_lbl_password"
-        app:layout_constraintTop_toBottomOf="@id/login_username" />
+            android:id="@+id/login_password"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autofillHints="password"
+            android:inputType="textPassword"
+            app:layout_constraintBottom_toTopOf="@id/login_recent_users"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/login_lbl_password"
+            app:layout_constraintTop_toBottomOf="@id/login_username"/>
 
     <ProgressBar
-        android:id="@+id/login_progress"
-        style="@android:style/Widget.Material.ProgressBar"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginVertical="20dp"
-        android:indeterminate="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="UnusedAttribute" />
+            android:id="@+id/login_progress"
+            style="@android:style/Widget.Material.ProgressBar"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginVertical="20dp"
+            android:indeterminate="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="UnusedAttribute"/>
 
     <TextView
-        android:id="@+id/login_lbl_username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="15dp"
-        android:labelFor="@id/login_username"
-        android:text="@string/lbl_username"
-        app:layout_constraintBottom_toBottomOf="@id/login_username"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/login_username" />
+            android:id="@+id/login_lbl_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="15dp"
+            android:labelFor="@id/login_username"
+            android:text="@string/lbl_username"
+            app:layout_constraintBottom_toBottomOf="@id/login_username"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/login_username"/>
 
     <TextView
-        android:id="@+id/login_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/msg_login"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/login_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/msg_login"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
-        android:id="@+id/login_lbl_password"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="15dp"
-        android:labelFor="@id/login_password"
-        android:text="@string/lbl_password"
-        app:layout_constraintBottom_toBottomOf="@id/login_password"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/login_password" />
+            android:id="@+id/login_lbl_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="15dp"
+            android:labelFor="@id/login_password"
+            android:text="@string/lbl_password"
+            app:layout_constraintBottom_toBottomOf="@id/login_password"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/login_password"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/login_recent_users"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/login_password" />
+            android:id="@+id/login_recent_users"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/login_password"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

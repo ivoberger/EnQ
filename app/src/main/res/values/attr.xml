@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="colorSurfaceDark" format="color" />
-    <attr name="colorDelete" format="color" />
-    <attr name="colorFavorite" format="color" />
-    <attr name="colorEnQ" format="color" />
+    <attr name="colorSurfaceDark" format="color"/>
+    <attr name="colorDelete" format="color"/>
+    <attr name="colorFavorite" format="color"/>
+    <attr name="colorEnQ" format="color"/>
 </resources>
