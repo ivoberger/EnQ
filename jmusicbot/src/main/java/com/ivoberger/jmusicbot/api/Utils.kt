@@ -1,5 +1,3 @@
-package com.ivoberger.jmusicbot.api
-
 /*
 * Copyright 2019 Ivo Berger
 *
@@ -15,6 +13,7 @@ package com.ivoberger.jmusicbot.api
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+package com.ivoberger.jmusicbot.api
 
 import android.net.wifi.WifiManager
 import com.ivoberger.jmusicbot.JMusicBot
