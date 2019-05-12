@@ -32,6 +32,8 @@ object Versions {
 
     const val crashlytics: String = "2.10.0"
 
+    const val com_diffplug_gradle_spotless_gradle_plugin: String = "3.23.0"
+
     const val com_github_bumptech_glide: String = "4.9.0"
 
     const val statemachine: String = "0.1.2"
@@ -78,7 +80,7 @@ object Versions {
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.3.2"
 
-    const val io_fabric_tools_gradle: String = "1.28.1"
+    const val io_fabric_tools_gradle: String = "1.28.1" // available: "1.29.0"
 
     const val assertj_core: String = "3.12.2"
 
@@ -98,7 +100,7 @@ object Versions {
 
         const val currentVersion: String = "5.4.1"
 
-        const val nightlyVersion: String = "5.5-20190510000040+0000"
+        const val nightlyVersion: String = "5.5-20190512000035+0000"
 
         const val releaseCandidate: String = ""
     }

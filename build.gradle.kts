@@ -15,8 +15,8 @@ buildscript {
 }
 
 plugins {
-    id("de.fayard.buildSrcVersions") version Versions.de_fayard_buildsrcversions_gradle_plugin
-    id("com.diffplug.gradle.spotless") version "3.23.0"
+    id("de.fayard.buildSrcVersions").version(Versions.de_fayard_buildsrcversions_gradle_plugin)
+    id("com.diffplug.gradle.spotless").version(Versions.com_diffplug_gradle_spotless_gradle_plugin)
 }
 
 allprojects {
