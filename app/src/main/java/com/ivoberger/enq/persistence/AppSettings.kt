@@ -51,6 +51,7 @@ object AppSettings {
     private const val KEY_SAVED_USERS = "savedUsers"
     private const val KEY_SAVED_SERVERS = "savedServers"
     private const val KEY_FAVORITES = "favorites"
+    private const val KEY_CURRENT_TOKEN = "currentToken"
 
     // serialization util vars
     val mMoshi by lazy { Moshi.Builder().build() }
@@ -128,9 +129,14 @@ object AppSettings {
     fun isServerKnown(toCheck: ServerInfo) = savedServers.contains(toCheck)
     fun getLatestServer(): ServerInfo? = savedServers.lastOrNull()
 
+    // latest auth token
+
+    var savedToken: String?
+        get() = loadString(KEY_CURRENT_TOKEN)
+        set(value) = saveString(KEY_CURRENT_TOKEN, value)
     // utils
 
-    private fun saveString(key: String, value: String) = preferences.edit { putString(key, value) }
+    private fun saveString(key: String, value: String?) = preferences.edit { putString(key, value) }
     private fun loadString(key: String): String? = preferences.getString(key, null)
 
     object VersionInfoParceler : Parceler<VersionInfo> {

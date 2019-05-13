@@ -88,7 +88,11 @@ class MainActivity : AppCompatActivity() {
                 savedInstanceState.getParcelable<ServerInfo>(KEY_CURRENT_SERVER)?.let {
                     lifecycleScope.launch {
                         try {
-                            JMusicBot.connect(AppSettings.getLatestUser()!!, it.baseUrl)
+                            JMusicBot.connect(
+                                AppSettings.getLatestUser()!!,
+                                it.baseUrl,
+                                AppSettings.savedToken
+                            )
                             continueWithBot()
                         } catch (e: Exception) {
                             Timber.w(e)

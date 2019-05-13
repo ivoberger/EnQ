@@ -23,7 +23,7 @@ import com.squareup.moshi.JsonClass
 class User(
     @Json(name = "name") val name: String,
     password: String? = null,
-    @Json(name = "userId") val id: String,
+    @Json(name = "userId") val id: String?,
     @Json(name = "permissions") permissions: List<Permissions> = listOf()
 ) {
 

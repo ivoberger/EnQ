@@ -115,7 +115,8 @@ class LoginDialog : DialogFragment() {
                 mLoginProgressViews.forEach { it?.visibility = View.VISIBLE }
             }
             // actual login
-            user?.let { JMusicBot.authorize(it) }
+            user?.let { JMusicBot.authorize(it, AppSettings.savedToken) }
+            AppSettings.savedToken = JMusicBot.authToken.toString()
             context?.toast(getString(R.string.msg_logged_in, JMusicBot.user!!.name))
             val mainActivity = activity as MainActivity
             mainActivity.continueWithBot()

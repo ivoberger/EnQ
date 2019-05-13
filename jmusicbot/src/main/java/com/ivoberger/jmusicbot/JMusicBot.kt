@@ -145,7 +145,7 @@ object JMusicBot {
             if (value == null) authToken = null
         }
 
-    internal var authToken: Auth.Token? = null
+    var authToken: Auth.Token? = null
         get() = mUserSession?.authToken ?: field
         set(value) {
             Timber.d("Setting token to $value")
@@ -159,10 +159,10 @@ object JMusicBot {
         InvalidParametersException::class, NotFoundException::class,
         ServerErrorException::class, IllegalStateException::class
     )
-    suspend fun connect(authUser: User, host: String) = withContext(Dispatchers.IO) {
+    suspend fun connect(authUser: User, host: String, authToken: String? = null) = withContext(Dispatchers.IO) {
         Timber.d("Quick connect")
         if (!state.hasServer) discoverHost(host)
-        if (!state.isConnected) authorize(authUser)
+        if (!state.isConnected) authorize(authUser, authToken)
     }
 
     suspend fun discoverHost(knownHost: String? = null) = withContext(Dispatchers.IO) {
@@ -190,6 +190,7 @@ object JMusicBot {
     )
     suspend fun authorize(user: User, authToken: String? = null) = withContext(Dispatchers.IO) {
         state.serverCheck()
+        this@JMusicBot.user = user
         authToken?.let { this@JMusicBot.authToken = Auth.Token(it) }
         Timber.d("Starting authorization")
         if (tokenValid()) return@withContext
@@ -231,8 +232,9 @@ object JMusicBot {
                 stateMachine.transition(Event.Authorize(user!!, authToken!!))
                 return true
             }
-            Timber.d("Invalid Token: User changed")
+            Timber.d("Invalid Token: User changed from ${tmpUser?.name} to ${user?.name}")
         } catch (e: Exception) {
+            Timber.w(e)
             Timber.d("Invalid Token: Test failed (${e.localizedMessage}")
         }
         authToken = null

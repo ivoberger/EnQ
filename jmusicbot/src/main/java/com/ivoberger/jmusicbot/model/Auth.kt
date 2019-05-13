@@ -20,16 +20,15 @@ import com.auth0.android.jwt.JWT
 import com.ivoberger.jmusicbot.exceptions.InvalidParametersException
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import java.util.UUID
 
 sealed class Auth {
 
     @JsonClass(generateAdapter = true)
     class Register(
         @Json(name = "name") val name: String,
-        @Json(name = "userId") val uuid: String = UUID.randomUUID().toString()
+        @Json(name = "userId") val uuid: String
     ) : Auth() {
-        constructor(user: User) : this(user.name, user.id)
+        constructor(user: User) : this(user.name, user.id!!)
     }
 
     class Basic(val name: String, val password: String) : Auth() {
