@@ -1,3 +1,2 @@
-- Fixes crash when the authorization expired
-- Fixes 2 crashes in search and suggestions when the providers couldn't be successfully fetched
-- Fixes crash when a network request timed out
+- Fixes bug where the user wouldn't be properly registered
+- Fixes issue that would prevent reusing a guest user on app crash or closing
