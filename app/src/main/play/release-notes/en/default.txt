@@ -1,2 +1,3 @@
 - Fixes bug where the user wouldn't be properly registered
 - Fixes issue that would prevent reusing a guest user on app crash or closing
+- Fixes crash on permission reload

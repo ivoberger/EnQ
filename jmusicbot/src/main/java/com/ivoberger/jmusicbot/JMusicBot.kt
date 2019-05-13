@@ -88,14 +88,11 @@ object JMusicBot {
                         connectionListeners.forEach { it.onConnectionRecovered() }
                     }
                     SideEffect.EndUserSession -> {
-                        user = null
-                        Timber.d("CLIENTS 1: SERVER ${mServerSession?.musicBotService()}, USER ${mUserSession?.musicBotService()}, USED $mServiceClient")
+                        authToken = null
                         mUserSession = null
                         mServiceClient = mServerSession!!.musicBotService()
-                        Timber.d("CLIENTS 2: SERVER ${mServerSession?.musicBotService()}, USER ${mUserSession?.musicBotService()}, USED $mServiceClient")
                     }
                     SideEffect.EndServerSession -> {
-                        user = null
                         mUserSession = null
                         mServerSession = null
                         if (trans.fromState is State.Discovering) return@onTransition
