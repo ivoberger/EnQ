@@ -61,6 +61,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var searchView: SearchView
 
     private val mViewModel: MainViewModel by viewModels()
+    private val mConnectionListener by lazy { ConnectionListener(this) }
     val navController: NavController by lazy { container_main_content.findNavController() }
     private val KEY_CURRENT_SERVER = "currentServer"
 
@@ -111,7 +112,7 @@ class MainActivity : AppCompatActivity() {
         // hide keyboard in case is wasn't hidden after login
         hideKeyboard()
         AppSettings.addUser(JMusicBot.user!!)
-        JMusicBot.connectionListeners.add((ConnectionListener(this@MainActivity)))
+        JMusicBot.connectionListeners.add(mConnectionListener)
         JMusicBot.connectionListeners.add(mViewModel)
     }
 
@@ -228,5 +229,10 @@ class MainActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putParcelable(KEY_CURRENT_SERVER, AppSettings.getLatestServer())
         super.onSaveInstanceState(outState)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        JMusicBot.connectionListeners.remove(mConnectionListener)
     }
 }

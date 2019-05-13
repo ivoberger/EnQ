@@ -15,7 +15,7 @@
 */
 package com.ivoberger.jmusicbot.listener
 
-interface ConnectionChangeListener {
+interface ConnectionListener {
 
     fun onConnectionLost(e: Exception? = null)
     fun onConnectionRecovered()

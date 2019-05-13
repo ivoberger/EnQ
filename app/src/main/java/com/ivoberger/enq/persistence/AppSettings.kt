@@ -106,6 +106,13 @@ object AppSettings {
         savedUsers = savedUsers.addToEnd(newUser)
     }
 
+    fun updateUser(oldUser: User, updatedUser: User) {
+        savedUsers = savedUsers.toMutableList().apply {
+            remove(oldUser)
+            add(updatedUser)
+        }
+    }
+
     fun getLatestUser(): User? = savedUsers.lastOrNull()
 
     fun clearSavedUsers() = run { savedUsers = listOf() }

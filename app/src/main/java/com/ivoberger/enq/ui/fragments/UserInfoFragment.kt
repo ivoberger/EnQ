@@ -17,10 +17,9 @@ package com.ivoberger.enq.ui.fragments
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
-import android.widget.Toast.LENGTH_SHORT
 import androidx.fragment.app.Fragment
 import com.ivoberger.enq.R
+import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.jmusicbot.JMusicBot
 import kotlinx.android.synthetic.main.fragment_user_info.*
@@ -56,20 +55,20 @@ class UserInfoFragment : Fragment(R.layout.fragment_user_info) {
                     toast(R.string.msg_inavlid_password)
                     return@onClick
                 }
-                val toast = Toast.makeText(context, "", LENGTH_SHORT)
                 lifecycleScope.launch(Dispatchers.IO) {
                     try {
                         JMusicBot.changePassword(input)
+                        val currentUser = AppSettings.getLatestUser()!!
+                        AppSettings.updateUser(currentUser, currentUser.apply { password = input })
                         Timber.d("Password for user ${it.name} successfully changed")
                         withContext(Dispatchers.Main) {
                             input_password.editText?.text = null
-                            toast.setText(R.string.msg_password_changed)
+                            toast(R.string.msg_password_changed)
                         }
                     } catch (e: Exception) {
                         Timber.w(e, "Error changing password")
-                        withContext(Dispatchers.Main) { toast.setText(R.string.msg_error_password_change) }
+                        withContext(Dispatchers.Main) { toast(R.string.msg_error_password_change) }
                     }
-                    withContext(Dispatchers.Main) { toast.show() }
                 }
             }
             btn_reload_permissions.onClick {

@@ -23,7 +23,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.ivoberger.enq.R
-import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
+import com.ivoberger.jmusicbot.listener.ConnectionListener
 import com.ivoberger.jmusicbot.model.MusicBotPlugin
 import kotlinx.android.synthetic.main.fragment_results.*
 import kotlinx.coroutines.Deferred
@@ -38,7 +38,7 @@ import timber.log.Timber
 @PotentialFutureAndroidXLifecycleKtxApi
 @ExperimentalSplittiesApi
 abstract class TabbedResultsFragment : Fragment(R.layout.fragment_results), ViewPager.OnPageChangeListener,
-    ConnectionChangeListener {
+    ConnectionListener {
     lateinit var mProviderPlugins: Deferred<List<MusicBotPlugin>?>
 
     var mSelectedPlugin: MusicBotPlugin? = null

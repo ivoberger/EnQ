@@ -41,10 +41,11 @@ inline fun <T> tryWithDefault(default: T? = null, toTry: () -> T) = try {
     default
 }
 
-inline fun <T> retryOnError(maxAttempts: Int = 5, toTry: () -> T): T? {
+suspend fun <T> retryOnError(maxAttempts: Int = 5, delay: Long = 1000, toTry: suspend () -> T): T? {
     var res = tryWithDefault { toTry() }
     var attempts = 1
     while (res == null && attempts <= maxAttempts) {
+        kotlinx.coroutines.delay(delay)
         res = tryWithDefault { toTry() }
         attempts++
     }

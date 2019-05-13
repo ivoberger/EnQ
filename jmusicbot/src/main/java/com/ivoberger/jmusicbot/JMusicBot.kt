@@ -32,7 +32,7 @@ import com.ivoberger.jmusicbot.exceptions.InvalidParametersException
 import com.ivoberger.jmusicbot.exceptions.NotFoundException
 import com.ivoberger.jmusicbot.exceptions.ServerErrorException
 import com.ivoberger.jmusicbot.exceptions.UsernameTakenException
-import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
+import com.ivoberger.jmusicbot.listener.ConnectionListener
 import com.ivoberger.jmusicbot.model.Auth
 import com.ivoberger.jmusicbot.model.Event
 import com.ivoberger.jmusicbot.model.MusicBotPlugin
@@ -129,7 +129,7 @@ object JMusicBot {
 
     private var mServiceClient: MusicBotService? = null
 
-    val connectionListeners: MutableList<ConnectionChangeListener> = mutableListOf()
+    val connectionListeners: MutableList<ConnectionListener> = mutableListOf()
 
     private val mQueue: MutableLiveData<List<QueueEntry>> = MutableLiveData()
     private val mPlayerState: MutableLiveData<PlayerState> = MutableLiveData()
@@ -184,46 +184,28 @@ object JMusicBot {
         state.running?.join()
     }
 
-    suspend fun recoverConnection() = withContext(Dispatchers.IO) {
-        Timber.d("Reconnecting")
-        while (!state.hasServer) {
-            state.running?.join()
-            discoverHost()
-        }
-        authorize()
-    }
-
     @Throws(
         InvalidParametersException::class, NotFoundException::class,
         ServerErrorException::class, IllegalStateException::class
     )
-    suspend fun authorize(authUser: User?) = withContext(Dispatchers.IO) {
-        user = authUser
-        authorize()
-    }
-
-    @Throws(
-        InvalidParametersException::class, NotFoundException::class,
-        ServerErrorException::class, IllegalStateException::class
-    )
-    suspend fun authorize(userName: String? = null, password: String? = null) = withContext(Dispatchers.IO) {
+    suspend fun authorize(user: User, authToken: String? = null) = withContext(Dispatchers.IO) {
         state.serverCheck()
+        authToken?.let { this@JMusicBot.authToken = Auth.Token(it) }
         Timber.d("Starting authorization")
         if (tokenValid()) return@withContext
-        if (userName.isNullOrBlank() && user == null) throw IllegalStateException("No username stored or supplied")
         try {
-            register(userName)
-            if (!password.isNullOrBlank()) changePassword(password)
+            register(user)
+            if (!user.password.isNullOrBlank()) changePassword(user.password!!)
             return@withContext
         } catch (e: UsernameTakenException) {
             Timber.w(e)
-            if (password.isNullOrBlank() && user?.password.isNullOrBlank()) {
-                Timber.d("No passwords found, throwing exception, $password, ${user?.name}")
+            if (user.password.isNullOrBlank()) {
+                Timber.d("No passwords found, throwing exception")
                 throw e
             }
         }
         try {
-            login(userName, password)
+            login(user)
             if (tokenValid()) return@withContext
         } catch (e: Exception) {
             Timber.w(e)
@@ -261,43 +243,26 @@ object JMusicBot {
         InvalidParametersException::class, AuthException::class,
         NotFoundException::class, ServerErrorException::class, IllegalStateException::class
     )
-    private suspend fun register(userName: String? = null) = withContext(Dispatchers.IO) {
-        Timber.d("Registering ${userName?.let { User(it) } ?: user}")
+    private suspend fun register(user: User) = withContext(Dispatchers.IO) {
+        Timber.d("Registering ${user.name}")
         state.serverCheck()
-        val credentials = when {
-            (!userName.isNullOrBlank()) -> {
-                user = User(userName)
-                Auth.Register(userName)
-            }
-            user != null -> Auth.Register(user!!)
-            else -> throw IllegalStateException("No username stored or supplied")
-        }
-        val token = mServiceClient!!.registerUser(credentials).process()!!
+        val token = mServiceClient!!.registerUser(Auth.Register(user)).process()!!
         Timber.d("Registered $user")
         authToken = Auth.Token(token)
-        stateMachine.transition(Event.Authorize(user!!, authToken!!))
+        stateMachine.transition(Event.Authorize(user, authToken!!))
     }
 
     @Throws(
         InvalidParametersException::class, AuthException::class,
         NotFoundException::class, ServerErrorException::class, IllegalStateException::class
     )
-    private suspend fun login(userName: String? = null, password: String? = null) = withContext(Dispatchers.IO) {
-        Timber.d("Logging in ${userName ?: user?.name}")
+    private suspend fun login(user: User) = withContext(Dispatchers.IO) {
+        Timber.d("Logging in ${user.name}")
         state.serverCheck()
-        val credentials = when {
-            (!(userName.isNullOrBlank() || password.isNullOrBlank())) -> {
-                user = User(userName, password)
-                Auth.Basic(userName, password).toAuthHeader()
-            }
-            user != null -> Auth.Basic(user!!).toAuthHeader()
-            else -> throw IllegalStateException("No user stored or supplied")
-        }
-        Timber.d("Auth: $credentials")
-        val token = mServiceClient!!.loginUser(credentials).process()!!
-        Timber.d("Logged in ${user?.name}")
+        val token = mServiceClient!!.loginUser(Auth.Basic(user).toAuthHeader()).process()!!
+        Timber.d("Logged in ${user.name}")
         authToken = Auth.Token(token)
-        stateMachine.transition(Event.Authorize(user!!, authToken!!))
+        stateMachine.transition(Event.Authorize(user, authToken!!))
     }
 
     @Throws(InvalidParametersException::class, AuthException::class)
@@ -315,7 +280,7 @@ object JMusicBot {
 
     suspend fun reloadPermissions() = withContext(Dispatchers.IO) {
         stateMachine.transition(Event.AuthExpired)
-        recoverConnection()
+        authorize(user!!)
     }
 
     @Throws(

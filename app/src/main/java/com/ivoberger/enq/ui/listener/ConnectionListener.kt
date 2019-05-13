@@ -18,7 +18,7 @@ package com.ivoberger.enq.ui.listener
 import com.ivoberger.enq.R
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.utils.attributeColor
-import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
+import com.ivoberger.jmusicbot.listener.ConnectionListener
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
@@ -28,16 +28,20 @@ import splitties.views.backgroundColor
 
 @ExperimentalSplittiesApi
 @PotentialFutureAndroidXLifecycleKtxApi
-class ConnectionListener(private val mainActivity: MainActivity) : ConnectionChangeListener {
+class ConnectionListener(private val mainActivity: MainActivity) : ConnectionListener {
+    private var connected = false
     override fun onConnectionLost(e: Exception?) {
         mainActivity.lifecycleScope.launch {
             mainActivity.bottom_navigation.setBackgroundResource(R.color.red_500)
         }
+        if (!connected) mainActivity.reset()
+        connected = false
     }
 
     override fun onConnectionRecovered() {
         mainActivity.lifecycleScope.launch {
             mainActivity.bottom_navigation.backgroundColor = mainActivity.attributeColor(R.attr.colorPrimary)
         }
+        connected = true
     }
 }

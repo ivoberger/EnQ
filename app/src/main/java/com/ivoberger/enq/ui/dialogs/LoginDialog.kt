@@ -21,6 +21,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.navigation.fragment.navArgs
+import com.ivoberger.enq.EnQ
 import com.ivoberger.enq.R
 import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.MainActivity
@@ -72,7 +73,8 @@ class LoginDialog : DialogFragment() {
         }
         dialog?.onShow {
             positiveButton.onClick {
-                user = User(mUserNameInput?.text.toString(), mPasswordInput?.text.toString())
+                val userName = mUserNameInput?.text.toString()
+                user = User(userName, mPasswordInput?.text.toString(), "${EnQ.instanceId}.$userName")
                 attemptLogin()
             }
             positiveButton.setTextColor(context.secondaryColor())
@@ -113,7 +115,7 @@ class LoginDialog : DialogFragment() {
                 mLoginProgressViews.forEach { it?.visibility = View.VISIBLE }
             }
             // actual login
-            JMusicBot.authorize(user)
+            user?.let { JMusicBot.authorize(it) }
             context?.toast(getString(R.string.msg_logged_in, JMusicBot.user!!.name))
             val mainActivity = activity as MainActivity
             mainActivity.continueWithBot()

@@ -20,6 +20,7 @@ import com.ivoberger.jmusicbot.KEY_AUTHORIZATION
 import com.ivoberger.jmusicbot.model.Auth
 import com.ivoberger.jmusicbot.model.AuthExpectation
 import com.ivoberger.jmusicbot.model.AuthType
+import com.ivoberger.jmusicbot.model.Event
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
@@ -48,11 +49,15 @@ class TokenAuthenticator : Authenticator {
                         JMusicBot.discoverHost()
                         JMusicBot.state.running?.join()
                     }
-                    JMusicBot.authorize()
+                    JMusicBot.user?.let { JMusicBot.authorize(it) }
                     JMusicBot.authToken?.toAuthHeader()
                 }
                 else -> null
             }
+        }
+        if (auth == null) {
+            JMusicBot.stateMachine.transition(Event.AuthExpired)
+            return@runBlocking null
         }
         val origRequest = response.request()
 

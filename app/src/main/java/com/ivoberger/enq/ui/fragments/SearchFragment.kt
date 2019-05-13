@@ -25,7 +25,7 @@ import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.ui.fragments.base.TabbedResultsFragment
 import com.ivoberger.enq.utils.retryOnError
 import com.ivoberger.jmusicbot.JMusicBot
-import com.ivoberger.jmusicbot.listener.ConnectionChangeListener
+import com.ivoberger.jmusicbot.listener.ConnectionListener
 import com.ivoberger.jmusicbot.model.MusicBotPlugin
 import kotlinx.android.synthetic.main.fragment_results.*
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +40,7 @@ import timber.log.Timber
 
 @PotentialFutureAndroidXLifecycleKtxApi
 @ExperimentalSplittiesApi
-class SearchFragment : TabbedResultsFragment(), ConnectionChangeListener {
+class SearchFragment : TabbedResultsFragment(), ConnectionListener {
 
     private val mSearchView: SearchView by lazy { (activity as MainActivity).searchView }
 

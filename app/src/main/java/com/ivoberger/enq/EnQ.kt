@@ -16,6 +16,8 @@
 package com.ivoberger.enq
 
 import android.app.Application
+import com.google.firebase.FirebaseApp
+import com.google.firebase.iid.FirebaseInstanceId
 import com.ivoberger.enq.logging.EnQDebugTree
 import com.ivoberger.enq.logging.FirebaseTree
 import kotlinx.coroutines.Dispatchers
@@ -24,8 +26,16 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class EnQ : Application() {
+
+    companion object {
+        lateinit var instanceId: String
+            private set
+    }
+
     override fun onCreate() {
         MainScope().launch(Dispatchers.Default) {
+            FirebaseApp.initializeApp(this@EnQ)
+            instanceId = FirebaseInstanceId.getInstance().id
             // logging (and crash reporting)
             if (Timber.treeCount() < 1) Timber.plant(
                 if (BuildConfig.DEBUG) EnQDebugTree() else FirebaseTree(applicationContext)
