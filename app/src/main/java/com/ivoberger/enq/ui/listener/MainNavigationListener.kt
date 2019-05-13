@@ -43,7 +43,9 @@ class MainNavigationListener(private val mainActivity: MainActivity) : NavContro
             R.id.dest_suggestions -> checkIfNotChecked(1)
             R.id.dest_favorites -> checkIfNotChecked(2)
             // remove highlight from bottom navigation if none of its menu points is selected (e.g. user info)
-            else -> mainActivity.bottom_navigation.menu.setGroupCheckable(0, false, true)
+            else -> mainActivity.lifecycleScope.launch {
+                mainActivity.bottom_navigation.menu.setGroupCheckable(0, false, true)
+            }
         }
     }
 
