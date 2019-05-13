@@ -4,7 +4,9 @@
     <string name="nav_favorites">Favoriten</string>
     <string name="lbl_album_art">Albumcover</string>
     <string name="tlt_login">Anmelden</string>
-    <string name="msg_login">Bitte gib einen Nutzernamen und ein Passwort ein (Passwort weglassen um als Gast anzumelden)</string>
+    <string name="msg_login">Bitte gib einen Nutzernamen und ein Passwort ein (Passwort weglassen um als Gast
+        anzumelden)
+    </string>
     <string name="btn_login">Login</string>
     <string name="tlt_no_server">Kein Server gefunden</string>
     <string name="btn_retry">Erneut suchen</string>
@@ -23,7 +25,9 @@
     <string name="msg_nothing_playing">Zur Zeit wird nichts abgespielt</string>
     <string name="msg_queue_smth">Spiel was ab!</string>
     <string name="nav_suggestions">Vorschlaege</string>
-    <string name="txt_suggested"><i>Vorgeschlagen</i></string>
+    <string name="txt_suggested">
+        <i>Vorgeschlagen</i>
+    </string>
     <string name="nav_user_options">Nutzer</string>
     <string name="msg_removed_from_favs">%1$s von den Favoriten entfernt</string>
     <string name="msg_no_permission">Du darfst das nicht</string>

@@ -13,13 +13,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package com.ivoberger.jmusicbot.model
+package com.ivoberger.jmusicbot.listener
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+interface ConnectionListener {
 
-@JsonClass(generateAdapter = true)
-data class QueueEntry(
-    @Json(name = "song") val song: Song,
-    @Json(name = "userName") val userName: String
-)
+    fun onConnectionLost(e: Exception? = null)
+    fun onConnectionRecovered()
+}

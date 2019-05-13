@@ -91,6 +91,10 @@ object Libs {
     const val crashlytics: String = "com.crashlytics.sdk.android:crashlytics:" +
             Versions.crashlytics
 
+    const val com_diffplug_gradle_spotless_gradle_plugin: String =
+            "com.diffplug.gradle.spotless:com.diffplug.gradle.spotless.gradle.plugin:" +
+            Versions.com_diffplug_gradle_spotless_gradle_plugin
+
     /**
      * https://github.com/bumptech/glide
      */

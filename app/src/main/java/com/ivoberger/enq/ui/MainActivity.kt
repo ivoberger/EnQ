@@ -1,3 +1,18 @@
+/*
+* Copyright 2019 Ivo Berger
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package com.ivoberger.enq.ui
 
 import android.os.Bundle
@@ -46,6 +61,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var searchView: SearchView
 
     private val mViewModel: MainViewModel by viewModels()
+    private val mConnectionListener by lazy { ConnectionListener(this) }
     val navController: NavController by lazy { container_main_content.findNavController() }
     private val KEY_CURRENT_SERVER = "currentServer"
 
@@ -72,7 +88,11 @@ class MainActivity : AppCompatActivity() {
                 savedInstanceState.getParcelable<ServerInfo>(KEY_CURRENT_SERVER)?.let {
                     lifecycleScope.launch {
                         try {
-                            JMusicBot.connect(AppSettings.getLatestUser()!!, it.baseUrl)
+                            JMusicBot.connect(
+                                AppSettings.getLatestUser()!!,
+                                it.baseUrl,
+                                AppSettings.savedToken
+                            )
                             continueWithBot()
                         } catch (e: Exception) {
                             Timber.w(e)
@@ -96,9 +116,8 @@ class MainActivity : AppCompatActivity() {
         // hide keyboard in case is wasn't hidden after login
         hideKeyboard()
         AppSettings.addUser(JMusicBot.user!!)
-        JMusicBot.connectionListeners.add((ConnectionListener(this@MainActivity)))
+        JMusicBot.connectionListeners.add(mConnectionListener)
         JMusicBot.connectionListeners.add(mViewModel)
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -214,5 +233,10 @@ class MainActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putParcelable(KEY_CURRENT_SERVER, AppSettings.getLatestServer())
         super.onSaveInstanceState(outState)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        JMusicBot.connectionListeners.remove(mConnectionListener)
     }
 }

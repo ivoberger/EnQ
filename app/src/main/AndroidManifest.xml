@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.ivoberger.enq">
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.ivoberger.enq">
 
     <application
-        android:name=".EnQ"
-        android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/EnQ"
-        android:usesCleartextTraffic="true"
-        tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
+            android:name=".EnQ"
+            android:allowBackup="true"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/app_name"
+            android:supportsRtl="true"
+            android:theme="@style/EnQ"
+            android:usesCleartextTraffic="true"
+            tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
         <activity android:name=".ui.MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
         <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
+                android:name="preloaded_fonts"
+                android:resource="@array/preloaded_fonts"/>
         <meta-data
-            android:name="firebase_analytics_collection_enabled"
-            android:value="false" />
+                android:name="firebase_analytics_collection_enabled"
+                android:value="false"/>
         <meta-data
-            android:name="firebase_crashlytics_collection_enabled"
-            android:value="false" />
+                android:name="firebase_crashlytics_collection_enabled"
+                android:value="false"/>
 
     </application>
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
 </manifest>

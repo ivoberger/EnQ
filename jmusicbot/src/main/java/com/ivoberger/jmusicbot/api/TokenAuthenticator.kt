@@ -1,3 +1,18 @@
+/*
+* Copyright 2019 Ivo Berger
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package com.ivoberger.jmusicbot.api
 
 import com.ivoberger.jmusicbot.JMusicBot
@@ -5,6 +20,7 @@ import com.ivoberger.jmusicbot.KEY_AUTHORIZATION
 import com.ivoberger.jmusicbot.model.Auth
 import com.ivoberger.jmusicbot.model.AuthExpectation
 import com.ivoberger.jmusicbot.model.AuthType
+import com.ivoberger.jmusicbot.model.Event
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
@@ -33,11 +49,15 @@ class TokenAuthenticator : Authenticator {
                         JMusicBot.discoverHost()
                         JMusicBot.state.running?.join()
                     }
-                    JMusicBot.authorize()
+                    JMusicBot.user?.let { JMusicBot.authorize(it) }
                     JMusicBot.authToken?.toAuthHeader()
                 }
                 else -> null
             }
+        }
+        if (auth == null) {
+            JMusicBot.stateMachine.transition(Event.AuthExpired)
+            return@runBlocking null
         }
         val origRequest = response.request()
 

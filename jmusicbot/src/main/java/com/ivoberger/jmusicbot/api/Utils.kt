@@ -1,9 +1,28 @@
+/*
+* Copyright 2019 Ivo Berger
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package com.ivoberger.jmusicbot.api
 
 import android.net.wifi.WifiManager
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.KEY_AUTHORIZATION
-import com.ivoberger.jmusicbot.exceptions.*
+import com.ivoberger.jmusicbot.exceptions.AuthException
+import com.ivoberger.jmusicbot.exceptions.InvalidParametersException
+import com.ivoberger.jmusicbot.exceptions.NotFoundException
+import com.ivoberger.jmusicbot.exceptions.ServerErrorException
+import com.ivoberger.jmusicbot.exceptions.UsernameTakenException
 import com.ivoberger.jmusicbot.model.Auth
 import com.ivoberger.jmusicbot.model.Event
 import kotlinx.coroutines.Deferred
@@ -19,6 +38,7 @@ import java.net.SocketTimeoutException
 private const val GROUP_ADDRESS = "224.0.0.142"
 internal const val PORT = 42945
 private const val LOCK_TAG = "enq_broadcast"
+private const val SOCKET_TIMEOUT = 4000
 
 internal fun WifiManager.discoverHost(): String? {
 
@@ -30,7 +50,7 @@ internal fun WifiManager.discoverHost(): String? {
         MulticastSocket(PORT).use { socket ->
             val groupAddress = InetAddress.getByName(GROUP_ADDRESS)
             socket.joinGroup(groupAddress)
-            socket.soTimeout = 4000
+            socket.soTimeout = SOCKET_TIMEOUT
             val buffer = ByteArray(8)
             val packet = DatagramPacket(buffer, buffer.size)
             socket.broadcast = true
@@ -48,7 +68,6 @@ internal fun WifiManager.discoverHost(): String? {
 internal fun OkHttpClient.Builder.withToken(token: Auth.Token) = addInterceptor { chain ->
     chain.proceed(chain.request().newBuilder().header(KEY_AUTHORIZATION, token.toAuthHeader()).build())
 }.authenticator(TokenAuthenticator()).build()
-
 
 @Throws(InvalidParametersException::class, AuthException::class, NotFoundException::class, ServerErrorException::class)
 internal suspend inline fun <reified T> Deferred<Response<T>>.process(

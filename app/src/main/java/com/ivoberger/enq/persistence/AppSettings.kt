@@ -1,3 +1,18 @@
+/*
+* Copyright 2019 Ivo Berger
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package com.ivoberger.enq.persistence
 
 import android.content.Context
@@ -10,10 +25,19 @@ import androidx.lifecycle.MutableLiveData
 import com.ivoberger.enq.R
 import com.ivoberger.enq.model.ServerInfo
 import com.ivoberger.enq.utils.addToEnd
-import com.ivoberger.jmusicbot.model.*
+import com.ivoberger.jmusicbot.model.MoshiTypes
+import com.ivoberger.jmusicbot.model.MusicBotPlugin
+import com.ivoberger.jmusicbot.model.MusicBotPluginJsonAdapter
+import com.ivoberger.jmusicbot.model.Song
+import com.ivoberger.jmusicbot.model.User
+import com.ivoberger.jmusicbot.model.VersionInfo
 import com.squareup.moshi.Moshi
 import kotlinx.android.parcel.Parceler
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import splitties.init.appCtx
 import splitties.toast.toast
 import timber.log.Timber
@@ -27,6 +51,7 @@ object AppSettings {
     private const val KEY_SAVED_USERS = "savedUsers"
     private const val KEY_SAVED_SERVERS = "savedServers"
     private const val KEY_FAVORITES = "favorites"
+    private const val KEY_CURRENT_TOKEN = "currentToken"
 
     // serialization util vars
     val mMoshi by lazy { Moshi.Builder().build() }
@@ -41,8 +66,8 @@ object AppSettings {
         set(value) = saveString(KEY_LAST_PROVIDER, mMusicBotPluginAdapter.toJson(value))
     var lastSuggester: MusicBotPlugin?
         get() = loadString(KEY_LAST_SUGGESTER)?.let { mMusicBotPluginAdapter.fromJson(it) }
-        set(value) = value?.let { saveString(KEY_LAST_SUGGESTER, mMusicBotPluginAdapter.toJson(it)) } ?: Unit
-
+        set(value) = value?.let { saveString(KEY_LAST_SUGGESTER, mMusicBotPluginAdapter.toJson(it)) }
+            ?: Unit
 
     // favorites management
 
@@ -71,7 +96,6 @@ object AppSettings {
         }
     }
 
-
     // saved user management
 
     private var savedUsers: List<User>
@@ -83,25 +107,36 @@ object AppSettings {
         savedUsers = savedUsers.addToEnd(newUser)
     }
 
+    fun updateUser(oldUser: User, updatedUser: User) {
+        savedUsers = savedUsers.toMutableList().apply {
+            remove(oldUser)
+            add(updatedUser)
+        }
+    }
+
     fun getLatestUser(): User? = savedUsers.lastOrNull()
 
     fun clearSavedUsers() = run { savedUsers = listOf() }
 
-
     // saved server management
 
     private var savedServers: List<ServerInfo>
-        get() = loadString(KEY_SAVED_SERVERS)?.let { mServerInfoListAdapter.fromJson(it) } ?: listOf()
+        get() = loadString(KEY_SAVED_SERVERS)?.let { mServerInfoListAdapter.fromJson(it) }
+            ?: listOf()
         set(value) = saveString(KEY_SAVED_SERVERS, mServerInfoListAdapter.toJson(value))
 
     fun addServer(newServer: ServerInfo) = run { savedServers = savedServers.addToEnd(newServer) }
     fun isServerKnown(toCheck: ServerInfo) = savedServers.contains(toCheck)
     fun getLatestServer(): ServerInfo? = savedServers.lastOrNull()
 
+    // latest auth token
 
+    var savedToken: String?
+        get() = loadString(KEY_CURRENT_TOKEN)
+        set(value) = saveString(KEY_CURRENT_TOKEN, value)
     // utils
 
-    private fun saveString(key: String, value: String) = preferences.edit { putString(key, value) }
+    private fun saveString(key: String, value: String?) = preferences.edit { putString(key, value) }
     private fun loadString(key: String): String? = preferences.getString(key, null)
 
     object VersionInfoParceler : Parceler<VersionInfo> {

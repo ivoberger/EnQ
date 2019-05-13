@@ -1,3 +1,18 @@
+/*
+* Copyright 2019 Ivo Berger
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package com.ivoberger.enq.utils
 
 import com.ivoberger.enq.R
@@ -26,10 +41,11 @@ inline fun <T> tryWithDefault(default: T? = null, toTry: () -> T) = try {
     default
 }
 
-inline fun <T> retryOnError(maxAttempts: Int = 5, toTry: () -> T): T? {
+suspend fun <T> retryOnError(maxAttempts: Int = 5, delay: Long = 1000, toTry: suspend () -> T): T? {
     var res = tryWithDefault { toTry() }
     var attempts = 1
     while (res == null && attempts <= maxAttempts) {
+        kotlinx.coroutines.delay(delay)
         res = tryWithDefault { toTry() }
         attempts++
     }

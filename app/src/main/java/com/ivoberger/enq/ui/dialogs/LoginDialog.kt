@@ -1,3 +1,18 @@
+/*
+* Copyright 2019 Ivo Berger
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package com.ivoberger.enq.ui.dialogs
 
 import android.app.Dialog
@@ -6,6 +21,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.navigation.fragment.navArgs
+import com.ivoberger.enq.EnQ
 import com.ivoberger.enq.R
 import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.MainActivity
@@ -57,7 +73,8 @@ class LoginDialog : DialogFragment() {
         }
         dialog?.onShow {
             positiveButton.onClick {
-                user = User(mUserNameInput?.text.toString(), mPasswordInput?.text.toString())
+                val userName = mUserNameInput?.text.toString()
+                user = User(userName, mPasswordInput?.text.toString(), "${EnQ.instanceId}.$userName")
                 attemptLogin()
             }
             positiveButton.setTextColor(context.secondaryColor())
@@ -98,7 +115,8 @@ class LoginDialog : DialogFragment() {
                 mLoginProgressViews.forEach { it?.visibility = View.VISIBLE }
             }
             // actual login
-            JMusicBot.authorize(user)
+            user?.let { JMusicBot.authorize(it, AppSettings.savedToken) }
+            AppSettings.savedToken = JMusicBot.authToken.toString()
             context?.toast(getString(R.string.msg_logged_in, JMusicBot.user!!.name))
             val mainActivity = activity as MainActivity
             mainActivity.continueWithBot()

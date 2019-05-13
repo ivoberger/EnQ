@@ -1,11 +1,25 @@
+/*
+* Copyright 2019 Ivo Berger
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package com.ivoberger.enq.ui.fragments
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
-import android.widget.Toast.LENGTH_SHORT
 import androidx.fragment.app.Fragment
 import com.ivoberger.enq.R
+import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.jmusicbot.JMusicBot
 import kotlinx.android.synthetic.main.fragment_user_info.*
@@ -20,7 +34,6 @@ import splitties.systemservices.inputMethodManager
 import splitties.toast.toast
 import splitties.views.onClick
 import timber.log.Timber
-
 
 @PotentialFutureAndroidXLifecycleKtxApi
 @ExperimentalSplittiesApi
@@ -42,20 +55,20 @@ class UserInfoFragment : Fragment(R.layout.fragment_user_info) {
                     toast(R.string.msg_inavlid_password)
                     return@onClick
                 }
-                val toast = Toast.makeText(context, "", LENGTH_SHORT)
                 lifecycleScope.launch(Dispatchers.IO) {
                     try {
                         JMusicBot.changePassword(input)
+                        val currentUser = AppSettings.getLatestUser()!!
+                        AppSettings.updateUser(currentUser, currentUser.apply { password = input })
                         Timber.d("Password for user ${it.name} successfully changed")
                         withContext(Dispatchers.Main) {
                             input_password.editText?.text = null
-                            toast.setText(R.string.msg_password_changed)
+                            toast(R.string.msg_password_changed)
                         }
                     } catch (e: Exception) {
                         Timber.w(e, "Error changing password")
-                        withContext(Dispatchers.Main) { toast.setText(R.string.msg_error_password_change) }
+                        withContext(Dispatchers.Main) { toast(R.string.msg_error_password_change) }
                     }
-                    withContext(Dispatchers.Main) { toast.show() }
                 }
             }
             btn_reload_permissions.onClick {
@@ -92,5 +105,4 @@ class UserInfoFragment : Fragment(R.layout.fragment_user_info) {
         JMusicBot.logout()
         (context as MainActivity).reset()
     }
-
 }
