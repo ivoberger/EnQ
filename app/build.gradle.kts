@@ -49,7 +49,7 @@ android {
     lintOptions {
         isAbortOnError = false
     }
-    packagingOptions.pickFirsts = setOf("META-INF/core-ktx_release.kotlin_module", "META-INF/atomicfu.kotlin_module")
+    packagingOptions.pickFirsts = setOf("META-INF/core-ktx_release.kotlin_module", "META-INF/atomicfu.kotlin_module", "META-INF/library-core_release.kotlin_module")
 }
 
 play {
@@ -67,7 +67,7 @@ dependencies {
     // Kotlin (extensions)
     implementation(Libs.kotlin_stdlib_jdk8)
     implementation(Libs.kotlinx_coroutines_android)
-    implementation(Libs.androidx_core_core_ktx)
+    implementation(Libs.core_ktx)
     implementation(Libs.fragment_ktx)
     // appcompat, arch components etc.
     implementation(Libs.appcompat)
@@ -105,5 +105,4 @@ dependencies {
 
     implementation(Libs.iconics_core)
     implementation(Libs.community_material_typeface)
-    implementation(Libs.ru_ztrap_iconics_core_ktx)
 }

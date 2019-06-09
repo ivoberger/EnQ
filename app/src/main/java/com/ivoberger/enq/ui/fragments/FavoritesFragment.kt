@@ -29,10 +29,12 @@ import com.ivoberger.enq.utils.icon
 import com.ivoberger.enq.utils.onPrimaryColor
 import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.Song
-import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.fastadapter.adapters.ModelAdapter
 import com.mikepenz.fastadapter.diff.FastAdapterDiffUtil
 import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
+import com.mikepenz.iconics.IconicsColor
+import com.mikepenz.iconics.sizeDp
+import com.mikepenz.iconics.typeface.library.community.material.CommunityMaterial
 import kotlinx.android.synthetic.main.fragment_queue.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,6 +50,7 @@ class FavoritesFragment : SongListFragment<SongItem>(), SimpleSwipeCallback.Item
 
     override val songAdapter: ModelAdapter<Song, SongItem> by lazy {
         ModelAdapter { element: Song -> SongItem(element) }
+
     }
     override val isRemoveAfterEnQ = false
 
@@ -59,7 +62,8 @@ class FavoritesFragment : SongListFragment<SongItem>(), SimpleSwipeCallback.Item
         songAdapter.add(AppSettings.favorites)
 
         val swipeToDeleteIcon =
-            context!!.icon(CommunityMaterial.Icon.cmd_delete).color(context!!.onPrimaryColor()).sizeDp(24)
+            context!!.icon(CommunityMaterial.Icon.cmd_delete).color(IconicsColor.colorInt(context!!.onPrimaryColor()))
+                .sizeDp(24)
         val swipeToDeleteColor = context!!.attributeColor(R.attr.colorDelete)
 
         ItemTouchHelper(

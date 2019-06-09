@@ -21,8 +21,7 @@ object Libs {
     /**
      * http://developer.android.com/tools/extras/support-library.html
      */
-    const val androidx_core_core_ktx: String = "androidx.core:core-ktx:" +
-            Versions.androidx_core_core_ktx
+    const val core_ktx: String = "androidx.core:core-ktx:" + Versions.core_ktx
 
     /**
      * http://developer.android.com/tools/extras/support-library.html
@@ -171,18 +170,33 @@ object Libs {
     const val community_material_typeface: String = "com.mikepenz:community-material-typeface:" +
             Versions.community_material_typeface
 
+    /**
+     * https://github.com/mikepenz/FastAdapter
+     */
     const val fastadapter_extensions_diff: String = "com.mikepenz:fastadapter-extensions-diff:" +
             Versions.fastadapter_extensions_diff
 
+    /**
+     * https://github.com/mikepenz/FastAdapter
+     */
     const val fastadapter_extensions_drag: String = "com.mikepenz:fastadapter-extensions-drag:" +
             Versions.fastadapter_extensions_drag
 
+    /**
+     * https://github.com/mikepenz/FastAdapter
+     */
     const val fastadapter_extensions_swipe: String = "com.mikepenz:fastadapter-extensions-swipe:" +
             Versions.fastadapter_extensions_swipe
 
+    /**
+     * https://github.com/mikepenz/FastAdapter
+     */
     const val fastadapter_extensions_ui: String = "com.mikepenz:fastadapter-extensions-ui:" +
             Versions.fastadapter_extensions_ui
 
+    /**
+     * https://github.com/mikepenz/FastAdapter
+     */
     const val fastadapter_extensions_utils: String = "com.mikepenz:fastadapter-extensions-utils:" +
             Versions.fastadapter_extensions_utils
 
@@ -285,10 +299,4 @@ object Libs {
     const val kotlinx_coroutines_android: String =
             "org.jetbrains.kotlinx:kotlinx-coroutines-android:" +
             Versions.kotlinx_coroutines_android
-
-    /**
-     * https://github.com/zTrap/Android-Iconics-Kt
-     */
-    const val ru_ztrap_iconics_core_ktx: String = "ru.ztrap.iconics:core-ktx:" +
-            Versions.ru_ztrap_iconics_core_ktx
 }

@@ -6,31 +6,31 @@
  * YOU are responsible for updating manually the dependency version.
  */
 object Versions {
-    const val appcompat: String = "1.1.0-alpha05"
+    const val appcompat: String = "1.1.0-beta01"
 
     const val constraintlayout: String = "2.0.0-beta1"
 
-    const val androidx_core_core_ktx: String = "1.1.0-alpha05"
+    const val core_ktx: String = "1.1.0-rc01"
 
-    const val fragment_ktx: String = "1.1.0-alpha08"
+    const val fragment_ktx: String = "1.1.0-beta01"
 
     const val androidx_lifecycle: String = "2.2.0-alpha01"
 
-    const val androidx_navigation: String = "2.1.0-alpha03"
+    const val androidx_navigation: String = "2.1.0-alpha05"
 
-    const val preference_ktx: String = "1.1.0-alpha05"
+    const val preference_ktx: String = "1.1.0-beta01"
 
-    const val recyclerview: String = "1.1.0-alpha05"
+    const val recyclerview: String = "1.1.0-alpha06"
 
-    const val aapt2: String = "3.5.0-beta01-5435860"
+    const val aapt2: String = "3.6.0-alpha02-5435860"
 
-    const val com_android_tools_build_gradle: String = "3.5.0-beta01"
+    const val com_android_tools_build_gradle: String = "3.6.0-alpha02"
 
-    const val lint_gradle: String = "26.5.0-beta01"
+    const val lint_gradle: String = "26.6.0-alpha02"
 
     const val jwtdecode: String = "1.3.0"
 
-    const val crashlytics: String = "2.10.0"
+    const val crashlytics: String = "2.10.1"
 
     const val com_diffplug_gradle_spotless_gradle_plugin: String = "3.23.0"
 
@@ -40,9 +40,9 @@ object Versions {
 
     const val com_github_triplet_play_gradle_plugin: String = "2.2.1"
 
-    const val material: String = "1.1.0-alpha01"
+    const val material: String = "1.1.0-alpha07"
 
-    const val com_google_dagger: String = "2.22.1"
+    const val com_google_dagger: String = "2.23.1"
 
     const val firebase_core: String = "16.0.9"
 
@@ -54,41 +54,39 @@ object Versions {
 
     const val com_louiscad_splitties: String = "3.0.0-alpha06"
 
-    const val community_material_typeface: String = "3.5.95.1"
+    const val community_material_typeface: String = "3.5.95.1-kotlin" // available: "3.5.95.1"
 
-    const val fastadapter_extensions_diff: String = "4.0.0-rc04"
+    const val fastadapter_extensions_diff: String = "4.0.0"
 
-    const val fastadapter_extensions_drag: String = "4.0.0-rc04"
+    const val fastadapter_extensions_drag: String = "4.0.0"
 
-    const val fastadapter_extensions_swipe: String = "4.0.0-rc04"
+    const val fastadapter_extensions_swipe: String = "4.0.0"
 
-    const val fastadapter_extensions_ui: String = "4.0.0-rc04"
+    const val fastadapter_extensions_ui: String = "4.0.0"
 
-    const val fastadapter_extensions_utils: String = "4.0.0-rc04"
+    const val fastadapter_extensions_utils: String = "4.0.0"
 
-    const val fastadapter: String = "4.0.0-rc04"
+    const val fastadapter: String = "4.0.0"
 
-    const val iconics_core: String = "3.2.5" // available: "4.0.0-b1"
+    const val iconics_core: String = "4.0.0"
 
     const val com_squareup_moshi: String = "1.8.0"
 
-    const val com_squareup_okhttp3: String = "3.14.1"
+    const val com_squareup_okhttp3: String = "3.14.2"
 
     const val okio: String = "2.2.2"
 
-    const val com_squareup_retrofit2: String = "2.5.0"
+    const val com_squareup_retrofit2: String = "2.6.0"
 
     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.3.2"
 
-    const val io_fabric_tools_gradle: String = "1.28.1" // available: "1.29.0"
+    const val io_fabric_tools_gradle: String = "1.29.0"
 
     const val assertj_core: String = "3.12.2"
 
     const val org_jetbrains_kotlin: String = "1.3.31"
 
-    const val kotlinx_coroutines_android: String = "1.2.1"
-
-    const val ru_ztrap_iconics_core_ktx: String = "1.0.3"
+    const val kotlinx_coroutines_android: String = "1.2.1" // available: "1.2.1-1.3.40-eap-67"
 
     /**
      *
@@ -100,8 +98,8 @@ object Versions {
 
         const val currentVersion: String = "5.4.1"
 
-        const val nightlyVersion: String = "5.5-20190512000035+0000"
+        const val nightlyVersion: String = "5.6-20190609000024+0000"
 
-        const val releaseCandidate: String = ""
+        const val releaseCandidate: String = "5.5-rc-2"
     }
 }

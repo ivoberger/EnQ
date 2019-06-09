@@ -38,8 +38,10 @@ import com.ivoberger.jmusicbot.JMusicBot
 import com.ivoberger.jmusicbot.model.Permissions
 import com.ivoberger.jmusicbot.model.PlayerState
 import com.ivoberger.jmusicbot.model.PlayerStates
-import com.mikepenz.community_material_typeface_library.CommunityMaterial
+import com.mikepenz.iconics.IconicsColor
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.sizeDp
+import com.mikepenz.iconics.typeface.library.community.material.CommunityMaterial
 import kotlinx.android.synthetic.main.fragment_player.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -97,14 +99,16 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         // pre-load drawables for player buttons
         lifecycleScope.launch(Dispatchers.IO) {
             val color = context.onPrimaryColor()
-            mPlayDrawable = icon(CommunityMaterial.Icon2.cmd_play).color(color)
-            mPauseDrawable = icon(CommunityMaterial.Icon2.cmd_pause).color(color)
-            mStoppedDrawable = icon(CommunityMaterial.Icon2.cmd_stop).color(color)
-            mErrorDrawable = icon(CommunityMaterial.Icon.cmd_alert_circle_outline).color(color)
-            mNotInFavoritesDrawable = icon(CommunityMaterial.Icon2.cmd_star_outline).color(color)
-            mInFavoritesDrawable = icon(CommunityMaterial.Icon2.cmd_star).color(context.secondaryColor())
+            mPlayDrawable = icon(CommunityMaterial.Icon2.cmd_play).color(IconicsColor.colorInt(color))
+            mPauseDrawable = icon(CommunityMaterial.Icon2.cmd_pause).color(IconicsColor.colorInt(color))
+            mStoppedDrawable = icon(CommunityMaterial.Icon2.cmd_stop).color(IconicsColor.colorInt(color))
+            mErrorDrawable = icon(CommunityMaterial.Icon.cmd_alert_circle_outline).color(IconicsColor.colorInt(color))
+            mNotInFavoritesDrawable = icon(CommunityMaterial.Icon2.cmd_star_outline).color(IconicsColor.colorInt(color))
+            mInFavoritesDrawable =
+                icon(CommunityMaterial.Icon2.cmd_star).color(IconicsColor.colorInt(context.secondaryColor()))
             mAlbumArtPlaceholderDrawable =
-                icon(CommunityMaterial.Icon.cmd_album).color(color).sizeDp(dimen(R.dimen.song_albumArt_size).toInt())
+                icon(CommunityMaterial.Icon.cmd_album).color(IconicsColor.colorInt(color))
+                    .sizeDp(dimen(R.dimen.song_albumArt_size).toInt())
         }
     }
 

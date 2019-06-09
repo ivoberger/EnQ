@@ -40,8 +40,9 @@ import com.ivoberger.enq.utils.awaitEnd
 import com.ivoberger.enq.utils.hideKeyboard
 import com.ivoberger.enq.utils.icon
 import com.ivoberger.jmusicbot.JMusicBot
-import com.mikepenz.community_material_typeface_library.CommunityMaterial
+import com.mikepenz.iconics.IconicsColor
 import com.mikepenz.iconics.typeface.IIcon
+import com.mikepenz.iconics.typeface.library.community.material.CommunityMaterial
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_player.*
 import kotlinx.coroutines.Dispatchers
@@ -51,7 +52,6 @@ import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
 import splitties.lifecycle.coroutines.lifecycleScope
-import splitties.resources.colorSL
 import timber.log.Timber
 
 @ExperimentalSplittiesApi
@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
             CommunityMaterial.Icon2.cmd_playlist_play,
             CommunityMaterial.Icon.cmd_all_inclusive,
             CommunityMaterial.Icon2.cmd_star_outline
-        ).map { lifecycleScope.async(Dispatchers.Default) { icon(it).color(colorSL(R.color.bottom_navigation)) } }
+        ).map { lifecycleScope.async(Dispatchers.Default) { icon(it).color(IconicsColor.colorRes(R.color.bottom_navigation)) } }
         lifecycleScope.launch { bottom_navigation.menu.forEachIndexed { idx, itm -> itm.icon = icons[idx].await() } }
 
         when {

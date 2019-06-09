@@ -34,13 +34,15 @@ import com.ivoberger.jmusicbot.KEY_QUEUE
 import com.ivoberger.jmusicbot.exceptions.AuthException
 import com.ivoberger.jmusicbot.model.Permissions
 import com.ivoberger.jmusicbot.model.QueueEntry
-import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.fastadapter.adapters.FastItemAdapter
 import com.mikepenz.fastadapter.diff.FastAdapterDiffUtil
 import com.mikepenz.fastadapter.drag.ItemTouchCallback
 import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
 import com.mikepenz.fastadapter.swipe_drag.SimpleSwipeDragCallback
 import com.mikepenz.fastadapter.utils.DragDropUtil
+import com.mikepenz.iconics.IconicsColor
+import com.mikepenz.iconics.sizeDp
+import com.mikepenz.iconics.typeface.library.community.material.CommunityMaterial
 import kotlinx.android.synthetic.main.fragment_queue.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -77,9 +79,9 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
         savedInstanceState?.also { mFastItemAdapter.withSavedInstanceState(it, KEY_QUEUE) }
 
         val deleteDrawable =
-            context!!.icon(CommunityMaterial.Icon2.cmd_star).color(onPrimaryColor()).sizeDp(24)
+            context!!.icon(CommunityMaterial.Icon2.cmd_star).color(IconicsColor.colorInt(onPrimaryColor())).sizeDp(24)
         val favoritesDrawable =
-            context!!.icon(CommunityMaterial.Icon.cmd_delete).color(onPrimaryColor()).sizeDp(24)
+            context!!.icon(CommunityMaterial.Icon.cmd_delete).color(IconicsColor.colorInt(onPrimaryColor())).sizeDp(24)
 
         // enable swipe and drag actions depending on the users permissions
         JMusicBot.user?.let {
