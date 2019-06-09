@@ -8,4 +8,4 @@
 [Sign up for testing](https://play.google.com/apps/testing/me.iberger.enq)
 
 ### Active Development paused
-Currently I'll only be take care of easily fixed or very critial bugs which make would make the app useless if not fixed. Current focus is on overhauling and properly testing the [core client library](https://github.com/IIIuminator/Jmusicbot-client)
+Currently I'll only be taking care of easily fixed or very critial bugs which make would render the app useless. The current focus is on overhauling and properly testing the [core client library](https://github.com/IIIuminator/Jmusicbot-client)
