@@ -31,38 +31,40 @@ import timber.log.Timber
 
 class TokenAuthenticator : Authenticator {
 
-    override fun authenticate(route: Route?, response: Response): Request? = runBlocking(Dispatchers.IO) {
-        Timber.d("Re-authorizing")
-        var auth: String? = null
-        response.body()?.let { body ->
-            val authExpectation =
-                JMusicBot.mBaseComponent.moshi.adapter(AuthExpectation::class.java).fromJson(String(body.bytes()))
-            Timber.d("AuthExpectation: $authExpectation")
-            auth = when (authExpectation?.format) {
-                AuthType.BASIC -> {
-                    Timber.d("BASIC Auth")
-                    JMusicBot.user?.let { Auth.Basic(it).toAuthHeader() }
-                }
-                AuthType.TOKEN -> {
-                    Timber.d("TOKEN Auth")
-                    if (!JMusicBot.state.hasServer) {
-                        JMusicBot.discoverHost()
-                        JMusicBot.state.running?.join()
+    override fun authenticate(route: Route?, response: Response): Request? =
+        runBlocking(Dispatchers.IO) {
+            Timber.d("Re-authorizing")
+            var auth: String? = null
+            response.body?.let { body ->
+                val authExpectation =
+                    JMusicBot.mBaseComponent.moshi.adapter(AuthExpectation::class.java)
+                        .fromJson(String(body.bytes()))
+                Timber.d("AuthExpectation: $authExpectation")
+                auth = when (authExpectation?.format) {
+                    AuthType.BASIC -> {
+                        Timber.d("BASIC Auth")
+                        JMusicBot.user?.let { Auth.Basic(it).toAuthHeader() }
                     }
-                    JMusicBot.user?.let { JMusicBot.authorize(it) }
-                    JMusicBot.authToken?.toAuthHeader()
+                    AuthType.TOKEN -> {
+                        Timber.d("TOKEN Auth")
+                        if (!JMusicBot.state.hasServer) {
+                            JMusicBot.discoverHost()
+                            JMusicBot.state.running?.join()
+                        }
+                        JMusicBot.user?.let { JMusicBot.authorize(it) }
+                        JMusicBot.authToken?.toAuthHeader()
+                    }
+                    else -> null
                 }
-                else -> null
             }
-        }
-        if (auth == null) {
-            JMusicBot.stateMachine.transition(Event.AuthExpired)
-            return@runBlocking null
-        }
-        val origRequest = response.request()
+            if (auth == null) {
+                JMusicBot.stateMachine.transition(Event.AuthExpired)
+                return@runBlocking null
+            }
+            val origRequest = response.request
 
-        return@runBlocking if (origRequest.header(KEY_AUTHORIZATION) == auth) null else origRequest.newBuilder()
-            .header(KEY_AUTHORIZATION, auth ?: "")
-            .build()
-    }
+            return@runBlocking if (origRequest.header(KEY_AUTHORIZATION) == auth) null else origRequest.newBuilder()
+                .header(KEY_AUTHORIZATION, auth ?: "")
+                .build()
+        }
 }

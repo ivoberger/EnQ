@@ -41,15 +41,16 @@ internal class BaseModule(private val logLevel: HttpLoggingInterceptor.Level = H
 
     @Provides
     fun okHttpClient(): OkHttpClient.Builder = OkHttpClient.Builder().cache(null).addInterceptor(
-        HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { msg ->
-            Timber.tag("BotSDKNetworking").v(msg)
-        }).setLevel(logLevel)
+        HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
+            override fun log(message: String) = Timber.tag("BotSDKNetworking").v(message)
+        }).apply { level = logLevel }
     )
 
     @Provides
     @Named(NameKeys.BUILDER_RETROFIT_BASE)
-    fun retrofitBuilder(okHttpClientBuilder: OkHttpClient.Builder, moshi: Moshi): Retrofit.Builder = Retrofit.Builder()
-        .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
-        .client(okHttpClientBuilder.build())
-        .addCallAdapterFactory(CoroutineCallAdapterFactory())
+    fun retrofitBuilder(okHttpClientBuilder: OkHttpClient.Builder, moshi: Moshi): Retrofit.Builder =
+        Retrofit.Builder()
+            .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
+            .client(okHttpClientBuilder.build())
+            .addCallAdapterFactory(CoroutineCallAdapterFactory())
 }

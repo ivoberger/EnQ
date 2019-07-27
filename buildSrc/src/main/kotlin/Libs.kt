@@ -139,9 +139,6 @@ object Libs {
 
     const val firebase_core: String = "com.google.firebase:firebase-core:" + Versions.firebase_core
 
-    /**
-     * http://tools.android.com/
-     */
     const val google_services: String = "com.google.gms:google-services:" + Versions.google_services
 
     /**
