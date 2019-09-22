@@ -10,12 +10,11 @@ buildscript {
         classpath(Libs.google_services)
         classpath(Libs.com_github_triplet_play_gradle_plugin)
         classpath(Libs.io_fabric_tools_gradle)
-        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${Versions.androidx_navigation}")
     }
 }
 
 plugins {
-    id("de.fayard.buildSrcVersions").version(Versions.de_fayard_buildsrcversions_gradle_plugin)
+    buildSrcVersions
     id("com.diffplug.gradle.spotless").version(Versions.com_diffplug_gradle_spotless_gradle_plugin)
 }
 
@@ -57,7 +56,7 @@ spotless {
 
 tasks {
     wrapper {
-        version = Versions.Gradle.runningVersion
+        gradleVersion = Versions.gradleLatestVersion
         distributionType = Wrapper.DistributionType.ALL
     }
 }
