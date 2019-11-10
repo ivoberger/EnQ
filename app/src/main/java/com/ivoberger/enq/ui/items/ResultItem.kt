@@ -20,6 +20,7 @@ import com.ivoberger.enq.utils.icon
 import com.ivoberger.enq.utils.secondaryColor
 import com.ivoberger.jmusicbot.client.model.Song
 import com.mikepenz.iconics.IconicsColor
+import com.mikepenz.iconics.IconicsSize
 import com.mikepenz.iconics.sizeDp
 import com.mikepenz.iconics.typeface.library.community.material.CommunityMaterial
 
@@ -32,7 +33,7 @@ class ResultItem(song: Song) : SongItem(song) {
         holder.txtDuration.compoundDrawablePadding = 20
         if (model in AppSettings.favorites) holder.txtDuration.setCompoundDrawables(
                 ctx.icon(CommunityMaterial.Icon2.cmd_star)
-                        .color(IconicsColor.colorInt(ctx.secondaryColor())).sizeDp(10),
+                        .color(IconicsColor.colorInt(ctx.secondaryColor())).size(IconicsSize.dp(10)),
                 null, null, null
         )
     }
