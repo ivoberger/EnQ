@@ -21,7 +21,6 @@ import com.ivoberger.enq.utils.secondaryColor
 import com.ivoberger.jmusicbot.client.model.Song
 import com.mikepenz.iconics.IconicsColor
 import com.mikepenz.iconics.IconicsSize
-import com.mikepenz.iconics.sizeDp
 import com.mikepenz.iconics.typeface.library.community.material.CommunityMaterial
 
 class ResultItem(song: Song) : SongItem(song) {
