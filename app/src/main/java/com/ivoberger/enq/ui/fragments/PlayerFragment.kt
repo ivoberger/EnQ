@@ -25,38 +25,35 @@ import android.view.animation.LinearInterpolator
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
+import coil.api.load
 import com.ivoberger.enq.R
 import com.ivoberger.enq.persistence.AppSettings
-import com.ivoberger.enq.persistence.GlideApp
 import com.ivoberger.enq.ui.viewmodel.MainViewModel
 import com.ivoberger.enq.utils.icon
 import com.ivoberger.enq.utils.onPrimaryColor
 import com.ivoberger.enq.utils.secondaryColor
 import com.ivoberger.enq.utils.tryWithErrorToast
-import com.ivoberger.jmusicbot.JMusicBot
-import com.ivoberger.jmusicbot.model.Permissions
-import com.ivoberger.jmusicbot.model.PlayerState
-import com.ivoberger.jmusicbot.model.PlayerStates
+import com.ivoberger.jmusicbot.client.JMusicBot
+import com.ivoberger.jmusicbot.client.model.Permissions
+import com.ivoberger.jmusicbot.client.model.PlayerState
+import com.ivoberger.jmusicbot.client.model.PlayerStates
+import com.mercari.remotedata.RemoteData
 import com.mikepenz.iconics.IconicsColor
 import com.mikepenz.iconics.IconicsDrawable
-import com.mikepenz.iconics.sizeDp
+import com.mikepenz.iconics.IconicsSize
 import com.mikepenz.iconics.typeface.library.community.material.CommunityMaterial
 import kotlinx.android.synthetic.main.fragment_player.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import splitties.experimental.ExperimentalSplittiesApi
-import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
-import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.resources.dimen
 import splitties.resources.str
 import splitties.toast.toast
 import splitties.views.onClick
 import timber.log.Timber
 
-@PotentialFutureAndroidXLifecycleKtxApi
-@ExperimentalSplittiesApi
 class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     private val mViewModel: MainViewModel by viewModels({ activity!! })
@@ -72,7 +69,10 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 velocityX: Float,
                 velocityY: Float
             ): Boolean {
-                if (velocityX > Math.abs(velocityY) * 2) if (JMusicBot.user!!.permissions.contains(Permissions.SKIP)) {
+                if (velocityX > Math.abs(velocityY) * 2) if (JMusicBot.user!!.permissions.contains(
+                                Permissions.SKIP
+                        )
+                ) {
                     lifecycleScope.launch { tryWithErrorToast { JMusicBot.skip() } }
                     return true
                 } else {
@@ -99,22 +99,28 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         // pre-load drawables for player buttons
         lifecycleScope.launch(Dispatchers.IO) {
             val color = context.onPrimaryColor()
-            mPlayDrawable = icon(CommunityMaterial.Icon2.cmd_play).color(IconicsColor.colorInt(color))
-            mPauseDrawable = icon(CommunityMaterial.Icon2.cmd_pause).color(IconicsColor.colorInt(color))
-            mStoppedDrawable = icon(CommunityMaterial.Icon2.cmd_stop).color(IconicsColor.colorInt(color))
-            mErrorDrawable = icon(CommunityMaterial.Icon.cmd_alert_circle_outline).color(IconicsColor.colorInt(color))
-            mNotInFavoritesDrawable = icon(CommunityMaterial.Icon2.cmd_star_outline).color(IconicsColor.colorInt(color))
+            mPlayDrawable =
+                    icon(CommunityMaterial.Icon2.cmd_play).color(IconicsColor.colorInt(color))
+            mPauseDrawable =
+                    icon(CommunityMaterial.Icon2.cmd_pause).color(IconicsColor.colorInt(color))
+            mStoppedDrawable =
+                    icon(CommunityMaterial.Icon2.cmd_stop).color(IconicsColor.colorInt(color))
+            mErrorDrawable = icon(CommunityMaterial.Icon.cmd_alert_circle_outline).color(
+                    IconicsColor.colorInt(color)
+            )
+            mNotInFavoritesDrawable =
+                    icon(CommunityMaterial.Icon2.cmd_star_outline).color(IconicsColor.colorInt(color))
             mInFavoritesDrawable =
-                icon(CommunityMaterial.Icon2.cmd_star).color(IconicsColor.colorInt(context.secondaryColor()))
+                    icon(CommunityMaterial.Icon2.cmd_star).color(IconicsColor.colorInt(context.secondaryColor()))
             mAlbumArtPlaceholderDrawable =
-                icon(CommunityMaterial.Icon.cmd_album).color(IconicsColor.colorInt(color))
-                    .sizeDp(dimen(R.dimen.song_albumArt_size).toInt())
+                    icon(CommunityMaterial.Icon.cmd_album).color(IconicsColor.colorInt(color))
+                            .size(IconicsSize.dp(dimen(R.dimen.song_albumArt_size).toInt()))
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mViewModel.playerState.observe(this) { onPlayerStateChanged(it) }
+        mViewModel.playerState.observe(this) { if (it is RemoteData.Success) onPlayerStateChanged(it.value) }
         Timber.d("Player created")
     }
 
@@ -133,7 +139,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     }
 
     private fun changePlaybackState() = lifecycleScope.launch(Dispatchers.IO) {
-        if (!JMusicBot.isConnected) return@launch
+        if (!JMusicBot.currentState.isConnected) return@launch
         tryWithErrorToast {
             when (mPlayerState.state) {
                 PlayerStates.STOP -> JMusicBot.play()
@@ -148,71 +154,70 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         AppSettings.changeFavoriteStatus(context!!, mPlayerState.songEntry!!.song).join()
         withContext(Dispatchers.Main) {
             song_favorite.setImageDrawable(
-                if (mPlayerState.songEntry!!.song in AppSettings.favorites) mInFavoritesDrawable
-                else mNotInFavoritesDrawable
+                    if (mPlayerState.songEntry!!.song in AppSettings.favorites) mInFavoritesDrawable
+                    else mNotInFavoritesDrawable
             )
         }
     }
 
-    private fun onPlayerStateChanged(newState: PlayerState) = lifecycleScope.launch(Dispatchers.Default) {
-        if (newState == mPlayerState || view == null) return@launch
-        mPlayerState = newState
-        when (newState.state) {
-            PlayerStates.STOP -> {
-                withContext(Dispatchers.Main) {
-                    song_title.setText(R.string.msg_nothing_playing)
-                    song_description.setText(R.string.msg_queue_smth)
-                    song_play_pause.setImageDrawable(mStoppedDrawable)
-                    song_favorite.visibility = View.GONE
+    private fun onPlayerStateChanged(newState: PlayerState) =
+            lifecycleScope.launch(Dispatchers.Default) {
+                if (newState == mPlayerState || view == null) return@launch
+                mPlayerState = newState
+                when (newState.state) {
+                    PlayerStates.STOP -> {
+                        withContext(Dispatchers.Main) {
+                            song_title.setText(R.string.msg_nothing_playing)
+                            song_description.setText(R.string.msg_queue_smth)
+                            song_play_pause.setImageDrawable(mStoppedDrawable)
+                            song_favorite.visibility = View.GONE
+                        }
+                        return@launch
+                    }
+                    PlayerStates.PLAY -> {
+                        withContext(Dispatchers.Main) {
+                            song_favorite.visibility = View.VISIBLE
+                            song_play_pause.setImageDrawable(mPauseDrawable)
+                        }
+                    }
+                    PlayerStates.PAUSE -> {
+                        withContext(Dispatchers.Main) {
+                            song_favorite.visibility = View.VISIBLE
+                            song_play_pause.setImageDrawable(mPlayDrawable)
+                        }
+                    }
+                    PlayerStates.ERROR -> {
+                        withContext(Dispatchers.Main) {
+                            song_play_pause.setImageDrawable(mErrorDrawable)
+                        }
+                        return@launch
+                    }
                 }
-                return@launch
-            }
-            PlayerStates.PLAY -> {
+                val songEntry = newState.songEntry!!
+                val song = songEntry.song
                 withContext(Dispatchers.Main) {
-                    song_favorite.visibility = View.VISIBLE
-                    song_play_pause.setImageDrawable(mPauseDrawable)
+                    // fill in song metadata
+                    song_title.text = song.title
+                    song_description.text = song.description
+                    song_album_art.load(song.albumArtUrl) { placeholder(mAlbumArtPlaceholderDrawable) }
+                    song.duration?.also {
+                        song_duration.text = String.format("%02d:%02d", it / 60, it % 60)
+                        song_progress.max = it * mProgressMultiplier
+                    }
+                    song_chosen_by.text = songEntry.userName ?: str(R.string.txt_suggested)
+                    // set fav status
+                    song_favorite.setImageDrawable(
+                            if (song in AppSettings.favorites) mInFavoritesDrawable
+                            else mNotInFavoritesDrawable
+                    )
+                    ObjectAnimator.ofInt(
+                            song_progress, "progress", mPlayerState.progress * mProgressMultiplier
+                    ).apply {
+                        setAutoCancel(true)
+                        duration = 1000
+                        interpolator = LinearInterpolator()
+                        start()
+                    }
                 }
             }
-            PlayerStates.PAUSE -> {
-                withContext(Dispatchers.Main) {
-                    song_favorite.visibility = View.VISIBLE
-                    song_play_pause.setImageDrawable(mPlayDrawable)
-                }
-            }
-            PlayerStates.ERROR -> {
-                withContext(Dispatchers.Main) {
-                    song_play_pause.setImageDrawable(mErrorDrawable)
-                }
-                return@launch
-            }
-        }
-        val songEntry = newState.songEntry!!
-        val song = songEntry.song
-        withContext(Dispatchers.Main) {
-            // fill in song metadata
-            song_title.text = song.title
-            song_description.text = song.description
-            GlideApp.with(this@PlayerFragment)
-                .load(song.albumArtUrl ?: mAlbumArtPlaceholderDrawable)
-                .into(song_album_art)
-            song.duration?.also {
-                song_duration.text = String.format("%02d:%02d", it / 60, it % 60)
-                song_progress.max = it * mProgressMultiplier
-            }
-            song_chosen_by.text = songEntry.userName ?: str(R.string.txt_suggested)
-            // set fav status
-            song_favorite.setImageDrawable(
-                if (song in AppSettings.favorites) mInFavoritesDrawable
-                else mNotInFavoritesDrawable
-            )
-            ObjectAnimator.ofInt(
-                song_progress, "progress", mPlayerState.progress * mProgressMultiplier
-            ).apply {
-                setAutoCancel(true)
-                duration = 1000
-                interpolator = LinearInterpolator()
-                start()
-            }
-        }
-    }
 }

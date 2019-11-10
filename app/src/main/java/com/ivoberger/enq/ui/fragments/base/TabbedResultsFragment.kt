@@ -21,24 +21,21 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.ivoberger.enq.R
-import com.ivoberger.jmusicbot.listener.ConnectionListener
-import com.ivoberger.jmusicbot.model.MusicBotPlugin
+import com.ivoberger.jmusicbot.client.listener.ConnectionChangeListener
+import com.ivoberger.jmusicbot.client.model.MusicBotPlugin
 import kotlinx.android.synthetic.main.fragment_results.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
-import splitties.experimental.ExperimentalSplittiesApi
-import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
-import splitties.lifecycle.coroutines.lifecycleScope
 import timber.log.Timber
 
-@PotentialFutureAndroidXLifecycleKtxApi
-@ExperimentalSplittiesApi
-abstract class TabbedResultsFragment : Fragment(R.layout.fragment_results), ViewPager.OnPageChangeListener,
-    ConnectionListener {
+abstract class TabbedResultsFragment : Fragment(R.layout.fragment_results),
+        ViewPager.OnPageChangeListener,
+        ConnectionChangeListener {
     lateinit var mProviderPlugins: Deferred<List<MusicBotPlugin>?>
 
     var mSelectedPlugin: MusicBotPlugin? = null
@@ -49,7 +46,7 @@ abstract class TabbedResultsFragment : Fragment(R.layout.fragment_results), View
         view_pager.addOnPageChangeListener(this)
         lifecycleScope.launch {
             if (mSelectedPlugin == null) mSelectedPlugin =
-                if (mProviderPlugins.await()?.size ?: 0 > 0) mProviderPlugins.await()?.get(0) else null
+                    if (mProviderPlugins.await()?.size ?: 0 > 0) mProviderPlugins.await()?.get(0) else null
             mSelectedPlugin?.let {
                 Timber.d("Setting tab to ${mProviderPlugins.await()!!.indexOf(it)}")
                 val idx = mProviderPlugins.await()!!.indexOf(it)
@@ -84,11 +81,16 @@ abstract class TabbedResultsFragment : Fragment(R.layout.fragment_results), View
 
     override fun onPageSelected(position: Int) {
         onTabSelected(position)
-        lifecycleScope.launch(Dispatchers.IO) { mSelectedPlugin = mProviderPlugins.await()?.get(position) }
+        lifecycleScope.launch(Dispatchers.IO) {
+            mSelectedPlugin = mProviderPlugins.await()?.get(position)
+        }
     }
 
-    abstract inner class SongListFragmentPager(fm: FragmentManager, val provider: List<MusicBotPlugin>) :
-        FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+    abstract inner class SongListFragmentPager(
+        fm: FragmentManager,
+        val provider: List<MusicBotPlugin>
+    ) :
+            FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
         val resultFragments: MutableList<ResultsFragment> = mutableListOf()
 

@@ -17,21 +17,17 @@ package com.ivoberger.enq.ui.fragments.base
 
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ivoberger.enq.ui.items.ResultItem
-import com.ivoberger.jmusicbot.model.Song
+import com.ivoberger.jmusicbot.client.model.Song
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.adapters.ModelAdapter
 import com.mikepenz.fastadapter.ui.items.ProgressItem
 import kotlinx.android.synthetic.main.fragment_queue.*
 import kotlinx.coroutines.launch
-import splitties.experimental.ExperimentalSplittiesApi
-import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
-import splitties.lifecycle.coroutines.lifecycleScope
 
-@ExperimentalSplittiesApi
-@PotentialFutureAndroidXLifecycleKtxApi
 open class ResultsFragment : SongListFragment<ResultItem>() {
 
     val loadingHeader: ItemAdapter<ProgressItem> by lazy { ItemAdapter<ProgressItem>() }

@@ -17,6 +17,7 @@ package com.ivoberger.enq.ui.fragments
 
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.ivoberger.enq.R
@@ -27,30 +28,24 @@ import com.ivoberger.enq.ui.items.SongItem
 import com.ivoberger.enq.utils.attributeColor
 import com.ivoberger.enq.utils.icon
 import com.ivoberger.enq.utils.onPrimaryColor
-import com.ivoberger.jmusicbot.JMusicBot
-import com.ivoberger.jmusicbot.model.Song
+import com.ivoberger.jmusicbot.client.JMusicBot
+import com.ivoberger.jmusicbot.client.model.Song
 import com.mikepenz.fastadapter.adapters.ModelAdapter
 import com.mikepenz.fastadapter.diff.FastAdapterDiffUtil
 import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
 import com.mikepenz.iconics.IconicsColor
-import com.mikepenz.iconics.sizeDp
+import com.mikepenz.iconics.IconicsSize
 import com.mikepenz.iconics.typeface.library.community.material.CommunityMaterial
 import kotlinx.android.synthetic.main.fragment_queue.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import splitties.experimental.ExperimentalSplittiesApi
-import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
-import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.toast.toast
 
-@ExperimentalSplittiesApi
-@PotentialFutureAndroidXLifecycleKtxApi
 class FavoritesFragment : SongListFragment<SongItem>(), SimpleSwipeCallback.ItemSwipeCallback {
 
     override val songAdapter: ModelAdapter<Song, SongItem> by lazy {
         ModelAdapter { element: Song -> SongItem(element) }
-
     }
     override val isRemoveAfterEnQ = false
 
@@ -62,14 +57,21 @@ class FavoritesFragment : SongListFragment<SongItem>(), SimpleSwipeCallback.Item
         songAdapter.add(AppSettings.favorites)
 
         val swipeToDeleteIcon =
-            context!!.icon(CommunityMaterial.Icon.cmd_delete).color(IconicsColor.colorInt(context!!.onPrimaryColor()))
-                .sizeDp(24)
+                context!!.icon(CommunityMaterial.Icon.cmd_delete)
+                        .color(IconicsColor.colorInt(context!!.onPrimaryColor())).size(
+                                IconicsSize.dp((24))
+                        )
         val swipeToDeleteColor = context!!.attributeColor(R.attr.colorDelete)
 
         ItemTouchHelper(
-            SimpleSwipeCallback(
-                this, swipeToDeleteIcon, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT, swipeToDeleteColor
-            ).withLeaveBehindSwipeRight(swipeToDeleteIcon).withBackgroundSwipeRight(swipeToDeleteColor)
+                SimpleSwipeCallback(
+                        this,
+                        swipeToDeleteIcon,
+                        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT,
+                        swipeToDeleteColor
+                ).withLeaveBehindSwipeRight(swipeToDeleteIcon).withBackgroundSwipeRight(
+                        swipeToDeleteColor
+                )
         ).attachToRecyclerView(recycler_queue)
     }
 

@@ -19,6 +19,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,11 +30,10 @@ import com.ivoberger.enq.ui.viewmodel.MainViewModel
 import com.ivoberger.enq.utils.attributeColor
 import com.ivoberger.enq.utils.icon
 import com.ivoberger.enq.utils.onPrimaryColor
-import com.ivoberger.jmusicbot.JMusicBot
-import com.ivoberger.jmusicbot.KEY_QUEUE
-import com.ivoberger.jmusicbot.exceptions.AuthException
-import com.ivoberger.jmusicbot.model.Permissions
-import com.ivoberger.jmusicbot.model.QueueEntry
+import com.ivoberger.jmusicbot.client.JMusicBot
+import com.ivoberger.jmusicbot.client.exceptions.AuthException
+import com.ivoberger.jmusicbot.client.model.Permissions
+import com.ivoberger.jmusicbot.client.model.QueueEntry
 import com.mikepenz.fastadapter.adapters.FastItemAdapter
 import com.mikepenz.fastadapter.diff.FastAdapterDiffUtil
 import com.mikepenz.fastadapter.drag.ItemTouchCallback
@@ -41,7 +41,7 @@ import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
 import com.mikepenz.fastadapter.swipe_drag.SimpleSwipeDragCallback
 import com.mikepenz.fastadapter.utils.DragDropUtil
 import com.mikepenz.iconics.IconicsColor
-import com.mikepenz.iconics.sizeDp
+import com.mikepenz.iconics.IconicsSize
 import com.mikepenz.iconics.typeface.library.community.material.CommunityMaterial
 import kotlinx.android.synthetic.main.fragment_queue.*
 import kotlinx.coroutines.Dispatchers
@@ -49,16 +49,14 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.sendBlocking
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import splitties.experimental.ExperimentalSplittiesApi
-import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
-import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.resources.color
 import splitties.toast.toast
 import timber.log.Timber
 
-@PotentialFutureAndroidXLifecycleKtxApi
-@ExperimentalSplittiesApi
-class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.ItemSwipeCallback, ItemTouchCallback {
+class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.ItemSwipeCallback,
+        ItemTouchCallback {
+
+    private val KEY_QUEUE = "queue"
 
     private val mViewModel: MainViewModel by viewModels({ activity!! })
     private val mFastItemAdapter: FastItemAdapter<QueueItem> by lazy { FastItemAdapter<QueueItem>() }
@@ -72,35 +70,43 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mViewModel.queue.observe(this) { mQueueUpdateChannel.sendBlocking(it) }
+        mViewModel.queue.observe(this) { if (it.isSuccess) mQueueUpdateChannel.sendBlocking(it.get()!!) }
 
         recycler_queue.layoutManager = LinearLayoutManager(context).apply { reverseLayout = true }
         recycler_queue.adapter = mFastItemAdapter
         savedInstanceState?.also { mFastItemAdapter.withSavedInstanceState(it, KEY_QUEUE) }
 
         val deleteDrawable =
-            context!!.icon(CommunityMaterial.Icon2.cmd_star).color(IconicsColor.colorInt(onPrimaryColor())).sizeDp(24)
+                context!!.icon(CommunityMaterial.Icon2.cmd_star)
+                        .color(IconicsColor.colorInt(onPrimaryColor())).size(
+                                IconicsSize.dp(24)
+                        )
         val favoritesDrawable =
-            context!!.icon(CommunityMaterial.Icon.cmd_delete).color(IconicsColor.colorInt(onPrimaryColor())).sizeDp(24)
+                context!!.icon(CommunityMaterial.Icon.cmd_delete)
+                        .color(IconicsColor.colorInt(onPrimaryColor())).size(IconicsSize.dp(24))
 
         // enable swipe and drag actions depending on the users permissions
         JMusicBot.user?.let {
             val userPermissions = it.permissions
             val touchCallback = if (userPermissions.contains(Permissions.MOVE))
                 SimpleSwipeDragCallback(
-                    this, this, deleteDrawable, ItemTouchHelper.LEFT, attributeColor(R.attr.colorFavorite)
+                        this,
+                        this,
+                        deleteDrawable,
+                        ItemTouchHelper.LEFT,
+                        attributeColor(R.attr.colorFavorite)
                 ) else SimpleSwipeCallback(
-                this,
-                deleteDrawable,
-                ItemTouchHelper.LEFT,
-                attributeColor(R.attr.colorDelete)
+                    this,
+                    deleteDrawable,
+                    ItemTouchHelper.LEFT,
+                    attributeColor(R.attr.colorDelete)
             )
 
             when (touchCallback) {
                 is SimpleSwipeCallback -> touchCallback.withBackgroundSwipeRight(color(R.color.deleteColor))
-                    .withLeaveBehindSwipeRight(favoritesDrawable)
+                        .withLeaveBehindSwipeRight(favoritesDrawable)
                 is SimpleSwipeDragCallback -> touchCallback.withBackgroundSwipeRight(color(R.color.deleteColor))
-                    .withLeaveBehindSwipeRight(favoritesDrawable)
+                        .withLeaveBehindSwipeRight(favoritesDrawable)
             }
             ItemTouchHelper(touchCallback).attachToRecyclerView(recycler_queue)
         }
@@ -110,9 +116,16 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
         for (newQueue in mQueueUpdateChannel) {
             if (isHidden) continue
             val diff = FastAdapterDiffUtil.calculateDiff(
-                mFastItemAdapter.itemAdapter, newQueue.map { QueueItem(it) }, QueueItem.DiffCallback()
+                    mFastItemAdapter.itemAdapter,
+                    newQueue.map { QueueItem(it) },
+                    QueueItem.DiffCallback()
             )
-            withContext(Dispatchers.Main) { FastAdapterDiffUtil.set(mFastItemAdapter.itemAdapter, diff) }
+            withContext(Dispatchers.Main) {
+                FastAdapterDiffUtil.set(
+                        mFastItemAdapter.itemAdapter,
+                        diff
+                )
+            }
         }
     }
 
@@ -121,7 +134,7 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
             val entry = mFastItemAdapter.getAdapterItem(position)
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
-                    if (!JMusicBot.isConnected) return@launch
+                    if (!JMusicBot.currentState.isConnected) return@launch
                     try {
                         JMusicBot.dequeue(entry.song)
                     } catch (e: AuthException) {
@@ -143,13 +156,13 @@ class QueueFragment : Fragment(R.layout.fragment_queue), SimpleSwipeCallback.Ite
     }
 
     override fun itemTouchOnMove(oldPosition: Int, newPosition: Int): Boolean {
-        if (!JMusicBot.isConnected) return false
+        if (!JMusicBot.currentState.isConnected) return false
         DragDropUtil.onMove(mFastItemAdapter.itemAdapter, oldPosition, newPosition)
         return true
     }
 
     override fun itemTouchDropped(oldPosition: Int, newPosition: Int) {
-        if (!JMusicBot.isConnected) return
+        if (!JMusicBot.currentState.isConnected) return
         lifecycleScope.launch(Dispatchers.IO) {
             val entry = mFastItemAdapter.getAdapterItem(newPosition).model
             Timber.d("Moved ${entry.song.title} from $oldPosition to $newPosition")

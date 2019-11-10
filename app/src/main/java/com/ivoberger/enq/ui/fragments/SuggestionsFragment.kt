@@ -18,21 +18,17 @@ package com.ivoberger.enq.ui.fragments
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.lifecycleScope
 import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.fragments.base.TabbedResultsFragment
 import com.ivoberger.enq.utils.retryOnError
-import com.ivoberger.jmusicbot.JMusicBot
-import com.ivoberger.jmusicbot.model.MusicBotPlugin
+import com.ivoberger.jmusicbot.client.JMusicBot
+import com.ivoberger.jmusicbot.client.model.MusicBotPlugin
 import kotlinx.android.synthetic.main.fragment_results.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import splitties.experimental.ExperimentalSplittiesApi
-import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
-import splitties.lifecycle.coroutines.lifecycleScope
 
-@PotentialFutureAndroidXLifecycleKtxApi
-@ExperimentalSplittiesApi
 class SuggestionsFragment : TabbedResultsFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,9 +58,9 @@ class SuggestionsFragment : TabbedResultsFragment() {
     }
 
     inner class SuggestionsFragmentPager(fm: FragmentManager, provider: List<MusicBotPlugin>) :
-        TabbedResultsFragment.SongListFragmentPager(fm, provider) {
+            TabbedResultsFragment.SongListFragmentPager(fm, provider) {
 
         override fun getItem(position: Int): Fragment =
-            SuggestionResultsFragment.newInstance(provider[position].id)
+                SuggestionResultsFragment.newInstance(provider[position].id)
     }
 }

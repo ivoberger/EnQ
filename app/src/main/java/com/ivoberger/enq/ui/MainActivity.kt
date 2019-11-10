@@ -25,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.forEachIndexed
 import androidx.fragment.app.commit
 import androidx.fragment.app.commitNow
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -39,7 +40,7 @@ import com.ivoberger.enq.ui.viewmodel.MainViewModel
 import com.ivoberger.enq.utils.awaitEnd
 import com.ivoberger.enq.utils.hideKeyboard
 import com.ivoberger.enq.utils.icon
-import com.ivoberger.jmusicbot.JMusicBot
+import com.ivoberger.jmusicbot.client.JMusicBot
 import com.mikepenz.iconics.IconicsColor
 import com.mikepenz.iconics.typeface.IIcon
 import com.mikepenz.iconics.typeface.library.community.material.CommunityMaterial
@@ -49,13 +50,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import splitties.experimental.ExperimentalSplittiesApi
-import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
-import splitties.lifecycle.coroutines.lifecycleScope
 import timber.log.Timber
 
-@ExperimentalSplittiesApi
-@PotentialFutureAndroidXLifecycleKtxApi
 class MainActivity : AppCompatActivity() {
 
     lateinit var searchView: SearchView
@@ -75,23 +71,27 @@ class MainActivity : AppCompatActivity() {
 
         // load bottom navigation icons async
         val icons = listOf<IIcon>(
-            CommunityMaterial.Icon2.cmd_playlist_play,
-            CommunityMaterial.Icon.cmd_all_inclusive,
-            CommunityMaterial.Icon2.cmd_star_outline
+                CommunityMaterial.Icon2.cmd_playlist_play,
+                CommunityMaterial.Icon.cmd_all_inclusive,
+                CommunityMaterial.Icon2.cmd_star_outline
         ).map { lifecycleScope.async(Dispatchers.Default) { icon(it).color(IconicsColor.colorRes(R.color.bottom_navigation)) } }
-        lifecycleScope.launch { bottom_navigation.menu.forEachIndexed { idx, itm -> itm.icon = icons[idx].await() } }
+        lifecycleScope.launch {
+            bottom_navigation.menu.forEachIndexed { idx, itm ->
+                itm.icon = icons[idx].await()
+            }
+        }
 
         when {
-            JMusicBot.isConnected -> continueWithBot()
+            JMusicBot.currentState.isConnected -> continueWithBot()
             savedInstanceState != null && AppSettings.getLatestUser() != null -> {
                 Timber.d("Resuming from saved state")
                 savedInstanceState.getParcelable<ServerInfo>(KEY_CURRENT_SERVER)?.let {
                     lifecycleScope.launch {
                         try {
                             JMusicBot.connect(
-                                AppSettings.getLatestUser()!!,
-                                it.baseUrl,
-                                AppSettings.savedToken
+                                    AppSettings.getLatestUser()!!,
+                                    it.baseUrl,
+                                    AppSettings.savedToken
                             )
                             continueWithBot()
                         } catch (e: Exception) {
@@ -101,7 +101,11 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-            JMusicBot.state.hasServer -> navController.navigate(MainDirections.actionGlobalLoginDialog(true))
+            JMusicBot.currentState.hasServer -> navController.navigate(
+                    MainDirections.actionGlobalLoginDialog(
+                            true
+                    )
+            )
             else -> navController.navigate(MainDirections.actionGlobalServerDiscoveryDialog())
         }
     }
@@ -111,8 +115,17 @@ class MainActivity : AppCompatActivity() {
      */
     fun continueWithBot() = lifecycleScope.launch(Dispatchers.Default) {
         Timber.d("Continuing")
-        supportFragmentManager.commit { replace(R.id.container_current_song, PlayerFragment(), null) }
-        if (navController.currentDestination?.id != R.id.dest_queue) navController.popBackStack(R.id.dest_queue, false)
+        supportFragmentManager.commit {
+            replace(
+                    R.id.container_current_song,
+                    PlayerFragment(),
+                    null
+            )
+        }
+        if (navController.currentDestination?.id != R.id.dest_queue) navController.popBackStack(
+                R.id.dest_queue,
+                false
+        )
         // hide keyboard in case is wasn't hidden after login
         hideKeyboard()
         AppSettings.addUser(JMusicBot.user!!)
@@ -135,7 +148,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         searchView.setOnSearchClickListener {
-            if (!JMusicBot.isConnected) return@setOnSearchClickListener
+            if (!JMusicBot.currentState.isConnected) return@setOnSearchClickListener
             navController.navigate(MainDirections.actionGlobalSearch())
             // save player collapse state
             playerCollapse = mViewModel.playerCollapsed
@@ -195,40 +208,42 @@ class MainActivity : AppCompatActivity() {
      * @param collapse: specifies if the player should be collapsed
      * @param duration: duration of the animation
      */
-    private fun changePlayerCollapse(collapse: Boolean, duration: Long = 1000) = lifecycleScope.launch {
-        current_song_container.animation.awaitEnd()
-        if (mViewModel.playerCollapsed == collapse) return@launch
-        Timber.d("Changing player collapse to $collapse")
-        val animation = current_song_container.animate().setDuration(duration)
-        val translateBy = current_song_container.height.toFloat()
-        if (!mViewModel.playerCollapsed) animation.translationYBy(translateBy)
-            .withEndAction { current_song_container.visibility = View.GONE }
-            .start()
-        else animation.translationYBy(-translateBy)
-            .withStartAction { current_song_container.visibility = View.VISIBLE }
-            .start()
-        mViewModel.playerCollapsed = collapse
-    }
+    private fun changePlayerCollapse(collapse: Boolean, duration: Long = 1000) =
+            lifecycleScope.launch {
+                current_song_container.animation.awaitEnd()
+                if (mViewModel.playerCollapsed == collapse) return@launch
+                Timber.d("Changing player collapse to $collapse")
+                val animation = current_song_container.animate().setDuration(duration)
+                val translateBy = current_song_container.height.toFloat()
+                if (!mViewModel.playerCollapsed) animation.translationYBy(translateBy)
+                        .withEndAction { current_song_container.visibility = View.GONE }
+                        .start()
+                else animation.translationYBy(-translateBy)
+                        .withStartAction { current_song_container.visibility = View.VISIBLE }
+                        .start()
+                mViewModel.playerCollapsed = collapse
+            }
 
     /**
      * collapsed or shows the BottomNavigation
      * @param collapse: specifies if the navigation should be collapsed
      * @param duration: duration of the animation
      */
-    private fun changeBottomNavCollapse(collapse: Boolean, duration: Long = 1000) = lifecycleScope.launch {
-        bottom_navigation.animation.awaitEnd()
-        if (mViewModel.bottomNavCollapsed == collapse) return@launch
-        Timber.d("Changing bottom nav collapse to $collapse")
-        val animation = bottom_navigation.animate().setDuration(duration)
-        val translateBy = bottom_navigation.height.toFloat()
-        if (!mViewModel.bottomNavCollapsed) animation.translationYBy(translateBy)
-            .withEndAction { bottom_navigation.visibility = View.GONE }
-            .start()
-        else animation.translationYBy(-translateBy)
-            .withStartAction { bottom_navigation.visibility = View.VISIBLE }
-            .start()
-        mViewModel.bottomNavCollapsed = collapse
-    }
+    private fun changeBottomNavCollapse(collapse: Boolean, duration: Long = 1000) =
+            lifecycleScope.launch {
+                bottom_navigation.animation.awaitEnd()
+                if (mViewModel.bottomNavCollapsed == collapse) return@launch
+                Timber.d("Changing bottom nav collapse to $collapse")
+                val animation = bottom_navigation.animate().setDuration(duration)
+                val translateBy = bottom_navigation.height.toFloat()
+                if (!mViewModel.bottomNavCollapsed) animation.translationYBy(translateBy)
+                        .withEndAction { bottom_navigation.visibility = View.GONE }
+                        .start()
+                else animation.translationYBy(-translateBy)
+                        .withStartAction { bottom_navigation.visibility = View.VISIBLE }
+                        .start()
+                mViewModel.bottomNavCollapsed = collapse
+            }
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putParcelable(KEY_CURRENT_SERVER, AppSettings.getLatestServer())

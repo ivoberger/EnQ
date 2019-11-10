@@ -15,9 +15,9 @@
 */
 package com.ivoberger.enq.utils
 
-import com.ivoberger.enq.persistence.GlideApp
+import coil.api.load
 import com.ivoberger.enq.ui.items.QueueItem
-import com.ivoberger.jmusicbot.model.Song
+import com.ivoberger.jmusicbot.client.model.Song
 import com.mikepenz.iconics.IconicsColor
 import com.mikepenz.iconics.typeface.library.community.material.CommunityMaterial
 
@@ -28,9 +28,8 @@ fun Song.bindView(holder: QueueItem.ViewHolder) {
     holder.txtTitle.text = this.title
     holder.txtDescription.text = this.description
 
-    GlideApp.with(holder.itemView)
-        .load(this.albumArtUrl)
-        .placeholder(ctx.icon(CommunityMaterial.Icon.cmd_album).color(IconicsColor.colorInt(ctx.onPrimaryColor())))
-        .into(holder.imgAlbumArt)
+    holder.imgAlbumArt.load(albumArtUrl) {
+        placeholder(ctx.icon(CommunityMaterial.Icon.cmd_album).color(IconicsColor.colorInt(ctx.onPrimaryColor())))
+    }
     this.duration?.let { holder.txtDuration.text = String.format("%02d:%02d", it / 60, it % 60) }
 }

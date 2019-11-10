@@ -8,6 +8,7 @@ plugins {
     id("com.google.gms.google-services")
     id("io.fabric")
     id("com.github.triplet.play")
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -90,14 +91,15 @@ dependencies {
     implementation(Libs.constraintlayout)
     implementation(Libs.material)
 
-    implementation("com.ivoberger:jmusicbot-client:0.8.5")
+    implementation(Libs.jmusicbot_client)
 
     // utils
     implementation(Libs.timber)
     implementation(Libs.crashlytics)
+    implementation("com.google.firebase:firebase-analytics:17.2.1")
 
     implementation(Libs.moshi)
-
+    implementation("io.coil-kt:coil:0.8.0")
     implementation(Libs.splitties_fun_pack_android_material_components)
 
     implementation(Libs.fastadapter)

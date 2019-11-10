@@ -24,19 +24,19 @@ import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.utils.bindView
 import com.ivoberger.enq.utils.icon
 import com.ivoberger.enq.utils.secondaryColor
-import com.ivoberger.jmusicbot.model.QueueEntry
-import com.ivoberger.jmusicbot.model.Song
+import com.ivoberger.jmusicbot.client.model.QueueEntry
+import com.ivoberger.jmusicbot.client.model.Song
 import com.mikepenz.fastadapter.drag.IDraggable
 import com.mikepenz.fastadapter.items.ModelAbstractItem
 import com.mikepenz.iconics.IconicsColor
-import com.mikepenz.iconics.sizeDp
+import com.mikepenz.iconics.IconicsSize
 import com.mikepenz.iconics.typeface.library.community.material.CommunityMaterial
 
 class QueueItem(
     queueEntry: QueueEntry,
     val song: Song = queueEntry.song
 ) :
-    ModelAbstractItem<QueueEntry, QueueItem.ViewHolder>(queueEntry), IDraggable {
+        ModelAbstractItem<QueueEntry, QueueItem.ViewHolder>(queueEntry), IDraggable {
 
     override var identifier: Long = song.id.hashCode().toLong()
     override val type: Int = R.id.queue_entry
@@ -55,8 +55,9 @@ class QueueItem(
 
         holder.txtDuration.compoundDrawablePadding = 20
         if (song in AppSettings.favorites) holder.txtDuration.setCompoundDrawables(
-            ctx.icon(CommunityMaterial.Icon2.cmd_star).color(IconicsColor.colorInt(ctx.secondaryColor())).sizeDp(10),
-            null, null, null
+                ctx.icon(CommunityMaterial.Icon2.cmd_star).color(IconicsColor.colorInt(ctx.secondaryColor())).size(
+                        IconicsSize.dp(10)),
+                null, null, null
         )
     }
 
@@ -84,6 +85,6 @@ class QueueItem(
         }
 
         override fun areContentsTheSame(oldItem: QueueItem, newItem: QueueItem): Boolean =
-            oldItem.model == newItem.model
+                oldItem.model == newItem.model
     }
 }

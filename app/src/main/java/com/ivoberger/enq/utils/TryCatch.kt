@@ -16,7 +16,7 @@
 package com.ivoberger.enq.utils
 
 import com.ivoberger.enq.R
-import com.ivoberger.jmusicbot.exceptions.ServerErrorException
+import com.ivoberger.jmusicbot.client.exceptions.ServerErrorException
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import splitties.toast.toast

@@ -18,7 +18,7 @@ package com.ivoberger.enq.ui.items
 import android.view.View
 import com.ivoberger.enq.R
 import com.ivoberger.enq.utils.bindView
-import com.ivoberger.jmusicbot.model.Song
+import com.ivoberger.jmusicbot.client.model.Song
 import com.mikepenz.fastadapter.items.ModelAbstractItem
 
 open class SongItem(song: Song) : ModelAbstractItem<Song, QueueItem.ViewHolder>(song) {

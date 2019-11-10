@@ -19,26 +19,22 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import com.ivoberger.enq.MainDirections
 import com.ivoberger.enq.R
 import com.ivoberger.enq.model.ServerInfo
 import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.utils.secondaryColor
-import com.ivoberger.jmusicbot.JMusicBot
+import com.ivoberger.jmusicbot.client.JMusicBot
 import kotlinx.coroutines.launch
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.onShow
 import splitties.alertdialog.appcompat.positiveButton
 import splitties.alertdialog.appcompat.titleResource
-import splitties.experimental.ExperimentalSplittiesApi
-import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
-import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.views.onClick
 import timber.log.Timber
 
-@ExperimentalSplittiesApi
-@PotentialFutureAndroidXLifecycleKtxApi
 class ServerDiscoveryDialog : DialogFragment() {
 
     private var isDiscovering = true
@@ -83,7 +79,6 @@ class ServerDiscoveryDialog : DialogFragment() {
             mRetryViews.forEach { it?.visibility = View.GONE }
         }
         JMusicBot.discoverHost(if (!triedLatestServer) AppSettings.getLatestServer()?.baseUrl else null)
-        JMusicBot.state.running?.join()
         // check if saved url works
         val versionInfo = try {
             JMusicBot.getVersionInfo()
@@ -91,18 +86,21 @@ class ServerDiscoveryDialog : DialogFragment() {
             Timber.w(e)
             if (!triedLatestServer) {
                 JMusicBot.discoverHost()
-                JMusicBot.state.running?.join()
                 triedLatestServer = true
             }
             null
         }
-        if (JMusicBot.state.hasServer) {
-            (activity as MainActivity).navController.navigate(MainDirections.actionGlobalLoginDialog(true))
+        if (JMusicBot.currentState.hasServer) {
+            (activity as MainActivity).navController.navigate(
+                    MainDirections.actionGlobalLoginDialog(
+                            true
+                    )
+            )
             Timber.d("Found server")
             activity?.lifecycleScope?.launch {
                 try {
                     val serverInfo = ServerInfo(
-                        JMusicBot.baseUrl!!, versionInfo
+                            JMusicBot.baseUrl!!, versionInfo
                             ?: JMusicBot.getVersionInfo()
                     )
                     AppSettings.addServer(serverInfo)

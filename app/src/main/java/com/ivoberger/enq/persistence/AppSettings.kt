@@ -18,19 +18,19 @@ package com.ivoberger.enq.persistence
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Parcel
-import android.preference.PreferenceManager
 import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.preference.PreferenceManager
 import com.ivoberger.enq.R
 import com.ivoberger.enq.model.ServerInfo
 import com.ivoberger.enq.utils.addToEnd
-import com.ivoberger.jmusicbot.model.MoshiTypes
-import com.ivoberger.jmusicbot.model.MusicBotPlugin
-import com.ivoberger.jmusicbot.model.MusicBotPluginJsonAdapter
-import com.ivoberger.jmusicbot.model.Song
-import com.ivoberger.jmusicbot.model.User
-import com.ivoberger.jmusicbot.model.VersionInfo
+import com.ivoberger.jmusicbot.client.model.MoshiTypes
+import com.ivoberger.jmusicbot.client.model.MusicBotPlugin
+import com.ivoberger.jmusicbot.client.model.MusicBotPluginJsonAdapter
+import com.ivoberger.jmusicbot.client.model.Song
+import com.ivoberger.jmusicbot.client.model.User
+import com.ivoberger.jmusicbot.client.model.VersionInfo
 import com.squareup.moshi.Moshi
 import kotlinx.android.parcel.Parceler
 import kotlinx.coroutines.Dispatchers
@@ -44,7 +44,11 @@ import timber.log.Timber
 
 object AppSettings {
 
-    private val preferences: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(appCtx) }
+    private val preferences: SharedPreferences by lazy {
+        PreferenceManager.getDefaultSharedPreferences(
+                appCtx
+        )
+    }
 
     private const val KEY_LAST_PROVIDER = "lastProvider"
     private const val KEY_LAST_SUGGESTER = "lastSuggester"
@@ -55,7 +59,11 @@ object AppSettings {
 
     // serialization util vars
     val mMoshi by lazy { Moshi.Builder().build() }
-    private val mMusicBotPluginAdapter: MusicBotPluginJsonAdapter by lazy { MusicBotPluginJsonAdapter(mMoshi) }
+    private val mMusicBotPluginAdapter: MusicBotPluginJsonAdapter by lazy {
+        MusicBotPluginJsonAdapter(
+                mMoshi
+        )
+    }
     private val mUserListAdapter by lazy { mMoshi.adapter<List<User>>(MoshiTypes.UserList) }
     private val mFavoritesAdapter by lazy { mMoshi.adapter<List<Song>>(MoshiTypes.SongList) }
     private val mServerInfoListAdapter by lazy { mMoshi.adapter<List<ServerInfo>>(ServerInfo.listMoshiType) }
@@ -66,8 +74,13 @@ object AppSettings {
         set(value) = saveString(KEY_LAST_PROVIDER, mMusicBotPluginAdapter.toJson(value))
     var lastSuggester: MusicBotPlugin?
         get() = loadString(KEY_LAST_SUGGESTER)?.let { mMusicBotPluginAdapter.fromJson(it) }
-        set(value) = value?.let { saveString(KEY_LAST_SUGGESTER, mMusicBotPluginAdapter.toJson(it)) }
-            ?: Unit
+        set(value) = value?.let {
+            saveString(
+                    KEY_LAST_SUGGESTER,
+                    mMusicBotPluginAdapter.toJson(it)
+            )
+        }
+                ?: Unit
 
     // favorites management
 
@@ -92,7 +105,14 @@ object AppSettings {
         } else {
             Timber.d("Adding $song to favorites")
             favorites = favorites + song
-            withContext(Dispatchers.Main) { context.toast(context.getString(R.string.msg_added_to_favs, song.title)) }
+            withContext(Dispatchers.Main) {
+                context.toast(
+                        context.getString(
+                                R.string.msg_added_to_favs,
+                                song.title
+                        )
+                )
+            }
         }
     }
 
@@ -122,7 +142,7 @@ object AppSettings {
 
     private var savedServers: List<ServerInfo>
         get() = loadString(KEY_SAVED_SERVERS)?.let { mServerInfoListAdapter.fromJson(it) }
-            ?: listOf()
+                ?: listOf()
         set(value) = saveString(KEY_SAVED_SERVERS, mServerInfoListAdapter.toJson(value))
 
     fun addServer(newServer: ServerInfo) = run { savedServers = savedServers.addToEnd(newServer) }
@@ -141,9 +161,9 @@ object AppSettings {
 
     object VersionInfoParceler : Parceler<VersionInfo> {
         override fun create(parcel: Parcel): VersionInfo =
-            mVersionInfoAdapter.fromJson(parcel.readString()!!)!!
+                mVersionInfoAdapter.fromJson(parcel.readString()!!)!!
 
         override fun VersionInfo.write(parcel: Parcel, flags: Int) =
-            parcel.writeString(mVersionInfoAdapter.toJson(this))
+                parcel.writeString(mVersionInfoAdapter.toJson(this))
     }
 }

@@ -17,24 +17,20 @@ package com.ivoberger.enq.ui.fragments
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import androidx.lifecycle.lifecycleScope
 import com.ivoberger.enq.ui.fragments.base.ResultsFragment
-import com.ivoberger.jmusicbot.JMusicBot
-import com.ivoberger.jmusicbot.KEY_PROVIDER_ID
-import com.ivoberger.jmusicbot.model.Song
+import com.ivoberger.jmusicbot.client.JMusicBot
+import com.ivoberger.jmusicbot.client.model.Song
 import com.mikepenz.fastadapter.ui.items.ProgressItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import splitties.experimental.ExperimentalSplittiesApi
-import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
-import splitties.lifecycle.coroutines.lifecycleScope
 import timber.log.Timber
 
-@PotentialFutureAndroidXLifecycleKtxApi
-@ExperimentalSplittiesApi
 class SearchResultsFragment : ResultsFragment() {
 
     companion object {
+        const val KEY_PROVIDER_ID = "providerId"
         fun newInstance(providerID: String) = SearchResultsFragment().apply {
             arguments = bundleOf(KEY_PROVIDER_ID to providerID)
         }

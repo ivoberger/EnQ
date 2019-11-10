@@ -17,26 +17,27 @@ package com.ivoberger.enq.ui.listener
 
 import android.os.Bundle
 import androidx.core.view.get
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import com.ivoberger.enq.R
 import com.ivoberger.enq.ui.MainActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
-import splitties.experimental.ExperimentalSplittiesApi
-import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
-import splitties.lifecycle.coroutines.lifecycleScope
 import timber.log.Timber
 
-@PotentialFutureAndroidXLifecycleKtxApi
-@ExperimentalSplittiesApi
-class MainNavigationListener(private val mainActivity: MainActivity) : NavController.OnDestinationChangedListener {
+class MainNavigationListener(private val mainActivity: MainActivity) :
+        NavController.OnDestinationChangedListener {
 
     init {
         Timber.d("Initializing MainNavigationListener")
     }
 
-    override fun onDestinationChanged(controller: NavController, destination: NavDestination, arguments: Bundle?) {
+    override fun onDestinationChanged(
+        controller: NavController,
+        destination: NavDestination,
+        arguments: Bundle?
+    ) {
         Timber.d("Navigated to ${destination.label} with id ${destination.id}")
         when (destination.id) {
             R.id.dest_queue -> checkIfNotChecked(0)

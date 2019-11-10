@@ -7,191 +7,197 @@ import kotlin.String
  *   `$ ./gradlew buildSrcVersions`
  */
 object Libs {
-  /**
-   * https://developer.android.com/jetpack/androidx
-   */
-  const val appcompat: String = "androidx.appcompat:appcompat:" + Versions.appcompat
+    /**
+     * https://github.com/Kotlin/kotlinx.coroutines
+     */
+    const val kotlinx_coroutines_android: String =
+            "org.jetbrains.kotlinx:kotlinx-coroutines-android:" +
+            Versions.org_jetbrains_kotlinx_kotlinx_coroutines
 
-  /**
-   * http://tools.android.com
-   */
-  const val constraintlayout: String = "androidx.constraintlayout:constraintlayout:" +
-      Versions.constraintlayout
+    /**
+     * https://kotlinlang.org/
+     */
+    const val kotlin_android_extensions: String =
+            "org.jetbrains.kotlin:kotlin-android-extensions:" + Versions.org_jetbrains_kotlin
 
-  /**
-   * http://developer.android.com/tools/extras/support-library.html
-   */
-  const val core_ktx: String = "androidx.core:core-ktx:" + Versions.core_ktx
+    /**
+     * https://kotlinlang.org/
+     */
+    const val kotlin_android_extensions_runtime: String =
+            "org.jetbrains.kotlin:kotlin-android-extensions-runtime:" +
+            Versions.org_jetbrains_kotlin
 
-  /**
-   * https://developer.android.com/topic/libraries/architecture/index.html
-   */
-  const val lifecycle_extensions: String = "androidx.lifecycle:lifecycle-extensions:" +
-      Versions.androidx_lifecycle
+    /**
+     * https://kotlinlang.org/
+     */
+    const val kotlin_annotation_processing_gradle: String =
+            "org.jetbrains.kotlin:kotlin-annotation-processing-gradle:" +
+            Versions.org_jetbrains_kotlin
 
-  /**
-   * http://developer.android.com/tools/extras/support-library.html
-   */
-  const val lifecycle_livedata_ktx: String = "androidx.lifecycle:lifecycle-livedata-ktx:" +
-      Versions.androidx_lifecycle
+    /**
+     * https://kotlinlang.org/
+     */
+    const val kotlin_gradle_plugin: String = "org.jetbrains.kotlin:kotlin-gradle-plugin:" +
+            Versions.org_jetbrains_kotlin
 
-  /**
-   * https://developer.android.com/topic/libraries/architecture/index.html
-   */
-  const val navigation_fragment_ktx: String = "androidx.navigation:navigation-fragment-ktx:" +
-      Versions.androidx_navigation
+    /**
+     * https://kotlinlang.org/
+     */
+    const val kotlin_stdlib_jdk8: String = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:" +
+            Versions.org_jetbrains_kotlin
 
-  /**
-   * https://developer.android.com/topic/libraries/architecture/index.html
-   */
-  const val navigation_ui_ktx: String = "androidx.navigation:navigation-ui-ktx:" +
-      Versions.androidx_navigation
+    /**
+     * https://developer.android.com/topic/libraries/architecture/index.html
+     */
+    const val navigation_fragment_ktx: String = "androidx.navigation:navigation-fragment-ktx:" +
+            Versions.androidx_navigation
 
-  /**
-   * https://developer.android.com/jetpack/androidx
-   */
-  const val preference_ktx: String = "androidx.preference:preference-ktx:" + Versions.preference_ktx
+    /**
+     * https://developer.android.com/topic/libraries/architecture/index.html
+     */
+    const val navigation_ui_ktx: String = "androidx.navigation:navigation-ui-ktx:" +
+            Versions.androidx_navigation
 
-  /**
-   * http://developer.android.com/tools/extras/support-library.html
-   */
-  const val recyclerview: String = "androidx.recyclerview:recyclerview:" + Versions.recyclerview
+    /**
+     * https://developer.android.com/topic/libraries/architecture/index.html
+     */
+    const val lifecycle_extensions: String = "androidx.lifecycle:lifecycle-extensions:" +
+            Versions.androidx_lifecycle
 
-  /**
-   * https://developer.android.com/studio
-   */
-  const val aapt2: String = "com.android.tools.build:aapt2:" + Versions.aapt2
+    /**
+     * http://developer.android.com/tools/extras/support-library.html
+     */
+    const val lifecycle_livedata_ktx: String = "androidx.lifecycle:lifecycle-livedata-ktx:" +
+            Versions.androidx_lifecycle
 
-  /**
-   * https://developer.android.com/studio
-   */
-  const val com_android_tools_build_gradle: String = "com.android.tools.build:gradle:" +
-      Versions.com_android_tools_build_gradle
+    /**
+     * https://developer.android.com/studio
+     */
+    const val com_android_tools_build_gradle: String = "com.android.tools.build:gradle:" +
+            Versions.com_android_tools_build_gradle
 
-  /**
-   * https://developer.android.com/studio
-   */
-  const val lint_gradle: String = "com.android.tools.lint:lint-gradle:" + Versions.lint_gradle
+    const val io_fabric_tools_gradle: String = "io.fabric.tools:gradle:" +
+            Versions.io_fabric_tools_gradle
 
-  const val crashlytics: String = "com.crashlytics.sdk.android:crashlytics:" + Versions.crashlytics
+    const val splitties_fun_pack_android_material_components: String =
+            "com.louiscad.splitties:splitties-fun-pack-android-material-components:" +
+            Versions.splitties_fun_pack_android_material_components
 
-  const val com_diffplug_gradle_spotless_gradle_plugin: String =
-      "com.diffplug.gradle.spotless:com.diffplug.gradle.spotless.gradle.plugin:" +
-      Versions.com_diffplug_gradle_spotless_gradle_plugin
+    const val com_diffplug_gradle_spotless_gradle_plugin: String =
+            "com.diffplug.gradle.spotless:com.diffplug.gradle.spotless.gradle.plugin:" +
+            Versions.com_diffplug_gradle_spotless_gradle_plugin
 
-  const val com_github_triplet_play_gradle_plugin: String =
-      "com.github.triplet.play:com.github.triplet.play.gradle.plugin:" +
-      Versions.com_github_triplet_play_gradle_plugin
+    const val de_fayard_buildsrcversions_gradle_plugin: String =
+            "de.fayard.buildSrcVersions:de.fayard.buildSrcVersions.gradle.plugin:" +
+            Versions.de_fayard_buildsrcversions_gradle_plugin
 
-  /**
-   * http://developer.android.com/tools/extras/support-library.html
-   */
-  const val material: String = "com.google.android.material:material:" + Versions.material
+    const val com_github_triplet_play_gradle_plugin: String =
+            "com.github.triplet.play:com.github.triplet.play.gradle.plugin:" +
+            Versions.com_github_triplet_play_gradle_plugin
 
-  const val google_services: String = "com.google.gms:google-services:" + Versions.google_services
+    /**
+     * https://github.com/mikepenz/FastAdapter
+     */
+    const val fastadapter_extensions_swipe: String = "com.mikepenz:fastadapter-extensions-swipe:" +
+            Versions.fastadapter_extensions_swipe
 
-  const val jmusicbot_client: String = "com.ivoberger:jmusicbot-client:" + Versions.jmusicbot_client
+    /**
+     * https://github.com/mikepenz/FastAdapter
+     */
+    const val fastadapter_extensions_utils: String = "com.mikepenz:fastadapter-extensions-utils:" +
+            Versions.fastadapter_extensions_utils
 
-  /**
-   * https://github.com/JakeWharton/timber
-   */
-  const val timber: String = "com.jakewharton.timber:timber:" + Versions.timber
+    /**
+     * https://github.com/mikepenz/Android-Iconics
+     */
+    const val community_material_typeface: String = "com.mikepenz:community-material-typeface:" +
+            Versions.community_material_typeface
 
-  const val splitties_fun_pack_android_material_components: String =
-      "com.louiscad.splitties:splitties-fun-pack-android-material-components:" +
-      Versions.splitties_fun_pack_android_material_components
+    /**
+     * https://github.com/mikepenz/FastAdapter
+     */
+    const val fastadapter_extensions_diff: String = "com.mikepenz:fastadapter-extensions-diff:" +
+            Versions.fastadapter_extensions_diff
 
-  /**
-   * https://github.com/mikepenz/Android-Iconics
-   */
-  const val community_material_typeface: String = "com.mikepenz:community-material-typeface:" +
-      Versions.community_material_typeface
+    /**
+     * https://github.com/mikepenz/FastAdapter
+     */
+    const val fastadapter_extensions_drag: String = "com.mikepenz:fastadapter-extensions-drag:" +
+            Versions.fastadapter_extensions_drag
 
-  /**
-   * https://github.com/mikepenz/FastAdapter
-   */
-  const val fastadapter_extensions_diff: String = "com.mikepenz:fastadapter-extensions-diff:" +
-      Versions.fastadapter_extensions_diff
+    /**
+     * https://github.com/mikepenz/FastAdapter
+     */
+    const val fastadapter_extensions_ui: String = "com.mikepenz:fastadapter-extensions-ui:" +
+            Versions.fastadapter_extensions_ui
 
-  /**
-   * https://github.com/mikepenz/FastAdapter
-   */
-  const val fastadapter_extensions_drag: String = "com.mikepenz:fastadapter-extensions-drag:" +
-      Versions.fastadapter_extensions_drag
+    /**
+     * http://tools.android.com
+     */
+    const val constraintlayout: String = "androidx.constraintlayout:constraintlayout:" +
+            Versions.constraintlayout
 
-  /**
-   * https://github.com/mikepenz/FastAdapter
-   */
-  const val fastadapter_extensions_swipe: String = "com.mikepenz:fastadapter-extensions-swipe:" +
-      Versions.fastadapter_extensions_swipe
+    const val jmusicbot_client: String = "com.ivoberger:jmusicbot-client:" +
+            Versions.jmusicbot_client
 
-  /**
-   * https://github.com/mikepenz/FastAdapter
-   */
-  const val fastadapter_extensions_ui: String = "com.mikepenz:fastadapter-extensions-ui:" +
-      Versions.fastadapter_extensions_ui
+    const val google_services: String = "com.google.gms:google-services:" + Versions.google_services
 
-  /**
-   * https://github.com/mikepenz/FastAdapter
-   */
-  const val fastadapter_extensions_utils: String = "com.mikepenz:fastadapter-extensions-utils:" +
-      Versions.fastadapter_extensions_utils
+    /**
+     * https://developer.android.com/jetpack/androidx
+     */
+    const val preference_ktx: String = "androidx.preference:preference-ktx:" +
+            Versions.preference_ktx
 
-  /**
-   * https://github.com/mikepenz/FastAdapter
-   */
-  const val fastadapter: String = "com.mikepenz:fastadapter:" + Versions.fastadapter
+    /**
+     * https://github.com/mikepenz/Android-Iconics
+     */
+    const val iconics_core: String = "com.mikepenz:iconics-core:" + Versions.iconics_core
 
-  /**
-   * https://github.com/mikepenz/Android-Iconics
-   */
-  const val iconics_core: String = "com.mikepenz:iconics-core:" + Versions.iconics_core
+    /**
+     * http://developer.android.com/tools/extras/support-library.html
+     */
+    const val recyclerview: String = "androidx.recyclerview:recyclerview:" + Versions.recyclerview
 
-  /**
-   * https://github.com/square/moshi
-   */
-  const val moshi: String = "com.squareup.moshi:moshi:" + Versions.moshi
+    const val crashlytics: String = "com.crashlytics.sdk.android:crashlytics:" +
+            Versions.crashlytics
 
-  const val de_fayard_buildsrcversions_gradle_plugin: String =
-      "de.fayard.buildSrcVersions:de.fayard.buildSrcVersions.gradle.plugin:" +
-      Versions.de_fayard_buildsrcversions_gradle_plugin
+    /**
+     * https://github.com/mikepenz/FastAdapter
+     */
+    const val fastadapter: String = "com.mikepenz:fastadapter:" + Versions.fastadapter
 
-  const val io_fabric_tools_gradle: String = "io.fabric.tools:gradle:" +
-      Versions.io_fabric_tools_gradle
+    /**
+     * https://developer.android.com/studio
+     */
+    const val lint_gradle: String = "com.android.tools.lint:lint-gradle:" + Versions.lint_gradle
 
-  /**
-   * https://kotlinlang.org/
-   */
-  const val kotlin_android_extensions_runtime: String =
-      "org.jetbrains.kotlin:kotlin-android-extensions-runtime:" + Versions.org_jetbrains_kotlin
+    /**
+     * https://developer.android.com/jetpack/androidx
+     */
+    const val appcompat: String = "androidx.appcompat:appcompat:" + Versions.appcompat
 
-  /**
-   * https://kotlinlang.org/
-   */
-  const val kotlin_android_extensions: String = "org.jetbrains.kotlin:kotlin-android-extensions:" +
-      Versions.org_jetbrains_kotlin
+    /**
+     * http://developer.android.com/tools/extras/support-library.html
+     */
+    const val core_ktx: String = "androidx.core:core-ktx:" + Versions.core_ktx
 
-  /**
-   * https://kotlinlang.org/
-   */
-  const val kotlin_annotation_processing_gradle: String =
-      "org.jetbrains.kotlin:kotlin-annotation-processing-gradle:" + Versions.org_jetbrains_kotlin
+    /**
+     * http://developer.android.com/tools/extras/support-library.html
+     */
+    const val material: String = "com.google.android.material:material:" + Versions.material
 
-  /**
-   * https://kotlinlang.org/
-   */
-  const val kotlin_gradle_plugin: String = "org.jetbrains.kotlin:kotlin-gradle-plugin:" +
-      Versions.org_jetbrains_kotlin
+    /**
+     * https://github.com/JakeWharton/timber
+     */
+    const val timber: String = "com.jakewharton.timber:timber:" + Versions.timber
 
-  /**
-   * https://kotlinlang.org/
-   */
-  const val kotlin_stdlib_jdk8: String = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:" +
-      Versions.org_jetbrains_kotlin
+    /**
+     * https://developer.android.com/studio
+     */
+    const val aapt2: String = "com.android.tools.build:aapt2:" + Versions.aapt2
 
-  /**
-   * https://github.com/Kotlin/kotlinx.coroutines
-   */
-  const val kotlinx_coroutines_android: String =
-      "org.jetbrains.kotlinx:kotlinx-coroutines-android:" + Versions.kotlinx_coroutines_android
+    /**
+     * https://github.com/square/moshi
+     */
+    const val moshi: String = "com.squareup.moshi:moshi:" + Versions.moshi
 }

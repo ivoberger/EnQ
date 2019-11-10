@@ -18,25 +18,21 @@ package com.ivoberger.enq.ui.fragments
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.ivoberger.enq.R
 import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.MainActivity
-import com.ivoberger.jmusicbot.JMusicBot
+import com.ivoberger.jmusicbot.client.JMusicBot
 import kotlinx.android.synthetic.main.fragment_user_info.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import splitties.experimental.ExperimentalSplittiesApi
-import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
-import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.resources.str
 import splitties.systemservices.inputMethodManager
 import splitties.toast.toast
 import splitties.views.onClick
 import timber.log.Timber
 
-@PotentialFutureAndroidXLifecycleKtxApi
-@ExperimentalSplittiesApi
 class UserInfoFragment : Fragment(R.layout.fragment_user_info) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

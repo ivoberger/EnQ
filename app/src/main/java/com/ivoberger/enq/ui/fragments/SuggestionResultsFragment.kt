@@ -18,32 +18,28 @@ package com.ivoberger.enq.ui.fragments
 import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.ivoberger.enq.R
 import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.fragments.base.ResultsFragment
 import com.ivoberger.enq.ui.items.ResultItem
 import com.ivoberger.enq.utils.tryWithErrorToast
-import com.ivoberger.jmusicbot.JMusicBot
-import com.ivoberger.jmusicbot.KEY_SUGGESTER_ID
-import com.ivoberger.jmusicbot.exceptions.AuthException
-import com.ivoberger.jmusicbot.model.Permissions
+import com.ivoberger.jmusicbot.client.JMusicBot
+import com.ivoberger.jmusicbot.client.exceptions.AuthException
+import com.ivoberger.jmusicbot.client.model.Permissions
 import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback
 import com.mikepenz.fastadapter.ui.items.ProgressItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import splitties.experimental.ExperimentalSplittiesApi
-import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
-import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.toast.toast
 import timber.log.Timber
 
-@PotentialFutureAndroidXLifecycleKtxApi
-@ExperimentalSplittiesApi
 class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwipeCallback {
 
     companion object {
+        const val KEY_SUGGESTER_ID = "suggesterId"
         fun newInstance(suggesterId: String) = SuggestionResultsFragment().apply {
             arguments = bundleOf(KEY_SUGGESTER_ID to suggesterId)
         }
@@ -62,15 +58,16 @@ class SuggestionResultsFragment : ResultsFragment(), SimpleSwipeCallback.ItemSwi
         super.onViewCreated(view, savedInstanceState)
         loadingHeader.add(ProgressItem())
         getSuggestions()
-        if (mCanDislike) fastAdapter.onLongClickListener = { _, _, item: ResultItem, position: Int ->
-            if (JMusicBot.isConnected) {
-                lifecycleScope.launch {
-                    tryWithErrorToast { JMusicBot.deleteSuggestion(mSuggesterId, item.model) }
-                    songAdapter.remove(position)
+        if (mCanDislike) fastAdapter.onLongClickListener =
+                { _, _, item: ResultItem, position: Int ->
+                    if (JMusicBot.currentState.isConnected) {
+                        lifecycleScope.launch {
+                            tryWithErrorToast { JMusicBot.deleteSuggestion(mSuggesterId, item.model) }
+                            songAdapter.remove(position)
+                        }
+                        true
+                    } else false
                 }
-                true
-            } else false
-        }
     }
 
     private fun getSuggestions() = lifecycleScope.launch(Dispatchers.IO) {

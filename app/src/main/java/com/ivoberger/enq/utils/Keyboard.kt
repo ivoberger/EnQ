@@ -18,8 +18,8 @@ package com.ivoberger.enq.utils
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.systemservices.inputMethodManager
 
 fun View.hideKeyboard() {

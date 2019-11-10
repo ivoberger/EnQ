@@ -17,6 +17,7 @@ package com.ivoberger.enq
 
 import android.app.Application
 import com.google.firebase.FirebaseApp
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.iid.FirebaseInstanceId
 import com.ivoberger.enq.logging.EnQDebugTree
 import com.ivoberger.enq.logging.FirebaseTree
@@ -35,10 +36,11 @@ class EnQ : Application() {
     override fun onCreate() {
         MainScope().launch(Dispatchers.Default) {
             FirebaseApp.initializeApp(this@EnQ)
+            FirebaseAnalytics.getInstance((this@EnQ)).setAnalyticsCollectionEnabled(false)
             instanceId = FirebaseInstanceId.getInstance().id
             // logging (and crash reporting)
             if (Timber.treeCount() < 1) Timber.plant(
-                if (BuildConfig.DEBUG) EnQDebugTree() else FirebaseTree(applicationContext)
+                    if (BuildConfig.DEBUG) EnQDebugTree() else FirebaseTree(applicationContext)
             )
         }
         super.onCreate()

@@ -20,22 +20,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.utils.retryOnError
-import com.ivoberger.jmusicbot.JMusicBot
-import com.ivoberger.jmusicbot.listener.ConnectionListener
-import com.ivoberger.jmusicbot.model.PlayerState
-import com.ivoberger.jmusicbot.model.QueueEntry
+import com.ivoberger.jmusicbot.client.JMusicBot
+import com.ivoberger.jmusicbot.client.android.playerStateLiveData
+import com.ivoberger.jmusicbot.client.android.queueLiveData
+import com.ivoberger.jmusicbot.client.listener.ConnectionChangeListener
+import com.ivoberger.jmusicbot.client.model.PlayerState
+import com.ivoberger.jmusicbot.client.model.QueueEntry
+import com.mercari.remotedata.RemoteData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class MainViewModel() : ViewModel(), ConnectionListener {
+class MainViewModel : ViewModel(), ConnectionChangeListener {
 
     var playerCollapsed = false
     var bottomNavCollapsed = false
 
-    val playerState: LiveData<PlayerState> by lazy { JMusicBot.getPlayerState() }
-    val queue: LiveData<List<QueueEntry>>by lazy { JMusicBot.getQueue() }
-    var mainActivityConnectionListener: ConnectionListener? = null
+    val playerState: LiveData<RemoteData<PlayerState, Exception>> by lazy { JMusicBot.playerStateLiveData }
+    val queue: LiveData<RemoteData<List<QueueEntry>, Exception>> by lazy { JMusicBot.queueLiveData }
+    var mainActivityConnectionListener: ConnectionChangeListener? = null
 
     init {
         Timber.d("MainViewModel initialized")

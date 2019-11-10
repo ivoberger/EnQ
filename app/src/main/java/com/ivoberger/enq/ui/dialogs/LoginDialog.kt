@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.ivoberger.enq.EnQ
 import com.ivoberger.enq.R
@@ -27,27 +28,22 @@ import com.ivoberger.enq.persistence.AppSettings
 import com.ivoberger.enq.ui.MainActivity
 import com.ivoberger.enq.utils.hideKeyboard
 import com.ivoberger.enq.utils.secondaryColor
-import com.ivoberger.jmusicbot.JMusicBot
-import com.ivoberger.jmusicbot.exceptions.AuthException
-import com.ivoberger.jmusicbot.exceptions.InvalidParametersException
-import com.ivoberger.jmusicbot.exceptions.ServerErrorException
-import com.ivoberger.jmusicbot.exceptions.UsernameTakenException
-import com.ivoberger.jmusicbot.model.User
+import com.ivoberger.jmusicbot.client.JMusicBot
+import com.ivoberger.jmusicbot.client.exceptions.AuthException
+import com.ivoberger.jmusicbot.client.exceptions.InvalidParametersException
+import com.ivoberger.jmusicbot.client.exceptions.ServerErrorException
+import com.ivoberger.jmusicbot.client.exceptions.UsernameTakenException
+import com.ivoberger.jmusicbot.client.model.User
 import kotlinx.coroutines.launch
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.onShow
 import splitties.alertdialog.appcompat.positiveButton
 import splitties.alertdialog.appcompat.titleResource
-import splitties.experimental.ExperimentalSplittiesApi
-import splitties.lifecycle.coroutines.PotentialFutureAndroidXLifecycleKtxApi
-import splitties.lifecycle.coroutines.lifecycleScope
 import splitties.toast.longToast
 import splitties.toast.toast
 import splitties.views.onClick
 import timber.log.Timber
 
-@ExperimentalSplittiesApi
-@PotentialFutureAndroidXLifecycleKtxApi
 class LoginDialog : DialogFragment() {
 
     private var loggingIn: Boolean = true
@@ -74,7 +70,8 @@ class LoginDialog : DialogFragment() {
         dialog?.onShow {
             positiveButton.onClick {
                 val userName = mUserNameInput?.text.toString()
-                user = User(userName, mPasswordInput?.text.toString(), "${EnQ.instanceId}.$userName")
+                user =
+                        User(userName, mPasswordInput?.text.toString(), "${EnQ.instanceId}.$userName")
                 attemptLogin()
             }
             positiveButton.setTextColor(context.secondaryColor())
@@ -82,11 +79,11 @@ class LoginDialog : DialogFragment() {
             mUserNameInput = findViewById(R.id.login_username)
             mPasswordInput = findViewById(R.id.login_password)
             mLoginMaskViews = listOf(
-                mUserNameInput,
-                findViewById(R.id.login_lbl_username),
-                mPasswordInput,
-                findViewById(R.id.login_lbl_password),
-                findViewById(R.id.login_message)
+                    mUserNameInput,
+                    findViewById(R.id.login_lbl_username),
+                    mPasswordInput,
+                    findViewById(R.id.login_lbl_password),
+                    findViewById(R.id.login_message)
             )
             mLoginProgressViews = listOf(findViewById(R.id.login_progress))
 
@@ -115,8 +112,9 @@ class LoginDialog : DialogFragment() {
                 mLoginProgressViews.forEach { it?.visibility = View.VISIBLE }
             }
             // actual login
-            user?.let { JMusicBot.authorize(it, AppSettings.savedToken) }
-            AppSettings.savedToken = JMusicBot.authToken.toString()
+            user?.let {
+                AppSettings.savedToken = JMusicBot.authorize(it, AppSettings.savedToken).toString()
+            }
             context?.toast(getString(R.string.msg_logged_in, JMusicBot.user!!.name))
             val mainActivity = activity as MainActivity
             mainActivity.continueWithBot()
